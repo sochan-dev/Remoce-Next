@@ -1,0 +1,6 @@
+@charset "UTF-8";
+@import './variables.scss';
+
+@mixin gradation($startColor, $endColor) {
+  background: linear-gradient($startColor, $endColor);
+}

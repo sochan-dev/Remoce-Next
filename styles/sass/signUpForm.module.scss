@@ -1,0 +1,9 @@
+@charset "UTF-8";
+@import './variables.scss';
+
+.root {
+  background-color: rgba(white, 0.5);
+  border-radius: 30px;
+  padding: 3rem;
+  box-shadow: 0 0 9px gray;
+}

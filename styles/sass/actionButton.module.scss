@@ -1,0 +1,14 @@
+@charset "UTF-8";
+@import './variables.scss';
+@import './componentWidth.scss';
+
+.root {
+  background-color: $color-accent;
+  border: solid 2px darken($color-accent, 15%);
+  margin: 0 auto;
+  &:hover {
+    background-color: lighten($color-accent, 15%);
+    border: solid 2px $color-focus;
+    font-weight: bold;
+  }
+}

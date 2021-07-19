@@ -1,0 +1,23 @@
+@charset "UTF-8";
+@import './variables.scss';
+@import './mixins.scss';
+.root {
+  //bodyの代わり
+  @include gradation($color-base, $color-base2);
+  //background-color: $color-base;
+  height: 100vh;
+  .main {
+    width: $width-base;
+    border: yellow solid 1px;
+    margin: 0 auto;
+    display: flex;
+  }
+  .contentArea {
+    width: 600px;
+    background-color: aqua;
+  }
+  .formContent {
+    width: 500px;
+    height: 400px;
+  }
+}
