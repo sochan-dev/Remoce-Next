@@ -10,13 +10,12 @@ import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
 /*/ ///////////////////////////////////////////////
 //stateの初期値
 interface authStatus {
-  userName: string
+  userId: string
   isLoading: boolean
   errorMessage: string
 }
 //signUp関数が受け取るuserの入力情報
 type inputUserInfo = {
-  userName: string
   email: string
   password: string
 }
@@ -25,7 +24,7 @@ type inputUserInfo = {
   stateの初期値
 /*/ ///////////////////////////////////////////////
 const initialState: authStatus = {
-  userName: '',
+  userId: '',
   isLoading: false,
   errorMessage: ''
 }
@@ -33,28 +32,44 @@ const initialState: authStatus = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-//サインアップとユーザー情報の登録
-export const signUp = createAsyncThunk<{ userName: string }, inputUserInfo>(
+//サインアップ
+export const signUp = createAsyncThunk<{ userId: string }, inputUserInfo>(
   'authStatus/signUp',
   async (registUserInfo) => {
-    console.log('発火')
-    const { userName, email, password } = registUserInfo
+    const { email, password } = registUserInfo
     try {
       const res = await auth.createUserWithEmailAndPassword(email, password)
-      const userId = res.user.uid
-      const userInfo: {
-        user_name: string
-        registration_date: firebaseTimeStamp
-      } = {
-        user_name: userName,
-        registration_date: serverTimeStamp() as firebaseTimeStamp
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          console.log('認証成功ー[signUp]')
+        } else {
+          console.log('認証失敗ー[signUp]')
+        }
+      })
+      const userInfo = {
+        userId: res.user.uid
       }
-      const ures = await db.collection('users').doc(userId).set(userInfo)
-      console.log('testestestes', ures)
-      return { userName: userInfo.user_name }
+      return userInfo
     } catch (e) {
       return Promise.reject(e.message)
     }
+  }
+)
+//自動認証
+export const authentication = createAsyncThunk<string | false>(
+  'authStatus/authentication',
+  async () => {
+    let uid: string
+    await auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log('認証成功ー[authentication]')
+      } else {
+        console.log('認証失敗ー[authentication]')
+      }
+      console.log('user', user, 'uid', user.uid)
+      uid = user.uid
+    })
+    return uid ? uid : false
   }
 )
 
@@ -70,12 +85,37 @@ export const authStatusSlice = createSlice({
   extraReducers: (builder) => {
     //signUp関数
     builder
-      .addCase(signUp.pending, (state, action) => {})
+      .addCase(signUp.pending, (state, action) => {
+        state.isLoading = true
+      })
       .addCase(signUp.fulfilled, (state, action) => {
-        state.userName = action.payload.userName
+        state.userId = action.payload.userId
+        state.isLoading = false
+        Router.push(`/home/${state.userId}`)
       })
       .addCase(signUp.rejected, (state, action) => {
         state.errorMessage = action.error.message
+        state.isLoading = false
+      })
+
+    builder
+      .addCase(authentication.pending, (state, action) => {
+        state.isLoading = true
+      })
+      .addCase(authentication.fulfilled, (state, action) => {
+        console.log('payload', action.payload)
+        if (action.payload) {
+          state.userId = action.payload
+          state.isLoading = false
+        } else {
+          console.log('通過')
+          state.isLoading = false
+          Router.push('/')
+        }
+      })
+      .addCase(authentication.rejected, (state, action) => {
+        state.errorMessage = action.error.message
+        state.isLoading = false
       })
   }
 })

@@ -1,7 +1,31 @@
-import React from 'react'
+import { NextPage, InferGetStaticPropsType } from 'next'
+import Router from 'next/router'
+import React, { useEffect } from 'react'
+import { auth } from '../../firebase'
+import { SignUpOrSignInForm } from '../components/templates'
 
-const Home: React.FC = () => {
-  return <></>
+type props = InferGetStaticPropsType<typeof getStaticProps>
+
+export const getStaticProps = async () => {
+  return {
+    props: {},
+    revalidate: 30
+  }
 }
 
-export default Home
+const SignUp: NextPage<props> = () => {
+  useEffect(() => {
+    console.log('認証')
+    auth.onAuthStateChanged((user) => {
+      user && Router.push(`/home/${user.uid}`)
+    })
+  }, [])
+
+  return (
+    <>
+      <SignUpOrSignInForm />
+    </>
+  )
+}
+
+export default SignUp

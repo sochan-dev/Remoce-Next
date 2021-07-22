@@ -1,0 +1,63 @@
+[] == collection or subCollection
+{} == documents
+() == array or map
+
+offices「office_id」:[
+    {
+        office_id,
+        office_name,
+        office_rule,
+        office_picture,
+        attendance_time,
+        leave_time,
+        break_start_time,
+	    break_start_end,
+        obligation_microphone,
+        obligation_video,
+        is_shuffle,
+        layouts「layout_id」:[
+            {
+                layout_id,
+                furniture_type,
+                author_id(employee_id),
+                is_close,
+                furniture_name,
+                furniture_detail,
+                furniture_size,
+                furniture_color,
+                furniture_width,
+                furniture_height,
+                furniture_x_coordinate,
+                furniture_y_coordinate,
+                access_Rights:(
+                    ...employee_id
+                )
+            },
+            ...
+        ],
+        employees「employee_id」:[
+            {
+                employee_id,
+                employee_name,
+                employee_icon,
+                self_introduction,
+                is_unavailable,
+                message,
+                employee_x_coordinate,
+                employee_y_coordinate
+            },
+            ...
+        ]
+    },
+    ...
+]
+
+
+users「user_id」:[
+    employee_to_office:(
+        employee_id,
+        employee_name,
+        office_id,
+    )
+
+]

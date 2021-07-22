@@ -1,10 +1,6 @@
 @charset "UTF-8";
 @import './variables.scss';
-@import './mixins.scss';
 .root {
-  //bodyの代わり
-  @include gradation($color-base, $color-base2);
-  //background-color: $color-base;
   height: 100vh;
   .main {
     width: $width-base;
@@ -13,11 +9,10 @@
     display: flex;
   }
   .contentArea {
-    width: 600px;
+    width: 700px;
     background-color: aqua;
   }
-  .formContent {
-    width: 500px;
-    height: 400px;
+  .formArea {
+    width: 400px;
   }
 }

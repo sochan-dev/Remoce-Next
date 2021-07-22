@@ -1,0 +1,22 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  height: 100vh;
+  .main {
+    border: yellow solid 1px;
+    margin: 0 auto;
+    display: flex;
+  }
+  .menuArea {
+    height: 100%;
+    width: 30%;
+    background-color: orange;
+    padding: 20px;
+  }
+  .contentArea {
+    height: 100%;
+    width: 70%;
+    background-color: aqua;
+    padding: 20px;
+  }
+}
