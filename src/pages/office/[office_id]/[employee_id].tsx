@@ -26,7 +26,7 @@ export const getStaticProps = async ({ params }) => {
       isSuccess = true
     })
     .catch((e) => {
-      console.log('失敗', e)
+      console.log('失敗j', e)
       isSuccess = false
     })
 
