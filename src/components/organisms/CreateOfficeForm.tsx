@@ -1,4 +1,4 @@
-import Router from 'next/router'
+import Router, { useRouter } from 'next/router'
 import React, { VFC, useState, ChangeEvent } from 'react'
 import { useSelector } from 'react-redux'
 import { getAuthStatus } from '../../stores/slices/authStatusSlice'
@@ -7,6 +7,7 @@ import Blanks from '../../../styles/sass/blanks.module.scss'
 import { db } from '../../../firebase'
 
 const CreateOfficeHome: VFC = () => {
+  const router = useRouter()
   const { userId, isLoading } = useSelector(getAuthStatus)
   const [officeName, setOfficeName] = useState('')
   const [employeeName, setEmployeeName] = useState('')
@@ -20,23 +21,30 @@ const CreateOfficeHome: VFC = () => {
   }
 
   const createOffice = async () => {
+    if (officeName == '' || employeeName == '') return
+
     let officeId: string, employeeId: string
     await db
       .collection('offices')
       .add({
         office_name: officeName
       })
-      .then((doc) => {
-        const officeId = doc.id
-        db.collection('offices')
+      .then(async (doc) => {
+        officeId = doc.id
+        await db
+          .collection('offices')
           .doc(officeId)
           .collection('employees')
           .add({
-            employee_name: employeeName
+            employee_name: employeeName,
+            employee_x_coordinate: 20,
+            employee_y_coordinate: 20
           })
-          .then((doc) => {
-            const employeeId = doc.id
-            db.collection('users')
+          .then(async (doc) => {
+            console.log('doc->', doc, 'doc.id->', doc.id)
+            employeeId = doc.id
+            await db
+              .collection('users')
               .doc(userId)
               .collection('employee_to_office')
               .doc(employeeId)
@@ -47,8 +55,9 @@ const CreateOfficeHome: VFC = () => {
               })
           })
       })
-
-    Router.push(`office/${officeId}/${employeeId}`)
+    console.log(router, Router)
+    router.push(`/office/${officeId}/${employeeId}`)
+    //``
   }
 
   return (

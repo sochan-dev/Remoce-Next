@@ -2,7 +2,7 @@ import { NextPage, InferGetStaticPropsType } from 'next'
 import Router from 'next/router'
 import React, { useEffect } from 'react'
 import { auth } from '../../firebase'
-import { SignUpOrSignInForm } from '../components/templates'
+import { SignUpTemplate } from '../components/templates'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -23,7 +23,7 @@ const SignUp: NextPage<props> = () => {
 
   return (
     <>
-      <SignUpOrSignInForm />
+      <SignUpTemplate />
     </>
   )
 }

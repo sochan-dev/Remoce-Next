@@ -1,7 +1,7 @@
 import React, { VFC } from 'react'
 import { SignUpForm, SignInForm } from '../organisms'
 import Styles from '../../../styles/sass/signForm.module.scss'
-const SignUpOrSignInForm: VFC = () => {
+const SignUpTemplate: VFC = () => {
   return (
     <main className={Styles.root}>
       <div className={Styles.main}>
@@ -14,4 +14,4 @@ const SignUpOrSignInForm: VFC = () => {
   )
 }
 
-export default SignUpOrSignInForm
+export default SignUpTemplate

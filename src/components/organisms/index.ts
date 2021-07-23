@@ -1,3 +1,5 @@
 export { default as SignUpForm } from './SignUpForm'
 export { default as SignInForm } from './SignInForm'
 export { default as CreateOfficeForm } from './CreateOfficeForm'
+export { default as ShowOfficeArea } from './ShowOfficeArea'
+export { default as ShowEmployeesArea } from './ShowEmployeesArea'

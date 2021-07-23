@@ -1,8 +1,7 @@
-import Router from 'next/router'
+import Router, { useRouter } from 'next/router'
 import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AppDispatch, AppThunk, RootState } from '..'
-import axios, { AxiosResponse } from 'axios'
 import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
 
 /*////////////////////////////////////////////////
@@ -39,13 +38,7 @@ export const signUp = createAsyncThunk<{ userId: string }, inputUserInfo>(
     const { email, password } = registUserInfo
     try {
       const res = await auth.createUserWithEmailAndPassword(email, password)
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          console.log('認証成功ー[signUp]')
-        } else {
-          console.log('認証失敗ー[signUp]')
-        }
-      })
+
       const userInfo = {
         userId: res.user.uid
       }
@@ -59,17 +52,13 @@ export const signUp = createAsyncThunk<{ userId: string }, inputUserInfo>(
 export const authentication = createAsyncThunk<string | false>(
   'authStatus/authentication',
   async () => {
-    let uid: string
-    await auth.onAuthStateChanged((user) => {
-      if (user) {
-        console.log('認証成功ー[authentication]')
-      } else {
-        console.log('認証失敗ー[authentication]')
-      }
-      console.log('user', user, 'uid', user.uid)
-      uid = user.uid
-    })
-    return uid ? uid : false
+    return await (() => {
+      return new Promise<string | false>((resolve) => {
+        auth.onAuthStateChanged((user) => {
+          user ? resolve(user.uid) : resolve(false)
+        })
+      })
+    })()
   }
 )
 
@@ -108,7 +97,7 @@ export const authStatusSlice = createSlice({
           state.userId = action.payload
           state.isLoading = false
         } else {
-          console.log('通過')
+          console.log('認証失敗！！！')
           state.isLoading = false
           Router.push('/')
         }

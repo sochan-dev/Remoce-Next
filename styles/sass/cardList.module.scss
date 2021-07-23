@@ -1,0 +1,9 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  width: 100%;
+  border: black solid 1px;
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}

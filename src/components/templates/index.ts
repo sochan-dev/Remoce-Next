@@ -1,1 +1,3 @@
-export { default as SignUpOrSignInForm } from './SignUpOrSignInForm'
+export { default as SignUpTemplate } from './SignUpTemplate'
+export { default as HomeTemplate } from './HomeTemplate'
+export { default as OfficeTemplate } from './OfficeTemplate'
