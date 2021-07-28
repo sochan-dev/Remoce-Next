@@ -8,7 +8,8 @@ import { db } from '../../../firebase'
 
 const CreateOfficeHome: VFC = () => {
   const router = useRouter()
-  const { userId, isLoading } = useSelector(getAuthStatus)
+  const selector = useSelector((state) => state)
+  const { userId } = getAuthStatus(selector)
   const [officeName, setOfficeName] = useState('')
   const [employeeName, setEmployeeName] = useState('')
 
@@ -36,6 +37,7 @@ const CreateOfficeHome: VFC = () => {
           .doc(officeId)
           .collection('employees')
           .add({
+            is_office: false,
             employee_name: employeeName,
             employee_x_coordinate: 20,
             employee_y_coordinate: 20

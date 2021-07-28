@@ -1,9 +1,9 @@
 import React, { VFC, useState, ChangeEvent } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { InputText, ActionButton } from '../atoms'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 
-import { signUp } from '../../stores/slices/authStatusSlice'
+import { signIn, signUp } from '../../stores/slices/authStatusSlice'
 
 const SignUpForm: VFC = () => {
   const dispatch = useDispatch()
@@ -20,6 +20,10 @@ const SignUpForm: VFC = () => {
 
   const handleRegister = () => {
     dispatch(signUp({ email: email, password: password }))
+  }
+
+  const handleSignIn = () => {
+    dispatch(signIn({ email: email, password: password }))
   }
 
   return (
@@ -39,7 +43,9 @@ const SignUpForm: VFC = () => {
         onChange={inputPassword}
       />
       <div className={Blanks.blank_32} />
-      <ActionButton label={'登録'} onClick={handleRegister} />
+      <ActionButton label={'サインアップ'} onClick={handleRegister} />
+      <div className={Blanks.blank_16} />
+      <ActionButton label={'サインイン'} onClick={handleSignIn} />
     </>
   )
 }

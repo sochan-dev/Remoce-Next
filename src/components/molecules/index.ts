@@ -1,2 +1,3 @@
 export { default as BelongOfficeCard } from './BelongOfficeCard'
-export { default as EmployeeIcon } from './EmployeeIcon'
+export { default as CoworkerIcon } from './CoworkerIcon'
+export { default as InviteCard } from './InviteCard'

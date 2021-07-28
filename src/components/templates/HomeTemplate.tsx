@@ -1,8 +1,12 @@
 import React, { VFC } from 'react'
 import Router from 'next/router'
-import { db, auth } from '../../../firebase'
+import { auth } from '../../../firebase'
 import Styles from '../../../styles/sass/Home.module.scss'
-import { CreateOfficeForm, ShowOfficeArea } from '../../components/organisms'
+import {
+  CreateOfficeForm,
+  ShowOfficeArea,
+  ShowInvitedOfficeArea
+} from '../../components/organisms'
 
 const HomeTemplate: VFC = () => {
   const logout = async () => {
@@ -17,6 +21,7 @@ const HomeTemplate: VFC = () => {
           <button onClick={logout}>ログアウト</button>
         </div>
         <div className={Styles.contentArea}>
+          <ShowInvitedOfficeArea />
           <ShowOfficeArea />
           <CreateOfficeForm />
         </div>

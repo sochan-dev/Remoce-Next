@@ -38,6 +38,7 @@ offices「office_id」:[
         employees「employee_id」:[
             {
                 employee_id,
+                is_office,
                 employee_name,
                 employee_icon,
                 self_introduction,
@@ -54,10 +55,15 @@ offices「office_id」:[
 
 
 users「user_id」:[
-    employee_to_office:(
-        employee_id,
-        employee_name,
-        office_id,
+    employee_to_office:[
+        {
+            employee_id,
+            employee_name,
+            office_id,
+        }
+        ...
+    ],
+    invited_office(
+        office_id
     )
-
 ]

@@ -3,6 +3,7 @@ import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AppDispatch, AppThunk, RootState } from '..'
 import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
   型宣言
@@ -38,6 +39,25 @@ export const signUp = createAsyncThunk<{ userId: string }, inputUserInfo>(
     const { email, password } = registUserInfo
     try {
       const res = await auth.createUserWithEmailAndPassword(email, password)
+      const uid = res.user.uid
+      await db.collection('users').doc(uid).set({})
+
+      const userInfo = {
+        userId: uid
+      }
+      return userInfo
+    } catch (e) {
+      return Promise.reject(e.message)
+    }
+  }
+)
+//サインイン
+export const signIn = createAsyncThunk<{ userId: string }, inputUserInfo>(
+  'authStatus/signIn',
+  async (registUserInfo) => {
+    const { email, password } = registUserInfo
+    try {
+      const res = await auth.signInWithEmailAndPassword(email, password)
 
       const userInfo = {
         userId: res.user.uid
@@ -48,6 +68,7 @@ export const signUp = createAsyncThunk<{ userId: string }, inputUserInfo>(
     }
   }
 )
+
 //自動認証
 export const authentication = createAsyncThunk<string | false>(
   'authStatus/authentication',
@@ -88,6 +109,20 @@ export const authStatusSlice = createSlice({
       })
 
     builder
+      .addCase(signIn.pending, (state, action) => {
+        state.isLoading = true
+      })
+      .addCase(signIn.fulfilled, (state, action) => {
+        state.userId = action.payload.userId
+        state.isLoading = false
+        Router.push(`/home/${state.userId}`)
+      })
+      .addCase(signIn.rejected, (state, action) => {
+        state.errorMessage = action.error.message
+        state.isLoading = false
+      })
+
+    builder
       .addCase(authentication.pending, (state, action) => {
         state.isLoading = true
       })
@@ -116,7 +151,12 @@ export const authStatusSlice = createSlice({
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const getAuthStatus = (state: RootState): authStatus => state.authStatus
+export const authStatusSelector = (state): authStatus => state.authStatus
+
+export const getAuthStatus = createSelector(
+  authStatusSelector,
+  (state) => state
+)
 
 //エクスポート
 export default authStatusSlice.reducer

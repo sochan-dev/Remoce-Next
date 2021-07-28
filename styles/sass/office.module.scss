@@ -1,0 +1,16 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  border: blue 1px solid;
+  .inviteTest {
+    height: 10vh;
+    display: flex;
+    border: green 1px solid;
+  }
+  .showEmployeesArea {
+    position: relative;
+    height: 80vh;
+    border: red 1px solid;
+    background-color: bisque;
+  }
+}

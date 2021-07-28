@@ -3,12 +3,14 @@ import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AppDispatch, AppThunk, RootState } from '..'
 import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
 export interface EmployeesStatus {
+  yourId: string
   employees: {
     employeeId: string
     employeeName: string
@@ -16,12 +18,23 @@ export interface EmployeesStatus {
     yCoordinate: number
   }[]
 }
+
+type Employee = {
+  id: number
+  employeeData: {
+    employeeId: string
+    employeeName: string
+    xCoordinate: number
+    yCoordinate: number
+  }
+}
 //signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
   stateの初期値
 /*/ ///////////////////////////////////////////////
 const initialState: EmployeesStatus = {
+  yourId: '',
   employees: []
 }
 
@@ -45,8 +58,23 @@ export const employeesStatusSlice = createSlice({
   initialState,
   //reducer
   reducers: {
-    fetchEmployees: (state, action: PayloadAction<EmployeesStatus>) => {
+    fetchEmployeesStatus: (state, action: PayloadAction<EmployeesStatus>) => {
+      state.yourId = action.payload.yourId
       state.employees = action.payload.employees
+    },
+    fetchEmployees: (
+      state,
+      action: PayloadAction<EmployeesStatus['employees']>
+    ) => {
+      console.log('paypay', action.payload)
+      state.employees = action.payload
+    },
+    updateEmployee: (state, action: PayloadAction<Employee>) => {
+      state.employees[action.payload.id] = action.payload.employeeData
+    },
+    addEmployee: (state, action: PayloadAction<Employee['employeeData']>) => {
+      console.log('store側', action.payload)
+      state.employees.push(action.payload)
     }
   },
   //AsyncThunkを扱うreducer
@@ -61,13 +89,27 @@ export const employeesStatusSlice = createSlice({
 /*////////////////////////////////////////////////
   Actions
 /*/ ///////////////////////////////////////////////
-export const { fetchEmployees } = employeesStatusSlice.actions
+export const {
+  fetchEmployeesStatus,
+  fetchEmployees,
+  updateEmployee,
+  addEmployee
+} = employeesStatusSlice.actions
 
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const getEmployees = (state: RootState): EmployeesStatus['employees'] =>
-  state.employeesStatus.employees
+export const EmployeesStatusSelector = (state): EmployeesStatus =>
+  state.employeesStatus
 
+export const getEmployees = createSelector(
+  EmployeesStatusSelector,
+  (state) => state
+)
+
+export const getEmployeeId = createSelector(
+  EmployeesStatusSelector,
+  (state) => state.yourId
+)
 //エクスポート
 export default employeesStatusSlice.reducer

@@ -1,18 +1,21 @@
-import React, { VFC, useContext } from 'react'
-import { BelongOfficeListContext } from '../../pages/home/[user_id]'
+import React, { VFC, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { BelongOfficeCard } from '../molecules'
+import { getWorkPlace } from '../../stores/slices/workPlacesSlice'
 import Styles from '../../../styles/sass/cardList.module.scss'
 
 const ShowOfficeArea: VFC = () => {
-  const belongOfficeList = useContext(BelongOfficeListContext)
+  const selector = useSelector((state) => state)
+  const workPlaces = getWorkPlace(selector)
+
   return (
     <div className={Styles.root}>
-      {belongOfficeList.map((data, i) => (
+      {workPlaces.map((data, i) => (
         <BelongOfficeCard
-          office_id={data.office_id}
-          office_name={data.office_name}
-          employee_id={data.employee_id}
-          employee_name={data.employee_name}
+          officeId={data.officeId}
+          officeName={data.officeName}
+          employeeId={data.employeeId}
+          employeeName={data.employeeName}
           key={i}
         />
       ))}

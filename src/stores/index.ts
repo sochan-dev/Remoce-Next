@@ -2,11 +2,17 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import authStatusReducer from './slices/authStatusSlice'
 import loadingStatusReducer from './slices/loadingStatusSlice'
 import employeesStatusReducer from './slices/employeesStatusSlice'
+import officeStatusReducer from './slices/officeStatusSlice'
+import workPlacesReducer from './slices/workPlacesSlice'
+import notificationsReducer from './slices/notificationsSlice'
 export const store = configureStore({
   reducer: {
     authStatus: authStatusReducer,
     loadingStatus: loadingStatusReducer,
-    employeesStatus: employeesStatusReducer
+    employeesStatus: employeesStatusReducer,
+    officeStatus: officeStatusReducer,
+    workPlaces: workPlacesReducer,
+    notifications: notificationsReducer
   }
 })
 

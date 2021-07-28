@@ -1,25 +1,31 @@
 import { NextPage, InferGetStaticPropsType, GetStaticPaths } from 'next'
-import Router from 'next/router'
-import React, { useEffect, createContext } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { HomeTemplate } from '../../components/templates'
 import { sdb } from '../../../ServerSideApp'
+import { db } from '../../../firebase'
 import { authentication } from '../../stores/slices/authStatusSlice'
+import { fetchWorkPlaces } from '../../stores/slices/workPlacesSlice'
+import { fetchInvites } from '../../stores/slices/notificationsSlice'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeDataList = {
-  employee_id: string
-  employee_name: string
-  office_id: string
-  office_name: string
-  office_picture?: string | false
+  employeeId: string
+  employeeName: string
+  officeId: string
+  officeName: string
+  officePicture?: string | false
 }[]
 type employeeData = {
   employee_id: string
   employee_name: string
   office_id: string
 }
-
+type InvitedOfficeList = {
+  officeId: string
+  officeName: string
+  officePicture?: string | false
+}[]
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
@@ -29,7 +35,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps = async ({ params }) => {
   const uid = params.user_id
-  const sendData: OfficeDataList = []
+  const belongOfficeList: OfficeDataList = []
+  const invitedOfficeList: InvitedOfficeList = []
   let errFlg = false
   await sdb
     .collection('users')
@@ -37,30 +44,66 @@ export const getStaticProps = async ({ params }) => {
     .collection('employee_to_office')
     .get()
     .then(async (snapshot) => {
-      for await (let childSnapshot of snapshot.docs) {
-        const employee = childSnapshot.data() as employeeData
-        await sdb
-          .collection('offices')
-          .doc(employee.office_id)
-          .get()
-          .then((snapshot) => {
-            sendData.push({
-              ...employee,
-              office_name: snapshot.data().office_name,
-              office_picture: snapshot.data().office_picture
-                ? snapshot.data().office_picture
-                : false
+      if (!snapshot.empty) {
+        console.log('---------------not empty')
+        for await (let childSnapshot of snapshot.docs) {
+          const employee = childSnapshot.data() as employeeData
+          await sdb
+            .collection('offices')
+            .doc(employee.office_id)
+            .get()
+            .then((snapshot) => {
+              belongOfficeList.push({
+                employeeId: employee.employee_id,
+                employeeName: employee.employee_name,
+                officeId: employee.office_id,
+                officeName: snapshot.data().office_name,
+                officePicture: snapshot.data().office_picture
+                  ? snapshot.data().office_picture
+                  : false
+              })
             })
-          })
+        }
       }
     })
-    .catch((e) => {})
+
+    .catch((e) => {
+      errFlg = true
+    })
+
+  //
+
+  await sdb
+    .collection('users')
+    .doc(uid)
+    .get()
+    .then(async (snapshot) => {
+      if (Object.keys(snapshot.data()).length !== 0) {
+        console.log('--------------------exist')
+        for await (let officeId of snapshot.data().invited_office) {
+          await sdb
+            .collection('offices')
+            .doc(officeId)
+            .get()
+            .then((officeData) => {
+              invitedOfficeList.push({
+                officeId: officeId,
+                officeName: officeData.data().office_name
+              })
+            })
+        }
+      }
+    })
 
   //ストレージからオフィスの画像を取得する処理ここに挟む
   if (!errFlg) {
     return {
-      props: { uid: uid, data: sendData },
-      revalidate: 1
+      props: {
+        uid: uid,
+        belongOfficeList: belongOfficeList,
+        invitedOfficeList: invitedOfficeList
+      },
+      revalidate: 600
     }
   } else {
     return {
@@ -72,21 +115,22 @@ export const getStaticProps = async ({ params }) => {
   }
 }
 
-export const BelongOfficeListContext = createContext<OfficeDataList>([])
-
 const HomePage: NextPage<props> = (props) => {
   const dispatch = useDispatch()
-  const uid = props.uid
-  const belongOfficeList = props.data
+  const { belongOfficeList, invitedOfficeList } = props
+
+  useEffect(() => {
+    dispatch(fetchWorkPlaces(belongOfficeList))
+    dispatch(fetchInvites(invitedOfficeList))
+  }, [])
+
   useEffect(() => {
     dispatch(authentication())
   }, [])
 
   return (
     <>
-      <BelongOfficeListContext.Provider value={belongOfficeList}>
-        <HomeTemplate />
-      </BelongOfficeListContext.Provider>
+      <HomeTemplate />
     </>
   )
 }
