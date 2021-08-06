@@ -1,18 +1,20 @@
 import React, { VFC, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { getEmployees } from '../../stores/slices/employeesStatusSlice'
+import { getEmployeesStatus } from '../../stores/slices/employeesStatusSlice'
 import {
   getOfficeId,
   getOfficeSize
 } from '../../stores/slices/officeStatusSlice'
+import { getRooms } from '../../stores/slices/roomsStatusSlice'
 import { CoworkerIcon } from '../molecules'
 import { MyIcon } from '../organisms'
+import { Room } from '../molecules'
 
 const ShowEmployeesArea: VFC = () => {
   console.log('ShowEmployeesArea再レンダリング')
-  const dispatch = useDispatch()
   const selector = useSelector((state) => state)
-  const { employees, yourId } = getEmployees(selector)
+  const { employees, yourId } = getEmployeesStatus(selector)
+  const rooms = getRooms(selector)
   const officeId = getOfficeId(selector)
   const officeSize = getOfficeSize(selector)
 
@@ -24,7 +26,7 @@ const ShowEmployeesArea: VFC = () => {
             key={i}
             id={i}
             officeId={officeId}
-            employeeData={employee}
+            ownData={employee}
             officeSize={officeSize}
           />
         ) : (
@@ -32,11 +34,19 @@ const ShowEmployeesArea: VFC = () => {
             key={i}
             id={i}
             officeId={officeId}
-            employeeData={employee}
+            ownData={employee}
             officeSize={officeSize}
           />
         )
       )}
+      {rooms.map((room, i) => (
+        <Room
+          key={i}
+          roomId={room.roomId}
+          roomX={room.roomX}
+          roomY={room.roomY}
+        />
+      ))}
     </>
   )
 }

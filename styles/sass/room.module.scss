@@ -1,0 +1,22 @@
+@charset "UTF-8";
+@import './variables.scss';
+
+.root {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: gray;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  .centerMark {
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    background-color: aqua;
+    opacity: 0.5;
+    border-radius: 50%;
+  }
+}

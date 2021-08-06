@@ -67,3 +67,16 @@ users「user_id」:[
         office_id
     )
 ]
+
+
+
+rooms[
+    {
+        roomId,
+        roomX,
+        roomY,
+        joinEmployee(
+            employee_id
+        )
+    }
+]

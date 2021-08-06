@@ -1,15 +1,18 @@
 import React, { VFC, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { db } from '../../../firebase'
-import { getOfficeSize } from '../../stores/slices/officeStatusSlice'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
+import { getEmployees } from '../../stores/slices/employeesStatusSlice'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
+import { ICONSIZE, SENSORSIZE } from '../../utils/iconSize'
 import Styles from '../../../styles/sass/employeeIcon.module.scss'
+import { getRooms } from '../../stores/slices/roomsStatusSlice'
+import axios from 'axios'
 
 type props = {
   id: number
   officeId: string
-  employeeData: {
+  ownData: {
     employeeId: string
     employeeName: string
     xCoordinate: number
@@ -21,40 +24,261 @@ type props = {
   }
 }
 
+type OverlapEmployee = {
+  employeeId: string
+  halfwayPointX: number
+  halfwayPointY: number
+}
+
+type PostRequest = {
+  officeId: string
+  joinEmployees: string[]
+  roomX: number
+  roomY: number
+}
+
+type PutRequest = {
+  officeId: string
+  employeeId: string
+  overlapRoomIds: string[] | false
+}
+
 const MyIcon: VFC<props> = (props) => {
   console.log('MyIcon再レンダリング')
   const selector = useSelector((state) => state)
-  const { officeId, employeeData, officeSize } = props
+  const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/room'
+  const employees = getEmployees(selector)
+  const rooms = getRooms(selector)
+  const { officeId, ownData } = props
   const draggableRef = useRef(null)
   const initialCoordinate = {
-    left: employeeData.xCoordinate * Math.round(officeSize.officeWidth / 100),
-    top: employeeData.yCoordinate * Math.round(officeSize.officeHeight / 100)
+    left: ownData.xCoordinate,
+    top: ownData.yCoordinate
   }
 
   const handleOnStop = (_: DraggableEvent, data: DraggableData) => {
-    const xRatio = Math.round(
-      ((initialCoordinate.left + data.lastX) / officeSize.officeWidth) * 100
-    )
-    const yRatio = Math.round(
-      ((initialCoordinate.top + data.lastY) / officeSize.officeHeight) * 100
-    )
+    console.log('stop!!!!!!!')
+    const xCoordinate = initialCoordinate.left + data.lastX
+    const yCoordinate = initialCoordinate.top + data.lastY
 
+    //座標の更新
     db.collection('offices')
       .doc(officeId)
       .collection('employees')
-      .doc(employeeData.employeeId)
+      .doc(ownData.employeeId)
       .update({
-        employee_x_coordinate: xRatio,
-        employee_y_coordinate: yRatio
+        employee_x_coordinate: xCoordinate,
+        employee_y_coordinate: yCoordinate
       })
       .then(() => {
-        console.log('完了')
+        console.log('myicon完了')
       })
       .catch((e) => console.log('MyIcon座標更新失敗'))
+
+    //roomとの重なりの判定
+    const ownStartX = xCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
+    const ownStartY = yCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
+    const ownEndX = ownStartX + ICONSIZE
+    const ownEndY = ownStartY + ICONSIZE
+
+    rooms.forEach((room) => {
+      const roomStartX = room.roomX
+      const roomStartY = room.roomY
+      const roomEndX = roomStartX + SENSORSIZE + 20
+      const roomEndY = roomStartY + SENSORSIZE + 20
+
+      if (
+        ((ownStartX <= roomStartX && roomStartX <= ownEndX) ||
+          (roomEndX <= ownEndX && ownStartX <= roomEndX) ||
+          (roomStartX <= ownStartX && ownEndX <= roomEndX)) &&
+        ((ownStartY <= roomStartY && roomStartY <= ownEndY) ||
+          (roomEndY <= ownEndY && ownStartY <= roomEndY) ||
+          (roomStartY <= ownStartY && ownEndY <= roomEndY))
+      ) {
+        console.log('roomと重なった！！')
+      }
+    })
+
+    //roomとは重なっていないので、他ユーザーとの重なりの判定
+    const sensorStartX = xCoordinate
+    const sensorStartY = yCoordinate
+    const sensorEndX = sensorStartX + SENSORSIZE
+    const sensorEndY = sensorStartY + SENSORSIZE
+    employees.forEach((employee) => {
+      if (ownData.employeeId !== employee.employeeId) {
+        const employeeStartX = employee.xCoordinate
+        const employeeStartY = employee.yCoordinate
+        const employeeEndX = employeeStartX + SENSORSIZE
+        const employeeEndY = employeeStartY + SENSORSIZE
+
+        if (
+          ((sensorStartX <= employeeStartX && employeeStartX <= sensorEndX) ||
+            (sensorStartX <= employeeEndX && employeeEndX <= sensorEndX)) &&
+          ((sensorStartY <= employeeStartY && employeeStartY <= sensorEndY) ||
+            (sensorStartY <= employeeEndY && employeeEndY <= sensorEndY))
+        ) {
+          console.log('employeeと重なった')
+          const halfwayPointX = Math.round((sensorStartX + employeeStartX) / 2)
+          const halfwayPointY = Math.round((sensorStartY + employeeStartY) / 2)
+        }
+      }
+    })
+  }
+  ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
+  /********************　座標の更新　****************** */
+  const fsUpdateCoordinate = async (
+    xCoordinate: number,
+    yCoordinate: number
+  ): Promise<boolean> => {
+    let isSuccess: boolean
+    await db
+      .collection('offices')
+      .doc(officeId)
+      .collection('employees')
+      .doc(ownData.employeeId)
+      .update({
+        employee_x_coordinate: xCoordinate,
+        employee_y_coordinate: yCoordinate
+      })
+      .then(() => {
+        isSuccess = true
+      })
+      .catch(() => {
+        isSuccess = false
+      })
+    return isSuccess
   }
 
+  /********************　roomとの重なりを判定　****************** */
+  const judgeOverlapRoom = (
+    xCoordinate: number,
+    yCoordinate: number
+  ): string[] => {
+    let overlapRoomIds: string[] = []
+    const ownStartX = xCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
+    const ownStartY = yCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
+    const ownEndX = ownStartX + ICONSIZE
+    const ownEndY = ownStartY + ICONSIZE
+
+    rooms.forEach((room) => {
+      const roomStartX = room.roomX
+      const roomStartY = room.roomY
+      const roomEndX = roomStartX + SENSORSIZE + 20
+      const roomEndY = roomStartY + SENSORSIZE + 20
+
+      if (
+        ((ownStartX <= roomStartX && roomStartX <= ownEndX) ||
+          (roomEndX <= ownEndX && ownStartX <= roomEndX) ||
+          (roomStartX <= ownStartX && ownEndX <= roomEndX)) &&
+        ((ownStartY <= roomStartY && roomStartY <= ownEndY) ||
+          (roomEndY <= ownEndY && ownStartY <= roomEndY) ||
+          (roomStartY <= ownStartY && ownEndY <= roomEndY))
+      ) {
+        overlapRoomIds.push(room.roomId)
+      }
+    })
+    return overlapRoomIds
+  }
+
+  /********************　employeeとの重なりを判定　****************** */
+  const judgeOverLapEmployee = (
+    xCoordinate: number,
+    yCoordinate: number
+  ): OverlapEmployee[] | false => {
+    let overlapEmployees: OverlapEmployee[] = []
+    const sensorStartX = xCoordinate
+    const sensorStartY = yCoordinate
+    const sensorEndX = sensorStartX + SENSORSIZE
+    const sensorEndY = sensorStartY + SENSORSIZE
+    employees.forEach((employee) => {
+      if (ownData.employeeId !== employee.employeeId) {
+        const employeeStartX = employee.xCoordinate
+        const employeeStartY = employee.yCoordinate
+        const employeeEndX = employeeStartX + SENSORSIZE
+        const employeeEndY = employeeStartY + SENSORSIZE
+
+        if (
+          ((sensorStartX <= employeeStartX && employeeStartX <= sensorEndX) ||
+            (sensorStartX <= employeeEndX && employeeEndX <= sensorEndX)) &&
+          ((sensorStartY <= employeeStartY && employeeStartY <= sensorEndY) ||
+            (sensorStartY <= employeeEndY && employeeEndY <= sensorEndY))
+        ) {
+          console.log('employeeと重なった')
+          const halfwayPointX = Math.round((sensorStartX + employeeStartX) / 2)
+          const halfwayPointY = Math.round((sensorStartY + employeeStartY) / 2)
+          const overlapEmployee: OverlapEmployee = {
+            employeeId: employee.employeeId,
+            halfwayPointX: halfwayPointX,
+            halfwayPointY: halfwayPointY
+          }
+          overlapEmployees.push(overlapEmployee)
+        }
+      }
+    })
+    return overlapEmployees.length > 0 ? overlapEmployees : false
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  const handleStop = (_: DraggableEvent, data: DraggableData) => {
+    const xCoordinate = initialCoordinate.left + data.lastX //自身のX座標
+    const yCoordinate = initialCoordinate.top + data.lastY //自身のY座標
+
+    fsUpdateCoordinate(xCoordinate, yCoordinate) //座標の更新
+    const overlapRoomIds = judgeOverlapRoom(xCoordinate, yCoordinate) //自身と重なってるroomのidを一括取得
+    console.log('overlapRoomids', overlapRoomIds)
+
+    if (overlapRoomIds.length === 0) {
+      //どのroomとも重なっていない
+      const overlapEmployees = judgeOverLapEmployee(xCoordinate, yCoordinate) //自身と重なっているemployeeを一括取得
+      if (overlapEmployees) {
+        //重なっているemployeeがいる
+
+        for (let overlapEmployee of overlapEmployees) {
+          //重なっている人数分room作成のリクエストする。
+          const req: PostRequest = {
+            officeId: officeId,
+            joinEmployees: [ownData.employeeId, overlapEmployee.employeeId],
+            roomX: overlapEmployee.halfwayPointX,
+            roomY: overlapEmployee.halfwayPointY
+          }
+          const reqJSON = JSON.stringify(req)
+          let params = new URLSearchParams()
+          params.append('data', reqJSON)
+          axios.post(URL, params)
+        }
+      } else {
+        //重なっているemployeeがいないのでroom情報のみ更新
+        const req: PutRequest = {
+          officeId: officeId,
+          employeeId: ownData.employeeId,
+          overlapRoomIds: false
+        }
+        const reqJSON = JSON.stringify(req)
+        let params = new URLSearchParams()
+        params.append('data', reqJSON)
+        axios.put(URL, params).then((res) => {
+          const d = res.data
+          console.log(d)
+        })
+      }
+    } else {
+      //roomと重なっているので、重なったroom情報に自分のIDを追加
+      const req: PutRequest = {
+        officeId: officeId,
+        employeeId: ownData.employeeId,
+        overlapRoomIds: overlapRoomIds
+      }
+      const reqJSON = JSON.stringify(req)
+      let params = new URLSearchParams()
+      params.append('data', reqJSON)
+      axios.put(URL, params)
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   return (
-    <Draggable nodeRef={draggableRef} onStop={handleOnStop} bounds="parent">
+    <Draggable nodeRef={draggableRef} onStop={handleStop} bounds="parent">
       <div ref={draggableRef} className={Styles.mine} style={initialCoordinate}>
         <AccountCircleIcon className={Styles.icon} />
       </div>
@@ -63,33 +287,33 @@ const MyIcon: VFC<props> = (props) => {
 }
 
 export default MyIcon
-/**
- *
- * <Draggable
-      position={{
-        x: currentPosition.xCoordinate,
-        y: currentPosition.yCoordinate
-      }}
-      onDrag={handleOnDrag}
-    >
-      <div className={Styles.mine}></div>
-    </Draggable>
- */
 
-/*const [initialCoordinate, setInitialCoordinate] = useState({
-    top: 0,
-    left: 0
-  })
-  const [parentWidth, setParentWidth] = useState(0)
-  const [parentHeight, setParentHeight] = useState(0)*/
+/*/////////%で座標を計算する場合。
+const xRatio = Math.round(
+  left: employeeData.xCoordinate * Math.round(officeSize.officeWidth / 100),
+  top: employeeData.yCoordinate * Math.round(officeSize.officeHeight / 100)
+/*
+((initialCoordinate.left + data.lastX) / officeSize.officeWidth) * 100)
+const yRatio = Math.round(
+  ((initialCoordinate.top + data.lastY) / officeSize.officeHeight) * 100
+)
+*/
 
-/*useEffect(() => {
-    setParentWidth(draggableRef.current.parentNode.clientWidth)
-    setParentHeight(draggableRef.current.parentNode.clientHeight)
-  }, [])
-  useEffect(() => {
-    setInitialCoordinate({
-      left: employeeData.xCoordinate * Math.round(officeSize.officeWidth / 100),
-      top: employeeData.yCoordinate * Math.round(officeSize.officeHeight / 100)
-    })
-  }, [parentWidth, parentHeight])*/
+/*/////////Roomとアイコンの座標比較用。
+console.log(
+      `ownStartX:${ownStartX},ownStartY:${ownStartY},ownEndX:${ownEndX},ownEndY:${ownEndY}`
+    )
+console.log(
+  `roomStartX:${roomStartX},roomStartY:${roomStartY},roomEndX:${roomEndX},roomEndY:${roomEndY}`
+)
+*/
+
+/*/////////検知エリアとemployeeとその中間の座標比較用。
+console.log('ーーーーーーーーーー重なったーーーーーーーー')
+console.log(`自分X：${sensorStartX}　自分Y：${sensorStartY}`)
+console.log(`相手X：${employeeStartX}　相手Y：${employeeStartY}`)
+console.log(`中間X：${halfwayPointX}　中間Y：${halfwayPointY}`)
+*/
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////

@@ -8,7 +8,7 @@ import Styles from '../../../styles/sass/employeeIcon.module.scss'
 type props = {
   id: number
   officeId: string
-  employeeData: {
+  ownData: {
     employeeId: string
     employeeName: string
     xCoordinate: number
@@ -36,10 +36,10 @@ type EmployeeData = {
 
 const CoworkerIcon: VFC<props> = (props) => {
   const dispatch = useDispatch()
-  const { id, officeId, employeeData, officeSize } = props
+  const { id, officeId, ownData } = props
   const initialCoordinate = {
-    left: employeeData.xCoordinate * Math.round(officeSize.officeWidth / 100),
-    top: employeeData.yCoordinate * Math.round(officeSize.officeHeight / 100)
+    left: ownData.xCoordinate,
+    top: ownData.yCoordinate
   }
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const CoworkerIcon: VFC<props> = (props) => {
       .collection('offices')
       .doc(officeId)
       .collection('employees')
-      .doc(employeeData.employeeId)
+      .doc(ownData.employeeId)
       .onSnapshot((doc) => {
         console.log('発火してる')
         const employee = doc.data() as Employee_data

@@ -1,15 +1,15 @@
 import { NextPage, InferGetStaticPropsType, GetStaticPaths } from 'next'
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { db } from '../../../../firebase'
+import { db, fieldValue } from '../../../../firebase'
 import { sdb } from '../../../../ServerSideApp'
 import { OfficeTemplate } from '../../../components/templates'
 import {
   fetchEmployeesStatus,
-  fetchEmployees,
-  addEmployee
+  fetchEmployees
 } from '../../../stores/slices/employeesStatusSlice'
 import { fetchOffice } from '../../../stores/slices/officeStatusSlice'
+import { fetchRooms } from '../../../stores/slices/roomsStatusSlice'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeData = {
@@ -20,6 +20,15 @@ type EmployeeData = {
   employee_name: string
   employee_x_coordinate: number
   employee_y_coordinate: number
+}
+
+type RoomsData = {
+  rooms: {
+    room_id: string
+    x_coordinate: number
+    y_coordinate: number
+    join_employees: string[]
+  }[]
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -35,6 +44,7 @@ export const getStaticProps = async ({ params }) => {
   let isSuccess: boolean
   let officeData: OfficeData
   let employeeList = []
+  let roomList = []
 
   await sdb
     .collection('offices')
@@ -78,13 +88,36 @@ export const getStaticProps = async ({ params }) => {
       isSuccess = false
     })
 
+  await sdb
+    .collection('offices')
+    .doc(officeId)
+    .collection('room')
+    .doc('room')
+    .get()
+    .then((snapshots) => {
+      const data = snapshots.data() as RoomsData
+      const roomData = data.rooms
+
+      roomData.forEach((room) => {
+        roomList.push({
+          roomId: room.room_id,
+          roomX: room.x_coordinate,
+          roomY: room.y_coordinate
+        })
+      })
+    })
+    .catch((e) => {
+      isSuccess = false
+    })
+
   if (isSuccess) {
     console.log('employeeList', employeeList)
     return {
       props: {
         officeData: { officeId: officeId, officeName: officeData.office_name },
         yourEmployeeId: employeeId,
-        employeeList: employeeList
+        employeeList: employeeList,
+        roomList: roomList
       },
       revalidate: 30
     }
@@ -100,7 +133,7 @@ export const getStaticProps = async ({ params }) => {
 
 const Office: NextPage<props> = (props) => {
   console.log('Office再レンダリング')
-  const { officeData, yourEmployeeId, employeeList } = props
+  const { officeData, yourEmployeeId, employeeList, roomList } = props
   console.log('officeData->', officeData, 'employeeList->', employeeList)
   const dispatch = useDispatch()
 
@@ -112,6 +145,7 @@ const Office: NextPage<props> = (props) => {
       })
     )
     dispatch(fetchOffice(officeData))
+    dispatch(fetchRooms(roomList))
 
     const leave = async () => {
       await db
@@ -162,35 +196,30 @@ const Office: NextPage<props> = (props) => {
     return unsubscribe
   }, [])
 
-  /*useEffect(() => {
+  useEffect(() => {
     const unsubscribe = db
       .collection('offices')
       .doc(officeData.officeId)
-      .collection('employees')
-      .onSnapshot(async (snapshots) => {
-        snapshots.docChanges().forEach((snapshot) => {
-          const em = snapshot.doc.data() as EmployeeData
-          console.log('type', snapshot.type)
-          if (snapshot.type === 'added') {
-            console.log('入社！！', em.employee_name)
-            dispatch(
-              addEmployee({
-                employeeId: em.employee_id,
-                employeeName: em.employee_name,
-                xCoordinate: em.employee_x_coordinate,
-                yCoordinate: em.employee_y_coordinate
-              })
-            )
+      .collection('room')
+      .doc('room')
+      .onSnapshot(async (snapshot) => {
+        console.log('room listener')
+        const rooms = snapshot.data().rooms as RoomsData['rooms']
+        const roomList = rooms.map((room) => {
+          return {
+            roomId: room.room_id,
+            roomX: room.x_coordinate,
+            roomY: room.y_coordinate,
+            joinEmployees: room.join_employees
           }
         })
+        dispatch(fetchRooms(roomList))
       })
-
     return unsubscribe
-  }, [])*/
+  }, [])
 
   return (
     <div>
-      <p>{`office_id:${officeData.officeId},あなたのemployee_id:${yourEmployeeId}`}</p>
       <OfficeTemplate />
     </div>
   )

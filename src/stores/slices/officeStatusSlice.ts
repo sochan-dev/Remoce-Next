@@ -15,6 +15,8 @@ export interface OfficeStatus {
   officeName: string
   officeWidth: number
   officeHeight: number
+  employeeWidthRatio: number
+  employeeHeightRatio: number
 }
 //signUp関数が受け取るuserの入力情報
 
@@ -25,7 +27,9 @@ const initialState: OfficeStatus = {
   officeId: '',
   officeName: '',
   officeWidth: 0,
-  officeHeight: 0
+  officeHeight: 0,
+  employeeWidthRatio: 0,
+  employeeHeightRatio: 0
 }
 
 type FetchOfficePayload = {
@@ -60,8 +64,14 @@ export const officeStatusSlice = createSlice({
       state.officeName = action.payload.officeName
     },
     fetchOfficeSize: (state, action: PayloadAction<FetchOfficeSizePayload>) => {
-      state.officeWidth = action.payload.officeWidth
-      state.officeHeight = action.payload.officeHeight
+      const officeWidth = action.payload.officeWidth
+      const officeHeight = action.payload.officeHeight
+      state.officeWidth = officeWidth
+      state.officeHeight = officeHeight
+      /*
+      state.employeeWidthRatio = Math.round((80 / officeWidth) * 100)
+      state.employeeHeightRatio = Math.round((80 / officeHeight) * 100)
+      */
     }
   },
   //AsyncThunkを扱うreducer

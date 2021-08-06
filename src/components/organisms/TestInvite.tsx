@@ -5,6 +5,14 @@ import { InputText, ActionButton } from '../atoms'
 import { db, fieldValue } from '../../../firebase'
 import { getOffice } from '../../stores/slices/officeStatusSlice'
 import { getEmployeeId } from '../../stores/slices/employeesStatusSlice'
+import transitions from '@material-ui/core/styles/transitions'
+
+type Room = {
+  room_id: string
+  x_coordinate: number
+  y_coordinate: number
+  join_employees: string[]
+}
 
 const TestInvite: VFC = () => {
   const router = useRouter()
@@ -28,14 +36,42 @@ const TestInvite: VFC = () => {
   }
 
   const handleLeave = async () => {
-    await db
-      .collection('offices')
-      .doc(officeId)
-      .collection('employees')
-      .doc(employeeId)
-      .update({
+    await db.runTransaction(async (transaction) => {
+      const employeeRef = db
+        .collection('offices')
+        .doc(officeId)
+        .collection('employees')
+        .doc(employeeId)
+      const roomRef = db
+        .collection('offices')
+        .doc(officeId)
+        .collection('room')
+        .doc('room')
+
+      let newRooms: Room[]
+
+      await transaction.get(roomRef).then(async (snapshot) => {
+        const rooms = snapshot.data() as Room[]
+        if (rooms) {
+          newRooms = rooms.map((room) => {
+            const newJoinEmployee = room.join_employees.filter((empId) => {
+              empId !== employeeId
+            })
+            return {
+              ...room,
+              join_employees: newJoinEmployee
+            }
+          })
+          transaction.update(roomRef, {
+            rooms: newRooms
+          })
+        }
+      })
+
+      transaction.update(employeeRef, {
         is_office: false
       })
+    })
     router.push(`/`)
   }
 

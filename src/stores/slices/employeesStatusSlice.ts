@@ -66,7 +66,6 @@ export const employeesStatusSlice = createSlice({
       state,
       action: PayloadAction<EmployeesStatus['employees']>
     ) => {
-      console.log('paypay', action.payload)
       state.employees = action.payload
     },
     updateEmployee: (state, action: PayloadAction<Employee>) => {
@@ -102,7 +101,7 @@ export const {
 export const EmployeesStatusSelector = (state): EmployeesStatus =>
   state.employeesStatus
 
-export const getEmployees = createSelector(
+export const getEmployeesStatus = createSelector(
   EmployeesStatusSelector,
   (state) => state
 )
@@ -110,6 +109,11 @@ export const getEmployees = createSelector(
 export const getEmployeeId = createSelector(
   EmployeesStatusSelector,
   (state) => state.yourId
+)
+
+export const getEmployees = createSelector(
+  EmployeesStatusSelector,
+  (state) => state.employees
 )
 //エクスポート
 export default employeesStatusSlice.reducer
