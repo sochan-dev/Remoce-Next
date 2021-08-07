@@ -5,7 +5,6 @@ import { InputText, ActionButton } from '../atoms'
 import { db, fieldValue } from '../../../firebase'
 import { getOffice } from '../../stores/slices/officeStatusSlice'
 import { getEmployeeId } from '../../stores/slices/employeesStatusSlice'
-import transitions from '@material-ui/core/styles/transitions'
 
 type Room = {
   room_id: string
@@ -53,18 +52,20 @@ const TestInvite: VFC = () => {
       await transaction.get(roomRef).then(async (snapshot) => {
         const rooms = snapshot.data() as Room[]
         if (rooms) {
-          newRooms = rooms.map((room) => {
-            const newJoinEmployee = room.join_employees.filter((empId) => {
-              empId !== employeeId
+          if (rooms.length > 0) {
+            newRooms = rooms.map((room) => {
+              const newJoinEmployee = room.join_employees.filter((empId) => {
+                empId !== employeeId
+              })
+              return {
+                ...room,
+                join_employees: newJoinEmployee
+              }
             })
-            return {
-              ...room,
-              join_employees: newJoinEmployee
-            }
-          })
-          transaction.update(roomRef, {
-            rooms: newRooms
-          })
+            transaction.update(roomRef, {
+              rooms: newRooms
+            })
+          }
         }
       })
 

@@ -10,6 +10,7 @@ import {
 } from '../../../stores/slices/employeesStatusSlice'
 import { fetchOffice } from '../../../stores/slices/officeStatusSlice'
 import { fetchRooms } from '../../../stores/slices/roomsStatusSlice'
+import useSFU from '../../../hooks/useSFU'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeData = {
