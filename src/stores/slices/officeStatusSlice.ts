@@ -24,7 +24,7 @@ export interface OfficeStatus {
   stateの初期値
 /*/ ///////////////////////////////////////////////
 const initialState: OfficeStatus = {
-  officeId: '',
+  officeId: 'intitla',
   officeName: '',
   officeWidth: 0,
   officeHeight: 0,

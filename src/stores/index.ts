@@ -6,6 +6,7 @@ import officeStatusReducer from './slices/officeStatusSlice'
 import workPlacesReducer from './slices/workPlacesSlice'
 import notificationsReducer from './slices/notificationsSlice'
 import roomsReducer from './slices/roomsStatusSlice'
+import newFurnitureReducer from './slices/newFurnitureSlice'
 export const store = configureStore({
   reducer: {
     authStatus: authStatusReducer,
@@ -14,7 +15,8 @@ export const store = configureStore({
     officeStatus: officeStatusReducer,
     workPlaces: workPlacesReducer,
     notifications: notificationsReducer,
-    roomsStatus: roomsReducer
+    roomsStatus: roomsReducer,
+    newFurnitureStatus: newFurnitureReducer
   }
 })
 

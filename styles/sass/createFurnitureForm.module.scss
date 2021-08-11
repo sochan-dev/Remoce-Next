@@ -1,0 +1,12 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  position: fixed;
+  bottom: 40px;
+  left: 0;
+  width: 400px;
+  height: 500px;
+  background-color: white;
+  opacity: 0.4;
+  padding: 20px;
+}

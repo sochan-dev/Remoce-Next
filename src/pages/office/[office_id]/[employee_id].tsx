@@ -17,7 +17,6 @@ type OfficeData = {
   office_name: string
 }
 type EmployeeData = {
-  employee_id: string
   employee_name: string
   employee_x_coordinate: number
   employee_y_coordinate: number

@@ -1,42 +1,29 @@
 import React, { VFC, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
-import { CallScreen, ShowEmployeesArea, TestInvite } from '../organisms'
-import { fetchOfficeSize } from '../../stores/slices/officeStatusSlice'
+import { useSelector } from 'react-redux'
+import {
+  CallScreen,
+  OfficeFooter,
+  ShowEmployeesArea,
+  TestInvite,
+  CreateFurnitureForm
+} from '../organisms'
+import { getIsCreate } from '../../stores/slices/newFurnitureSlice'
 import Styles from '../../../styles/sass/office.module.scss'
 
 const OfficeTemplate: VFC = () => {
-  const dispatch = useDispatch()
-  const officeRef = useRef(null)
-
-  useEffect(() => {
-    dispatch(
-      fetchOfficeSize({
-        officeWidth: officeRef.current.offsetWidth,
-        officeHeight: officeRef.current.offsetHeight
-      })
-    )
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('resize', () => {
-      dispatch(
-        fetchOfficeSize({
-          officeWidth: officeRef.current.offsetWidth,
-          officeHeight: officeRef.current.offsetHeight
-        })
-      )
-    })
-  }, [])
-
+  const selector = useSelector((state) => state)
+  const isCreate = getIsCreate(selector)
   return (
     <div className={Styles.root}>
       <CallScreen />
       <div className={Styles.inviteTest}>
         <TestInvite />
       </div>
-      <div className={Styles.showEmployeesArea} ref={officeRef}>
+      <div className={Styles.showEmployeesArea}>
         <ShowEmployeesArea />
       </div>
+      {isCreate && <CreateFurnitureForm />}
+      <OfficeFooter />
     </div>
   )
 }
