@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   setNewFurnitureSize,
   getNewFurnitureSize,
-  getNewFurnitureIsClose,
-  FurnitureSize
+  getNewFurnitureIsClose
 } from '../stores/slices/newFurnitureSlice'
 
 const useFurnitureRadioControl = () => {
@@ -15,28 +14,28 @@ const useFurnitureRadioControl = () => {
   console.log('newFurnitureSize', newFurnitureSize, 'isClose', f)
 
   const changeFurnitureSize = (e: ChangeEvent<HTMLInputElement>) => {
-    const checkedType = e.target.value as FurnitureSize
+    const checkedType = Number(e.target.value)
     dispatch(setNewFurnitureSize(checkedType))
   }
 
   const furnitureSizeRadioList = [
     {
       id: 1,
-      value: 'small',
+      value: 1,
       label: 'small',
-      isChecked: newFurnitureSize === 'small' ? true : false
+      isChecked: newFurnitureSize === 1 ? true : false
     },
     {
       id: 2,
-      value: 'medium',
+      value: 2,
       label: 'medium',
-      isChecked: newFurnitureSize === 'medium' ? true : false
+      isChecked: newFurnitureSize === 2 ? true : false
     },
     {
       id: 3,
-      value: 'large',
+      value: 3,
       label: 'large',
-      isChecked: newFurnitureSize === 'large' ? true : false
+      isChecked: newFurnitureSize === 3 ? true : false
     }
   ]
   console.log('furnitureSizeRadioList', furnitureSizeRadioList)

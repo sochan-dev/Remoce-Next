@@ -7,13 +7,13 @@ import { createSelector } from 'reselect'
 /*////////////////////////////////////////////////
   型宣言
 /*/ ///////////////////////////////////////////////
-export type FurnitureSize = 'small' | 'medium' | 'large'
 //stateの初期値
 export interface NewFurniture {
   isCreate: boolean
+  isDisplay: boolean
   furnitureName: string
   furnitureDetail: string
-  furnitureSize: FurnitureSize
+  furnitureSize: number
   isClose: boolean
   authorities: string[]
 }
@@ -23,9 +23,10 @@ export interface NewFurniture {
 /*/ ///////////////////////////////////////////////
 const initialState: NewFurniture = {
   isCreate: false,
+  isDisplay: false,
   furnitureName: '',
   furnitureDetail: '',
-  furnitureSize: 'medium',
+  furnitureSize: 2,
   isClose: false,
   authorities: []
 }
@@ -46,8 +47,9 @@ export const newFurnitureSlice = createSlice({
   initialState,
   //reducer
   reducers: {
-    setIsCreate: (state) => {
+    setCreateDisplay: (state) => {
       state.isCreate = !state.isCreate
+      state.isDisplay = !state.isDisplay
     },
     setNewFurnitureName: (state, action: PayloadAction<string>) => {
       state.furnitureName = action.payload
@@ -55,7 +57,7 @@ export const newFurnitureSlice = createSlice({
     setNewFurnitureDetail: (state, action: PayloadAction<string>) => {
       state.furnitureDetail = action.payload
     },
-    setNewFurnitureSize: (state, action: PayloadAction<FurnitureSize>) => {
+    setNewFurnitureSize: (state, action: PayloadAction<number>) => {
       state.furnitureSize = action.payload
     },
     setNewFurnitureIsClose: (state, action: PayloadAction<boolean>) => {
@@ -78,7 +80,7 @@ export const newFurnitureSlice = createSlice({
   Actions
 /*/ ///////////////////////////////////////////////
 export const {
-  setIsCreate,
+  setCreateDisplay,
   setNewFurnitureName,
   setNewFurnitureDetail,
   setNewFurnitureSize,
@@ -95,6 +97,14 @@ export const newFurnitureSelector = (state): NewFurniture =>
 export const getIsCreate = createSelector(
   newFurnitureSelector,
   (state) => state.isCreate
+)
+export const getIsDisplay = createSelector(
+  newFurnitureSelector,
+  (state) => state.isDisplay
+)
+export const getFurnitureName = createSelector(
+  newFurnitureSelector,
+  (state) => state.furnitureName
 )
 export const getNewFurniture = createSelector(
   newFurnitureSelector,

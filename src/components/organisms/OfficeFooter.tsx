@@ -1,13 +1,13 @@
 import React, { VFC } from 'react'
 import { useDispatch } from 'react-redux'
 import { ActionButton } from '../atoms'
-import { setIsCreate } from '../../stores/slices/newFurnitureSlice'
+import { setCreateDisplay } from '../../stores/slices/newFurnitureSlice'
 import Styles from '../../../styles/sass/footer.module.scss'
 
 const OfficeFooter = () => {
   const dispatch = useDispatch()
   const handleOnClick = () => {
-    dispatch(setIsCreate())
+    dispatch(setCreateDisplay())
   }
   return (
     <div className={Styles.root}>

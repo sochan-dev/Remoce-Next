@@ -5,16 +5,13 @@ import {
   getOfficeId,
   getOfficeSize
 } from '../../stores/slices/officeStatusSlice'
-import { getRooms } from '../../stores/slices/roomsStatusSlice'
 import { CoworkerIcon } from '../molecules'
 import { MyIcon } from '../organisms'
-import { Room } from '../molecules'
 
 const ShowEmployeesArea: VFC = () => {
   console.log('ShowEmployeesArea再レンダリング')
   const selector = useSelector((state) => state)
   const { employees, yourId } = getEmployeesStatus(selector)
-  const rooms = getRooms(selector)
   const officeId = getOfficeId(selector)
   const officeSize = getOfficeSize(selector)
 
@@ -39,14 +36,6 @@ const ShowEmployeesArea: VFC = () => {
           />
         )
       )}
-      {rooms.map((room, i) => (
-        <Room
-          key={i}
-          roomId={room.roomId}
-          roomX={room.roomX}
-          roomY={room.roomY}
-        />
-      ))}
     </>
   )
 }

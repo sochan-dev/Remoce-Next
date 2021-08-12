@@ -8,9 +8,11 @@ import {
   fetchEmployeesStatus,
   fetchEmployees
 } from '../../../stores/slices/employeesStatusSlice'
-import { fetchOffice } from '../../../stores/slices/officeStatusSlice'
+import {
+  fetchOffice,
+  setScrollValue
+} from '../../../stores/slices/officeStatusSlice'
 import { fetchRooms } from '../../../stores/slices/roomsStatusSlice'
-import useSFU from '../../../hooks/useSFU'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeData = {
@@ -161,6 +163,20 @@ const Office: NextPage<props> = (props) => {
     return () => {
       leave()
     }
+  }, [])
+
+  useEffect(() => {
+    const scrollAction = () => {
+      console.log('横スクロール：' + window.scrollX)
+      console.log('縦スクロール：' + window.scrollY)
+    }
+    window.addEventListener('scroll', () => {
+      console.log('横スクロール：' + window.scrollX)
+      console.log('縦スクロール：' + window.scrollY)
+      dispatch(setScrollValue({ x: window.scrollX, y: window.scrollY }))
+    })
+
+    return window.removeEventListener('scroll', scrollAction)
   }, [])
 
   useEffect(() => {

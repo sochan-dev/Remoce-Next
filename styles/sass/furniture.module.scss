@@ -1,0 +1,23 @@
+@charset "UTF-8";
+@import './variables.scss';
+
+%furnitureRoot {
+  border: solid 2px black;
+}
+
+.new {
+  @extend %furnitureRoot;
+  position: fixed !important;
+  z-index: 6;
+}
+.touch {
+  @extend %furnitureRoot;
+  position: absolute;
+  z-index: 6;
+}
+
+.exist {
+  @extend %furnitureRoot;
+  position: absolute;
+  z-index: 5;
+}

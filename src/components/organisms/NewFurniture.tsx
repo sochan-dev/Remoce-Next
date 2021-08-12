@@ -1,218 +1,130 @@
-import React, { VFC, useRef } from 'react'
+import React, { VFC, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { db } from '../../../firebase'
+import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
-import { getEmployees } from '../../stores/slices/employeesStatusSlice'
-import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import { ICONSIZE, SENSORSIZE } from '../../utils/iconSize'
-import Styles from '../../../styles/sass/employeeIcon.module.scss'
-import { getRooms } from '../../stores/slices/roomsStatusSlice'
 import axios from 'axios'
-
-type props = {
-  id: number
-  officeId: string
-  ownData: {
-    employeeId: string
-    employeeName: string
-    xCoordinate: number
-    yCoordinate: number
-  }
-  officeSize: {
-    officeWidth: number
-    officeHeight: number
-  }
-}
-
-type OverlapEmployee = {
-  employeeId: string
-  halfwayPointX: number
-  halfwayPointY: number
-}
+import {
+  getNewFurnitureSize,
+  getNewFurniture
+} from '../../stores/slices/newFurnitureSlice'
+import { getScrollValue } from '../../stores/slices/officeStatusSlice'
+import { getOfficeId } from '../../stores/slices/officeStatusSlice'
+import {
+  judgeLargerTarget,
+  judgeSmallerTarget,
+  judgeSameTarget
+} from './utils/judgeOverlap'
+import { OBJECTSIZE } from './utils/iconSize'
+import Styles from '../../../styles/sass/furniture.module.scss'
 
 type PostRequest = {
   officeId: string
-  joinEmployees: string[]
-  roomX: number
-  roomY: number
+  furnitureName: string
+  furnitureDetail: string
+  furnitureSize: number
+  isClose: boolean
+  authorities: string[]
+  xCoordinate: number
+  yCoordinate: number
 }
 
-type PutRequest = {
-  officeId: string
-  employeeId: string
-  overlapRoomIds: string[] | false
-}
-
-const NewFurniture: VFC<props> = (props) => {
+const NewFurniture: VFC = () => {
   const selector = useSelector((state) => state)
+  const [isDrag, setIsDrag] = useState(false)
   const URL =
     'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/furniture'
-  const employees = getEmployees(selector)
-  const rooms = getRooms(selector)
-  const { officeId, ownData } = props
+  const furnitureList = getFurniture(selector)
+  const newFurnitureSize = getNewFurnitureSize(selector)
   const draggableRef = useRef(null)
   const initialCoordinate = {
-    left: ownData.xCoordinate,
-    top: ownData.yCoordinate
+    left: 100,
+    bottom: 100,
+    width: newFurnitureSize * OBJECTSIZE,
+    height: newFurnitureSize * OBJECTSIZE
   }
 
-  ///////////////////////////////////////////////////////
-  /********************　座標の更新　****************** */
-  const fsUpdateCoordinate = async (
-    xCoordinate: number,
-    yCoordinate: number
-  ): Promise<boolean> => {
-    let isSuccess: boolean
-    await db
-      .collection('offices')
-      .doc(officeId)
-      .collection('employees')
-      .doc(ownData.employeeId)
-      .update({
-        employee_x_coordinate: xCoordinate,
-        employee_y_coordinate: yCoordinate
-      })
-      .then(() => {
-        isSuccess = true
-      })
-      .catch(() => {
-        isSuccess = false
-      })
-    return isSuccess
-  }
+  const judgeOverlapFurniture = (xCoordinate: number, yCoordinate: number) => {
+    let isOverlap = false
+    const ownStartX = xCoordinate
+    const ownStartY = yCoordinate
+    const ownEndX = ownStartX + newFurnitureSize * OBJECTSIZE
+    const ownEndY = ownStartY + newFurnitureSize * OBJECTSIZE
+    const ownInfo = {
+      ownStartX: ownStartX,
+      ownStartY: ownStartY,
+      ownEndX: ownEndX,
+      ownEndY: ownEndY
+    }
 
-  /********************　roomとの重なりを判定　****************** */
-  const judgeOverlapRoom = (
-    xCoordinate: number,
-    yCoordinate: number
-  ): string[] => {
-    let overlapRoomIds: string[] = []
-    const ownStartX = xCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
-    const ownStartY = yCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
-    const ownEndX = ownStartX + ICONSIZE
-    const ownEndY = ownStartY + ICONSIZE
-
-    rooms.forEach((room) => {
-      const roomStartX = room.roomX
-      const roomStartY = room.roomY
-      const roomEndX = roomStartX + SENSORSIZE + 20
-      const roomEndY = roomStartY + SENSORSIZE + 20
-
-      if (
-        ((ownStartX <= roomStartX && roomStartX <= ownEndX) ||
-          (roomEndX <= ownEndX && ownStartX <= roomEndX) ||
-          (roomStartX <= ownStartX && ownEndX <= roomEndX)) &&
-        ((ownStartY <= roomStartY && roomStartY <= ownEndY) ||
-          (roomEndY <= ownEndY && ownStartY <= roomEndY) ||
-          (roomStartY <= ownStartY && ownEndY <= roomEndY))
-      ) {
-        overlapRoomIds.push(room.roomId)
+    for (let furniture of furnitureList) {
+      const targetInfo = {
+        xCoordinate: furniture.xCoordinate,
+        yCoordinate: furniture.yCoordinate,
+        size: furniture.furnitureSize * OBJECTSIZE
       }
-    })
-    return overlapRoomIds
-  }
+      if (isOverlap) break
 
-  /********************　employeeとの重なりを判定　****************** */
-  const judgeOverLapEmployee = (
-    xCoordinate: number,
-    yCoordinate: number
-  ): OverlapEmployee[] | false => {
-    let overlapEmployees: OverlapEmployee[] = []
-    const sensorStartX = xCoordinate
-    const sensorStartY = yCoordinate
-    const sensorEndX = sensorStartX + SENSORSIZE
-    const sensorEndY = sensorStartY + SENSORSIZE
-    employees.forEach((employee) => {
-      if (ownData.employeeId !== employee.employeeId) {
-        const employeeStartX = employee.xCoordinate
-        const employeeStartY = employee.yCoordinate
-        const employeeEndX = employeeStartX + SENSORSIZE
-        const employeeEndY = employeeStartY + SENSORSIZE
-
-        if (
-          ((sensorStartX <= employeeStartX && employeeStartX <= sensorEndX) ||
-            (sensorStartX <= employeeEndX && employeeEndX <= sensorEndX)) &&
-          ((sensorStartY <= employeeStartY && employeeStartY <= sensorEndY) ||
-            (sensorStartY <= employeeEndY && employeeEndY <= sensorEndY))
-        ) {
-          console.log('employeeと重なった')
-          const halfwayPointX = Math.round((sensorStartX + employeeStartX) / 2)
-          const halfwayPointY = Math.round((sensorStartY + employeeStartY) / 2)
-          const overlapEmployee: OverlapEmployee = {
-            employeeId: employee.employeeId,
-            halfwayPointX: halfwayPointX,
-            halfwayPointY: halfwayPointY
-          }
-          overlapEmployees.push(overlapEmployee)
-        }
-      }
-    })
-    return overlapEmployees.length > 0 ? overlapEmployees : false
-  }
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  const handleStop = (_: DraggableEvent, data: DraggableData) => {
-    const xCoordinate = initialCoordinate.left + data.lastX //自身のX座標
-    const yCoordinate = initialCoordinate.top + data.lastY //自身のY座標
-
-    fsUpdateCoordinate(xCoordinate, yCoordinate) //座標の更新
-    const overlapRoomIds = judgeOverlapRoom(xCoordinate, yCoordinate) //自身と重なってるroomのidを一括取得
-    console.log('overlapRoomids', overlapRoomIds)
-
-    if (overlapRoomIds.length === 0) {
-      //どのroomとも重なっていない
-      const overlapEmployees = judgeOverLapEmployee(xCoordinate, yCoordinate) //自身と重なっているemployeeを一括取得
-      if (overlapEmployees) {
-        //重なっているemployeeがいる
-
-        for (let overlapEmployee of overlapEmployees) {
-          //重なっている人数分room作成のリクエストする。
-          const req: PostRequest = {
-            officeId: officeId,
-            joinEmployees: [ownData.employeeId, overlapEmployee.employeeId],
-            roomX: overlapEmployee.halfwayPointX,
-            roomY: overlapEmployee.halfwayPointY
-          }
-          const reqJSON = JSON.stringify(req)
-          let params = new URLSearchParams()
-          params.append('data', reqJSON)
-          axios.post(URL, params)
-        }
+      if (furniture.furnitureSize < newFurnitureSize) {
+        isOverlap = judgeLargerTarget(ownInfo, targetInfo)
+      } else if (furniture.furnitureSize === newFurnitureSize) {
+        isOverlap = judgeSameTarget(ownInfo, targetInfo)
       } else {
-        //重なっているemployeeがいないのでroom情報のみ更新
-        const req: PutRequest = {
-          officeId: officeId,
-          employeeId: ownData.employeeId,
-          overlapRoomIds: false
-        }
-        const reqJSON = JSON.stringify(req)
-        let params = new URLSearchParams()
-        params.append('data', reqJSON)
-        axios.put(URL, params).then((res) => {
-          const d = res.data
-          console.log(d)
-        })
+        isOverlap = judgeSmallerTarget(ownInfo, targetInfo)
       }
-    } else {
-      //roomと重なっているので、重なったroom情報に自分のIDを追加
-      const req: PutRequest = {
+    }
+
+    return isOverlap
+  }
+
+  const handleStop = (_: DraggableEvent, data: DraggableData) => {
+    const { scrollX, scrollY } = getScrollValue(selector)
+    const xCoordinate = initialCoordinate.left + data.lastX + scrollX //自身のX座標
+    const yCoordinate = data.node.offsetTop + data.lastY + scrollY //自身のY座標
+
+    const isCreate = judgeOverlapFurniture(xCoordinate, yCoordinate)
+    if (isCreate) {
+      const newFurniture = getNewFurniture(selector)
+      const officeId = getOfficeId(selector)
+      const req: PostRequest = {
         officeId: officeId,
-        employeeId: ownData.employeeId,
-        overlapRoomIds: overlapRoomIds
+        furnitureName: newFurniture.furnitureName,
+        furnitureDetail: newFurniture.furnitureDetail,
+        furnitureSize: newFurniture.furnitureSize,
+        isClose: newFurniture.isClose,
+        authorities: newFurniture.authorities,
+        xCoordinate: xCoordinate,
+        yCoordinate: yCoordinate
       }
       const reqJSON = JSON.stringify(req)
       let params = new URLSearchParams()
       params.append('data', reqJSON)
-      axios.put(URL, params)
+      axios.post(URL, params)
     }
   }
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const onBlur = () => {
+    setIsDrag(false)
+    console.log('blur')
+  }
+  const onClick = () => {
+    setIsDrag(true)
+    console.log('onClick')
+  }
 
   return (
-    <Draggable nodeRef={draggableRef} onStop={handleStop} bounds="parent">
-      <div ref={draggableRef} className={Styles.mine} style={initialCoordinate}>
-        <AccountCircleIcon className={Styles.icon} />
-      </div>
+    <Draggable
+      nodeRef={draggableRef}
+      onStop={handleStop}
+      bounds="parent"
+      onStart={onClick}
+      grid={[15, 15]}
+    >
+      <div
+        ref={draggableRef}
+        className={isDrag ? Styles.new : Styles.new}
+        style={initialCoordinate}
+      ></div>
     </Draggable>
   )
 }

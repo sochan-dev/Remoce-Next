@@ -17,6 +17,8 @@ export interface OfficeStatus {
   officeHeight: number
   employeeWidthRatio: number
   employeeHeightRatio: number
+  scrollX: number
+  scrollY: number
 }
 //signUp関数が受け取るuserの入力情報
 
@@ -24,12 +26,14 @@ export interface OfficeStatus {
   stateの初期値
 /*/ ///////////////////////////////////////////////
 const initialState: OfficeStatus = {
-  officeId: 'intitla',
+  officeId: '',
   officeName: '',
   officeWidth: 0,
   officeHeight: 0,
   employeeWidthRatio: 0,
-  employeeHeightRatio: 0
+  employeeHeightRatio: 0,
+  scrollX: 0,
+  scrollY: 0
 }
 
 type FetchOfficePayload = {
@@ -42,6 +46,7 @@ type FetchOfficeSizePayload = {
   officeHeight: number
 }
 
+type ScrollValue = { x: number; y: number }
 /*////////////////////////////////////////////////
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
@@ -72,6 +77,10 @@ export const officeStatusSlice = createSlice({
       state.employeeWidthRatio = Math.round((80 / officeWidth) * 100)
       state.employeeHeightRatio = Math.round((80 / officeHeight) * 100)
       */
+    },
+    setScrollValue: (state, action: PayloadAction<ScrollValue>) => {
+      state.scrollX = Math.floor(action.payload.x)
+      state.scrollY = Math.floor(action.payload.y)
     }
   },
   //AsyncThunkを扱うreducer
@@ -86,7 +95,8 @@ export const officeStatusSlice = createSlice({
 /*////////////////////////////////////////////////
   Actions
 /*/ ///////////////////////////////////////////////
-export const { fetchOffice, fetchOfficeSize } = officeStatusSlice.actions
+export const { fetchOffice, fetchOfficeSize, setScrollValue } =
+  officeStatusSlice.actions
 
 /*////////////////////////////////////////////////
   Selector
@@ -100,6 +110,12 @@ export const getOfficeId = createSelector(
 )
 export const getOfficeSize = createSelector(officeSelector, (state) => {
   return { officeWidth: state.officeWidth, officeHeight: state.officeHeight }
+})
+export const getScrollValue = createSelector(officeSelector, (state) => {
+  return {
+    scrollX: state.scrollX,
+    scrollY: state.scrollY
+  }
 })
 //エクスポート
 export default officeStatusSlice.reducer
