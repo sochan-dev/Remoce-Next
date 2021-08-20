@@ -1,0 +1,17 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  display: flex;
+  z-index: 10;
+  position: fixed;
+  width: 800px;
+  top: 0;
+  right: 0;
+  .videoArea {
+    display: flex;
+  }
+  .inlineBlock {
+    margin-top: 60px;
+    margin-bottom: 50px;
+  }
+}

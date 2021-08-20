@@ -4,10 +4,12 @@ import { db } from '../../../firebase'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { getEmployees } from '../../stores/slices/employeesStatusSlice'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import { ICONSIZE, SENSORSIZE } from './utils/iconSize'
+import { ICONSIZE, SENSORSIZE, OBJECTSIZE } from './utils/iconSize'
 import Styles from '../../../styles/sass/employeeIcon.module.scss'
 import { getRooms } from '../../stores/slices/roomsStatusSlice'
 import axios from 'axios'
+import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
+import { judgeLargerTarget } from './utils/judgeOverlap'
 
 type props = {
   id: number
@@ -30,25 +32,32 @@ type OverlapEmployee = {
   halfwayPointY: number
 }
 
-type PostRequest = {
+type RoomPostRequest = {
   officeId: string
   joinEmployees: string[]
   roomX: number
   roomY: number
 }
 
-type PutRequest = {
+type RoomPutRequest = {
   officeId: string
   employeeId: string
   overlapRoomIds: string[] | false
 }
 
+type FurnitureRequest = {
+  officeId: string
+  employeeId: string
+  furnitureId: string | string[]
+}
+
 const MyIcon: VFC<props> = (props) => {
   console.log('MyIcon再レンダリング')
   const selector = useSelector((state) => state)
-  const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/room'
+  const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/'
   const employees = getEmployees(selector)
   const rooms = getRooms(selector)
+  const furnitureList = getFurniture(selector)
   const { officeId, ownData } = props
   const draggableRef = useRef(null)
   const initialCoordinate = {
@@ -79,6 +88,60 @@ const MyIcon: VFC<props> = (props) => {
         isSuccess = false
       })
     return isSuccess
+  }
+  /********************　現stateでfurnitureに所属しているか判定　****************** */
+  const judgeJoinFurniture = () => {
+    let joinFurnitureList: string[] = []
+    furnitureList.forEach((furniture) => {
+      furniture.joinEmployees.forEach((joinEmployee) => {
+        if (ownData.employeeId === joinEmployee) {
+          joinFurnitureList.push(furniture.furnitureId)
+        }
+      })
+    })
+    return joinFurnitureList
+  }
+  /********************　重なったemployee（Coworker）がFurnitureと重なっているか判定　****************** */
+  const judgeEmployeeOverlapFurniture = (employeeId: string) => {
+    let isOverlap = false
+    for (let furniture of furnitureList) {
+      if (isOverlap) continue
+      furniture.joinEmployees.forEach((joinEmployeeId) => {
+        if (joinEmployeeId === employeeId) isOverlap = true
+      })
+    }
+    return isOverlap
+  }
+
+  /********************　furnitureとの重なりを判定　****************** */
+  const judgeOverlapFurniture = (
+    xCoordinate: number,
+    yCoordinate: number
+  ): string | false => {
+    let overlapFurnitureId: string | false = false
+    const ownStartX = xCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
+    const ownStartY = yCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
+    const ownEndX = ownStartX + ICONSIZE
+    const ownEndY = ownStartY + ICONSIZE
+    const ownInfo = {
+      ownStartX: ownStartX,
+      ownStartY: ownStartY,
+      ownEndX: ownEndX,
+      ownEndY: ownEndY
+    }
+
+    for (let furniture of furnitureList) {
+      if (overlapFurnitureId) break
+      const targetInfo = {
+        xCoordinate: furniture.xCoordinate,
+        yCoordinate: furniture.yCoordinate,
+        size: furniture.furnitureSize * OBJECTSIZE
+      }
+      if (judgeLargerTarget(ownInfo, targetInfo)) {
+        overlapFurnitureId = furniture.furnitureId
+      }
+    }
+    return overlapFurnitureId
   }
 
   /********************　roomとの重なりを判定　****************** */
@@ -156,54 +219,95 @@ const MyIcon: VFC<props> = (props) => {
     const yCoordinate = initialCoordinate.top + data.lastY //自身のY座標
 
     fsUpdateCoordinate(xCoordinate, yCoordinate) //座標の更新
-    const overlapRoomIds = judgeOverlapRoom(xCoordinate, yCoordinate) //自身と重なってるroomのidを一括取得
-    console.log('overlapRoomids', overlapRoomIds)
+    const overlapFurnitureId = judgeOverlapFurniture(xCoordinate, yCoordinate) //自身と重なっているfurnitureのIDを取得
+    if (overlapFurnitureId) {
+      //furnitureと重なっている
+      //roomのjoinEmployeesから自身のIDを削除
+      const roomReq: RoomPutRequest = {
+        officeId: officeId,
+        employeeId: ownData.employeeId,
+        overlapRoomIds: false
+      }
+      const roomReqJSON = JSON.stringify(roomReq)
+      let roomParams = new URLSearchParams()
+      roomParams.append('data', roomReqJSON)
+      axios.put(`${URL}room`, roomParams)
+      //furnitureのjoinEmployeesに自身のIDを追加
+      const furnitureReq: FurnitureRequest = {
+        officeId: officeId,
+        employeeId: ownData.employeeId,
+        furnitureId: overlapFurnitureId
+      }
+      const furnitureReqJSON = JSON.stringify(furnitureReq)
+      let furnitureParams = new URLSearchParams()
+      furnitureParams.append('data', furnitureReqJSON)
+      axios.put(`${URL}furniture`, furnitureParams)
+    } else {
+      //furnitureと重なっていない
+      const joinFurnitureList = judgeJoinFurniture()
+      if (joinFurnitureList.length > 0) {
+        const furnitureReq: FurnitureRequest = {
+          officeId: officeId,
+          employeeId: ownData.employeeId,
+          furnitureId: joinFurnitureList
+        }
+        const furnitureReqJSON = JSON.stringify(furnitureReq)
+        let furnitureParams = new URLSearchParams()
+        furnitureParams.append('data', furnitureReqJSON)
+        axios.put(`${URL}furniture`, furnitureParams)
+      }
+      //room処理開始
+      const overlapRoomIds = judgeOverlapRoom(xCoordinate, yCoordinate) //自身と重なってるroomのidを一括取得
+      if (overlapRoomIds.length === 0) {
+        //どのroomとも重なっていない
+        const overlapEmployees = judgeOverLapEmployee(xCoordinate, yCoordinate) //自身と重なっているemployeeを一括取得
+        if (overlapEmployees) {
+          //重なっているemployeeがいる
 
-    if (overlapRoomIds.length === 0) {
-      //どのroomとも重なっていない
-      const overlapEmployees = judgeOverLapEmployee(xCoordinate, yCoordinate) //自身と重なっているemployeeを一括取得
-      if (overlapEmployees) {
-        //重なっているemployeeがいる
-
-        for (let overlapEmployee of overlapEmployees) {
-          //重なっている人数分room作成のリクエストする。
-          const req: PostRequest = {
+          for (let overlapEmployee of overlapEmployees) {
+            //ここで重なってるEmployeeがFurnitureに所属していないか確認。していたらcontinue
+            if (judgeEmployeeOverlapFurniture(overlapEmployee.employeeId)) {
+              continue
+            }
+            //重なっている人数分room作成のリクエストする。
+            const req: RoomPostRequest = {
+              officeId: officeId,
+              joinEmployees: [ownData.employeeId, overlapEmployee.employeeId],
+              roomX: overlapEmployee.halfwayPointX,
+              roomY: overlapEmployee.halfwayPointY
+            }
+            const reqJSON = JSON.stringify(req)
+            let params = new URLSearchParams()
+            params.append('data', reqJSON)
+            axios.post(`${URL}room`, params)
+          }
+        } else {
+          //重なっているemployeeがいないのでroom情報のみ更新
+          const req: RoomPutRequest = {
             officeId: officeId,
-            joinEmployees: [ownData.employeeId, overlapEmployee.employeeId],
-            roomX: overlapEmployee.halfwayPointX,
-            roomY: overlapEmployee.halfwayPointY
+            employeeId: ownData.employeeId,
+            overlapRoomIds: false
           }
           const reqJSON = JSON.stringify(req)
           let params = new URLSearchParams()
           params.append('data', reqJSON)
-          axios.post(URL, params)
+          axios.put(`${URL}room`, params).then((res) => {
+            const d = res.data
+            console.log(d)
+          })
         }
       } else {
-        //重なっているemployeeがいないのでroom情報のみ更新
-        const req: PutRequest = {
+        //roomと重なっているので、重なったroom情報に自分のIDを追加
+        const req: RoomPutRequest = {
           officeId: officeId,
           employeeId: ownData.employeeId,
-          overlapRoomIds: false
+          overlapRoomIds: overlapRoomIds
         }
         const reqJSON = JSON.stringify(req)
         let params = new URLSearchParams()
         params.append('data', reqJSON)
-        axios.put(URL, params).then((res) => {
-          const d = res.data
-          console.log(d)
-        })
+        axios.put(`${URL}room`, params)
       }
-    } else {
-      //roomと重なっているので、重なったroom情報に自分のIDを追加
-      const req: PutRequest = {
-        officeId: officeId,
-        employeeId: ownData.employeeId,
-        overlapRoomIds: overlapRoomIds
-      }
-      const reqJSON = JSON.stringify(req)
-      let params = new URLSearchParams()
-      params.append('data', reqJSON)
-      axios.put(URL, params)
     }
   }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

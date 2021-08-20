@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@jswf/react": "^1.0.33",
     "@reduxjs/toolkit": "^1.5.1",
     "@types/react-select": "^4.0.17",
     "axios": "^0.21.1",
@@ -18,6 +19,8 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-draggable": "^4.4.3",
+    "react-popout": "^2.0.1",
+    "react-popout-component": "^1.8.5",
     "react-redux": "^7.2.4",
     "react-select": "^4.3.1",
     "sass": "^1.34.0",

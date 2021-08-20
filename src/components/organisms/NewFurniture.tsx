@@ -1,12 +1,14 @@
 import React, { VFC, useState, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { db } from '../../../firebase'
 import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import axios from 'axios'
 import {
   getNewFurnitureSize,
-  getNewFurniture
+  getNewFurniture,
+  clearNewFurniture,
+  clearIsCreate
 } from '../../stores/slices/newFurnitureSlice'
 import { getScrollValue } from '../../stores/slices/officeStatusSlice'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
@@ -30,19 +32,20 @@ type PostRequest = {
 }
 
 const NewFurniture: VFC = () => {
+  const dispatch = useDispatch()
   const selector = useSelector((state) => state)
-  const [isDrag, setIsDrag] = useState(false)
   const URL =
     'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/furniture'
   const furnitureList = getFurniture(selector)
   const newFurnitureSize = getNewFurnitureSize(selector)
   const draggableRef = useRef(null)
   const initialCoordinate = {
-    left: 100,
-    bottom: 100,
+    left: 10,
+    bottom: 60,
     width: newFurnitureSize * OBJECTSIZE,
     height: newFurnitureSize * OBJECTSIZE
   }
+  const [message, setMessage] = useState('')
 
   const judgeOverlapFurniture = (xCoordinate: number, yCoordinate: number) => {
     let isOverlap = false
@@ -74,16 +77,24 @@ const NewFurniture: VFC = () => {
       }
     }
 
-    return isOverlap
+    return !isOverlap
+  }
+
+  const judgeOverhang = (xCoordinate: number, yCoordinate: number) => {
+    const ownEndX = xCoordinate + newFurnitureSize * OBJECTSIZE
+    const ownEndY = yCoordinate + newFurnitureSize * OBJECTSIZE
+
+    return ownEndX <= 2000 && ownEndY <= 1500 ? true : false
   }
 
   const handleStop = (_: DraggableEvent, data: DraggableData) => {
     const { scrollX, scrollY } = getScrollValue(selector)
     const xCoordinate = initialCoordinate.left + data.lastX + scrollX //自身のX座標
     const yCoordinate = data.node.offsetTop + data.lastY + scrollY //自身のY座標
-
     const isCreate = judgeOverlapFurniture(xCoordinate, yCoordinate)
-    if (isCreate) {
+    const isOverhang = judgeOverhang(xCoordinate, yCoordinate)
+
+    if (isCreate && isOverhang) {
       const newFurniture = getNewFurniture(selector)
       const officeId = getOfficeId(selector)
       const req: PostRequest = {
@@ -97,34 +108,37 @@ const NewFurniture: VFC = () => {
         yCoordinate: yCoordinate
       }
       const reqJSON = JSON.stringify(req)
+      console.log('reqJson', reqJSON)
       let params = new URLSearchParams()
       params.append('data', reqJSON)
-      axios.post(URL, params)
+      axios
+        .post(URL, params)
+        .then((res) => {
+          dispatch(clearNewFurniture())
+        })
+        .catch(() => {
+          setMessage('作成に失敗しました')
+        })
+    } else {
+      setMessage('ここにはオブジェクトを生成できません。')
     }
   }
 
-  const onBlur = () => {
-    setIsDrag(false)
-    console.log('blur')
-  }
-  const onClick = () => {
-    setIsDrag(true)
-    console.log('onClick')
+  const handleStart = () => {
+    dispatch(clearIsCreate())
   }
 
   return (
     <Draggable
       nodeRef={draggableRef}
       onStop={handleStop}
+      onStart={handleStart}
       bounds="parent"
-      onStart={onClick}
       grid={[15, 15]}
     >
-      <div
-        ref={draggableRef}
-        className={isDrag ? Styles.new : Styles.new}
-        style={initialCoordinate}
-      ></div>
+      <div ref={draggableRef} className={Styles.new} style={initialCoordinate}>
+        {message}
+      </div>
     </Draggable>
   )
 }

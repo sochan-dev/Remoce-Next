@@ -13,7 +13,7 @@
 
 .mine {
   @extend %employeeRoot;
-  z-index: 3;
+  z-index: 10;
   .icon {
     color: red;
   }
@@ -21,7 +21,7 @@
 
 .coworker {
   @extend %employeeRoot;
-  z-index: 2;
+  z-index: 9;
   .icon {
     color: blue;
   }

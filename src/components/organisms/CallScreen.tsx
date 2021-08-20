@@ -1,33 +1,95 @@
-import React, { VFC } from 'react'
+import React, { useState, useEffect, useRef, VFC } from 'react'
+import { ActionButton } from '../atoms'
 import { VideoArea } from '../molecules'
 import useSFU from '../../hooks/useSFU'
-import Styles from '../../../styles/sass/videoArea.module.scss'
-
-type remoteUser = {
-  id: string
-  video: MediaStream
-}[]
+import { CallScreenHeader, CallScreenFooter } from '../organisms'
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
+import Styles from '../../../styles/sass/callScreen.module.scss'
 
 const CallScreen: VFC = () => {
-  const [videosInfo, handles, isTalking] = useSFU()
+  console.log('---CallScreenコンポーネント再レンダリング---')
+  const [isDisplay, setIsDisplay] = useState(false)
+  const [isMinimize, setIsMinimize] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const draggableRef = useRef(null)
+  const [videosInfo, handles, testSend] = useSFU(setIsDisplay)
+  const { id, video } = videosInfo.localInfo
 
-  console.log('remote???', videosInfo)
+  useEffect(() => {
+    const newPosition = isMinimize ? null : { x: 0, y: 0 }
+    setPosition(newPosition)
+  }, [isMinimize])
 
+  const updateIsMinimize = (isMinimize: boolean) => {
+    setIsMinimize(isMinimize)
+  }
+
+  const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+    setPosition({ x: data.lastX, y: data.lastY })
+  }
+
+  const rootStyle = {
+    minimize: {
+      width: '10%',
+      right: '0px',
+      top: '0px'
+    },
+    maximize: {
+      width: '100%',
+      left: '0px',
+      top: '0px'
+    }
+  }
+  const videosStyle = isMinimize
+    ? {
+        visibility: 'hidden' as 'hidden',
+        height: '0px',
+        lineHeight: '0px',
+        overflow: 'hidden',
+        margin: '0px'
+      }
+    : {
+        visibility: 'visible' as 'visible'
+      }
   return (
     <>
-      <div className={Styles.root}>
-        <div>
-          <p>I am:{videosInfo.localInfo.id}</p>
-          <video
-            width="320px"
-            ref={videosInfo.localInfo.video}
-            autoPlay
-            playsInline
-            muted
-          ></video>
-        </div>
-        {isTalking ? <VideoArea remotesInfo={videosInfo.remotesInfo} /> : <></>}
-      </div>
+      {isDisplay && (
+        <Draggable
+          nodeRef={draggableRef}
+          position={position}
+          onDrag={handleDrag}
+        >
+          <div
+            ref={draggableRef}
+            className={Styles.root}
+            style={isMinimize ? rootStyle.minimize : rootStyle.maximize}
+          >
+            <CallScreenHeader updateIsMinimize={updateIsMinimize} />
+            <div className={Styles.inlineBlock} style={videosStyle}>
+              <video
+                width="320px"
+                ref={video}
+                autoPlay
+                playsInline
+                muted
+              ></video>
+            </div>
+            <div className={Styles.inlineBlock} style={videosStyle}>
+              <div className={Styles.videoArea}>
+                {!isMinimize && (
+                  <VideoArea remotesInfo={videosInfo.remotesInfo} />
+                )}
+              </div>
+            </div>
+            {!isMinimize && (
+              <>
+                <CallScreenFooter handles={handles} />{' '}
+                <ActionButton label={'test'} onClick={testSend} />
+              </>
+            )}
+          </div>
+        </Draggable>
+      )}
     </>
   )
 }

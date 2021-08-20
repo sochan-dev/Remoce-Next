@@ -10,7 +10,8 @@ import { createSelector } from 'reselect'
 //stateの初期値
 export interface FurnitureStatus {
   furniture: {
-    isCreate: boolean
+    furnitureId: string
+    roomId: string
     furnitureName: string
     furnitureDetail: string
     furnitureSize: number
@@ -18,6 +19,7 @@ export interface FurnitureStatus {
     authorities: string[]
     xCoordinate: number
     yCoordinate: number
+    joinEmployees: string[]
   }[]
 }
 

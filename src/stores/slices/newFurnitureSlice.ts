@@ -65,6 +65,18 @@ export const newFurnitureSlice = createSlice({
     },
     setNewFurnitureAuthorities: (state, action: PayloadAction<string[]>) => {
       state.authorities = action.payload
+    },
+    clearIsCreate: (state) => {
+      state.isCreate = false
+    },
+    clearNewFurniture: (state) => {
+      state.isCreate = false
+      state.isDisplay = false
+      state.furnitureName = ''
+      state.furnitureDetail = ''
+      state.furnitureSize = 2
+      state.isClose = false
+      state.authorities = []
     }
   },
   //AsyncThunkを扱うreducer
@@ -85,7 +97,9 @@ export const {
   setNewFurnitureDetail,
   setNewFurnitureSize,
   setNewFurnitureIsClose,
-  setNewFurnitureAuthorities
+  setNewFurnitureAuthorities,
+  clearIsCreate,
+  clearNewFurniture
 } = newFurnitureSlice.actions
 
 /*////////////////////////////////////////////////

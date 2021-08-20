@@ -1,0 +1,11 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  .test {
+    position: absolute;
+    p {
+      font-size: 7px;
+      color: blue;
+    }
+  }
+}

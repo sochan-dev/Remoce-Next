@@ -1,12 +1,26 @@
-import { useState, useEffect, useRef } from 'react'
+import { EmployeesStatus } from './../stores/slices/employeesStatusSlice'
+import { getFurniture } from './../stores/slices/furnitureStatusSlice'
+import { useState, useEffect, useRef, SetStateAction, Dispatch } from 'react'
 import { useSelector } from 'react-redux'
 import { getRooms } from '../stores/slices/roomsStatusSlice'
-import { getEmployeeId } from '../stores/slices/employeesStatusSlice'
+import {
+  getEmployeeId,
+  getOwnEmployeeData
+} from '../stores/slices/employeesStatusSlice'
 import Peer, { SfuRoom } from 'skyway-js'
+import { database } from 'firebase-admin'
 
-type remoteUser = {
+type EmployeeStatus = {
+  employeeId: string
+  employeeName: string
+  isDisplay: boolean
+  isMute: boolean
+}
+
+type RemoteUser = {
   id: string
   video: MediaStream
+  employeeStatus?: EmployeeStatus
 }
 
 type Rooms = {
@@ -16,11 +30,39 @@ type Rooms = {
   joinEmployees: string[]
 }[]
 
+type FurnitureList = {
+  furnitureId: string
+  roomId: string
+  furnitureName: string
+  furnitureDetail: string
+  furnitureSize: number
+  isClose: boolean
+  authorities: string[]
+  xCoordinate: number
+  yCoordinate: number
+  joinEmployees: string[]
+}[]
+
+type AddStatus = {
+  type: 'add'
+  data: EmployeeStatus
+}
+
+type IsDisplay = { isDisplay: boolean }
+type IsMute = { isMute: boolean }
+
+type UpdateStatus = {
+  type: 'update'
+  data: IsMute | IsDisplay
+}
+
+type StatusData = AddStatus | UpdateStatus
+
 let localVideo: MediaStream
 let room: SfuRoom
 
 const judgeJoinRoom = (rooms: Rooms, employeeId: string) => {
-  let sfuRoomId: string = ''
+  let sfuRoomId = ''
   if (rooms.length > 0) {
     rooms.forEach((room) => {
       room.joinEmployees.forEach((empId) => {
@@ -32,7 +74,20 @@ const judgeJoinRoom = (rooms: Rooms, employeeId: string) => {
   return sfuRoomId
 }
 
-const useSFU = () => {
+const judgeJoinFurniture = (
+  furnitureList: FurnitureList,
+  employeeId: string
+) => {
+  let sfuRoomId = ''
+  for (let furniture of furnitureList) {
+    furniture.joinEmployees.forEach((joinEmployee) => {
+      if (joinEmployee === employeeId) sfuRoomId = furniture.roomId
+    })
+  }
+  return sfuRoomId
+}
+
+const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   const [peer, setPeer] = useState<Peer | null>(null)
   useEffect(() => {
     const skywayKey: string | undefined = process.env.NEXT_PUBLIC_SKYWAY_API_KEY
@@ -47,19 +102,33 @@ const useSFU = () => {
   }, [])
   const selector = useSelector((state) => state)
   const rooms = getRooms(selector)
+  const furnitureList = getFurniture(selector)
   const employeeId = getEmployeeId(selector)
+  const ownEmployeeData = getOwnEmployeeData(selector)
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const [myId, setMyId] = useState('')
-  const [remoteUsersInfo, setRemoteUsersInfo] = useState<remoteUser[]>([])
-  const [isTalking, setIsTalking] = useState(false)
-  console.log('useSFU起動', remoteUsersInfo)
-  const sfuRoomId = judgeJoinRoom(rooms, employeeId)
+  const [remoteUsersInfo, setRemoteUsersInfo] = useState<RemoteUser[]>([])
+  let sfuRoomId = ''
+  const joinRoomId = judgeJoinRoom(rooms, employeeId)
+  const joinFurnitureId = judgeJoinFurniture(furnitureList, employeeId)
+  if (joinFurnitureId !== '') {
+    sfuRoomId = joinFurnitureId
+  } else if (joinRoomId !== '') {
+    sfuRoomId = joinRoomId
+  }
+
+  useEffect(() => {
+    console.log('useEffect内sfuRoomid', sfuRoomId)
+    sfuRoomId !== '' ? setDisplay(true) : setDisplay(false)
+  }, [sfuRoomId])
+
   useEffect(() => {
     console.log('==========useEffect起動==============-')
     if (sfuRoomId !== '') {
+      console.log('sfuRoomId', sfuRoomId)
       handleJoin(sfuRoomId)
     } else {
-      if (isTalking) handleLeave()
+      handleLeave()
     }
   }, [sfuRoomId])
 
@@ -71,6 +140,7 @@ const useSFU = () => {
     })
 
     room.on('stream', async (stream) => {
+      console.log('stream受信！！！！', stream)
       const id = stream.peerId
       const video = stream
       let isUpdate = true
@@ -78,13 +148,23 @@ const useSFU = () => {
       remoteUsersInfo.forEach((remoteUser) => {
         if (remoteUser.id === id) isUpdate = false
       })
+
       if (isUpdate) {
         setRemoteUsersInfo((beforeInfo) => [
           ...beforeInfo,
           { id: id, video: video }
         ])
       }
-      setIsTalking(true)
+      const sendData: AddStatus = {
+        type: 'add',
+        data: {
+          employeeId: employeeId,
+          employeeName: ownEmployeeData.employeeName,
+          isDisplay: true,
+          isMute: true
+        }
+      }
+      room.send(sendData)
     })
 
     room.on('peerJoin', (peerId) => {
@@ -96,6 +176,40 @@ const useSFU = () => {
       setRemoteUsersInfo((beforeInfo) =>
         beforeInfo.filter((user) => user.id !== peerId)
       )
+    })
+
+    room.on('data', (roomData) => {
+      const src = roomData.src
+      const data = roomData.data as StatusData
+      console.log('dataイベント受信', src, data)
+      switch (data.type) {
+        case 'add':
+          console.log('switch-add通過')
+          setRemoteUsersInfo((beforeUserInfo) => {
+            return beforeUserInfo.map((beforeUser) => {
+              return beforeUser.id === src
+                ? { ...beforeUser, employeeStatus: data.data }
+                : beforeUser
+            })
+          })
+          break
+        case 'update':
+          console.log('switch-update通過')
+          setRemoteUsersInfo((beforeUserInfo) => {
+            return beforeUserInfo.map((beforeInfo) => {
+              return beforeInfo.id === src
+                ? {
+                    ...beforeInfo,
+                    employeeStatus: {
+                      ...beforeInfo.employeeStatus,
+                      ...data.data
+                    }
+                  }
+                : beforeInfo
+            })
+          })
+          break
+      }
     })
 
     room.once('close', () => {
@@ -126,10 +240,12 @@ const useSFU = () => {
 
   const handleLeave = () => {
     console.log('handleLeave')
-    setIsTalking(false)
-    room.close()
-    localVideo.getTracks().forEach((track) => track.stop())
-    if (localVideoRef.current) localVideoRef.current.srcObject = null
+
+    if (room) {
+      room.close()
+      localVideo.getTracks().forEach((track) => track.stop())
+      if (localVideoRef.current) localVideoRef.current.srcObject = null
+    }
   }
 
   const handleDestroy = () => {
@@ -196,16 +312,50 @@ const useSFU = () => {
     room.replaceStream(localVideo)
   }
 
+  const handleTurnVideo = (isEnabled: boolean) => {
+    console.log('handleTurnVideo', isEnabled)
+    if (localVideo) localVideo.getVideoTracks()[0].enabled = isEnabled
+    const sendData: UpdateStatus = {
+      type: 'update',
+      data: {
+        isDisplay: isEnabled
+      }
+    }
+    room.send(sendData)
+  }
+  const handleTurnVoice = (isEnabled: boolean) => {
+    console.log('handleTurnVoice', isEnabled)
+    if (localVideo) localVideo.getAudioTracks()[0].enabled = isEnabled
+    const sendData: UpdateStatus = {
+      type: 'update',
+      data: {
+        isMute: isEnabled
+      }
+    }
+    room.send(sendData)
+  }
+
   const videosInfo = {
     localInfo: { id: myId, video: localVideoRef },
     remotesInfo: remoteUsersInfo
   }
   const handles = {
     handleShare: handleShare,
-    handleShareClose: handleShareClose
+    handleShareClose: handleShareClose,
+    handleTurnVideo: handleTurnVideo,
+    handleTurnVoice: handleTurnVoice
   }
 
-  return [videosInfo, handles, isTalking] as const
+  const testSend = () => {
+    room.send({
+      employeeId: employeeId,
+      employeeName: ownEmployeeData.employeeName,
+      isDisplay: true,
+      isMute: true
+    })
+  }
+
+  return [videosInfo, handles, testSend] as const
 }
 
 export default useSFU

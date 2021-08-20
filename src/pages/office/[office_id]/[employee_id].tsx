@@ -8,6 +8,7 @@ import {
   fetchEmployeesStatus,
   fetchEmployees
 } from '../../../stores/slices/employeesStatusSlice'
+import { fetchFurniture } from '../../../stores/slices/furnitureStatusSlice'
 import {
   fetchOffice,
   setScrollValue
@@ -33,6 +34,31 @@ type RoomsData = {
   }[]
 }
 
+type Furniture = {
+  room_id: string
+  furniture_name: string
+  furniture_detail: string
+  furniture_size: number
+  is_close: boolean
+  authorities: string[]
+  x_coordinate: number
+  y_coordinate: number
+  join_employees: []
+}
+
+type FurnitureList = {
+  furnitureId: string
+  roomId: string
+  furnitureName: string
+  furnitureDetail: string
+  furnitureSize: number
+  isClose: boolean
+  authorities: string[]
+  xCoordinate: number
+  yCoordinate: number
+  joinEmployees: []
+}[]
+
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
@@ -46,7 +72,8 @@ export const getStaticProps = async ({ params }) => {
   let isSuccess: boolean
   let officeData: OfficeData
   let employeeList = []
-  let roomList = []
+  const roomList = []
+  const furnitureList: FurnitureList = []
 
   await sdb
     .collection('offices')
@@ -112,6 +139,29 @@ export const getStaticProps = async ({ params }) => {
       isSuccess = false
     })
 
+  await sdb
+    .collection('offices')
+    .doc(officeId)
+    .collection('furniture')
+    .get()
+    .then((snapshots) => {
+      snapshots.forEach((snapshot) => {
+        const furniture = snapshot.data() as Furniture
+        furnitureList.push({
+          furnitureId: snapshot.id,
+          roomId: furniture.room_id,
+          furnitureName: furniture.furniture_name,
+          furnitureDetail: furniture.furniture_detail,
+          furnitureSize: furniture.furniture_size,
+          isClose: furniture.is_close,
+          authorities: furniture.authorities,
+          xCoordinate: furniture.x_coordinate,
+          yCoordinate: furniture.y_coordinate,
+          joinEmployees: furniture.join_employees
+        })
+      })
+    })
+
   if (isSuccess) {
     console.log('employeeList', employeeList)
     return {
@@ -119,7 +169,8 @@ export const getStaticProps = async ({ params }) => {
         officeData: { officeId: officeId, officeName: officeData.office_name },
         yourEmployeeId: employeeId,
         employeeList: employeeList,
-        roomList: roomList
+        roomList: roomList,
+        furnitureList: furnitureList
       },
       revalidate: 30
     }
@@ -135,7 +186,8 @@ export const getStaticProps = async ({ params }) => {
 
 const Office: NextPage<props> = (props) => {
   console.log('Office再レンダリング')
-  const { officeData, yourEmployeeId, employeeList, roomList } = props
+  const { officeData, yourEmployeeId, employeeList, roomList, furnitureList } =
+    props
   console.log('officeData->', officeData, 'employeeList->', employeeList)
   const dispatch = useDispatch()
 
@@ -148,6 +200,7 @@ const Office: NextPage<props> = (props) => {
     )
     dispatch(fetchOffice(officeData))
     dispatch(fetchRooms(roomList))
+    dispatch(fetchFurniture(furnitureList))
 
     const leave = async () => {
       await db
@@ -171,8 +224,6 @@ const Office: NextPage<props> = (props) => {
       console.log('縦スクロール：' + window.scrollY)
     }
     window.addEventListener('scroll', () => {
-      console.log('横スクロール：' + window.scrollX)
-      console.log('縦スクロール：' + window.scrollY)
       dispatch(setScrollValue({ x: window.scrollX, y: window.scrollY }))
     })
 
@@ -230,6 +281,33 @@ const Office: NextPage<props> = (props) => {
           }
         })
         dispatch(fetchRooms(roomList))
+      })
+    return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = db
+      .collection('offices')
+      .doc(officeData.officeId)
+      .collection('furniture')
+      .onSnapshot(async (snapshots) => {
+        const furnitureList: FurnitureList = []
+        snapshots.forEach((snapshot) => {
+          const furniture = snapshot.data() as Furniture
+          furnitureList.push({
+            furnitureId: snapshot.id,
+            roomId: furniture.room_id,
+            furnitureName: furniture.furniture_name,
+            furnitureDetail: furniture.furniture_detail,
+            furnitureSize: furniture.furniture_size,
+            isClose: furniture.is_close,
+            authorities: furniture.authorities,
+            xCoordinate: furniture.x_coordinate,
+            yCoordinate: furniture.y_coordinate,
+            joinEmployees: furniture.join_employees
+          })
+        })
+        dispatch(fetchFurniture(furnitureList))
       })
     return unsubscribe
   }, [])

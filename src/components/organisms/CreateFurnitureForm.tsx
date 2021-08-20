@@ -9,11 +9,13 @@ import { RadioButtons } from '../molecules'
 import {
   getNewFurniture,
   setNewFurnitureName,
-  setNewFurnitureDetail
+  setNewFurnitureDetail,
+  getNewFurnitureSize
 } from '../../stores/slices/newFurnitureSlice'
 import { InputText } from '../atoms'
 import Select from 'react-select'
 import Styles from '../../../styles/sass/createFurnitureForm.module.scss'
+import { OBJECTSIZE } from './utils/iconSize'
 
 const CreateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()
@@ -22,8 +24,14 @@ const CreateFurnitureForm: VFC = () => {
     useFurnitureRadioControl()
   const [changeIsClose, isCloseRadioList] = useIsCloseRadioControl()
   const [authorityData, selectAuthority] = useSelectAuthority()
-
   const { furnitureName, furnitureDetail } = getNewFurniture(selector)
+  const furnitureSize = getNewFurnitureSize(selector)
+
+  const height = furnitureSize * 100 + 300
+
+  const formHeight = {
+    height: height
+  }
 
   const inputFurnitureName = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setNewFurnitureName(e.target.value))
@@ -33,7 +41,7 @@ const CreateFurnitureForm: VFC = () => {
   }
 
   return (
-    <div className={Styles.root}>
+    <div className={Styles.root} style={formHeight}>
       <InputText
         label={'オブジェクト名を入力してください'}
         value={furnitureName}

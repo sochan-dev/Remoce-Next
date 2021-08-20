@@ -111,6 +111,14 @@ export const getEmployeeId = createSelector(
   (state) => state.yourId
 )
 
+export const getOwnEmployeeData = createSelector(
+  EmployeesStatusSelector,
+  (state) => {
+    const myId = state.yourId
+    return state.employees.filter((employee) => employee.employeeId === myId)[0]
+  }
+)
+
 export const getEmployees = createSelector(
   EmployeesStatusSelector,
   (state) => state.employees
