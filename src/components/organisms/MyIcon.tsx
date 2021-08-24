@@ -40,6 +40,11 @@ type OverlapEmployee = {
   halfwayPointY: number
 }
 
+type OverlapFurnitureInfo = {
+  furnitureId: string
+  isAuthority: boolean
+}
+
 type RoomPostRequest = {
   officeId: string
   joinEmployees: string[]
@@ -69,6 +74,7 @@ const MyIcon: VFC<props> = (props) => {
   const { officeId, ownData } = props
   const draggableRef = useRef(null)
   const [isHover, setIsHover] = useState(false)
+  const [message, setMessage] = useState<false | string>(false)
   const initialCoordinate = {
     left: ownData.xCoordinate,
     top: ownData.yCoordinate
@@ -126,8 +132,8 @@ const MyIcon: VFC<props> = (props) => {
   const judgeOverlapFurniture = (
     xCoordinate: number,
     yCoordinate: number
-  ): string | false => {
-    let overlapFurnitureId: string | false = false
+  ): OverlapFurnitureInfo | false => {
+    let overlapFurnitureInfo: OverlapFurnitureInfo | false = false
     const ownStartX = xCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
     const ownStartY = yCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
     const ownEndX = ownStartX + ICONSIZE
@@ -140,17 +146,28 @@ const MyIcon: VFC<props> = (props) => {
     }
 
     for (let furniture of furnitureList) {
-      if (overlapFurnitureId) break
+      if (overlapFurnitureInfo) break
       const targetInfo = {
         xCoordinate: furniture.xCoordinate,
         yCoordinate: furniture.yCoordinate,
         size: furniture.furnitureSize * OBJECTSIZE
       }
       if (judgeLargerTarget(ownInfo, targetInfo)) {
-        overlapFurnitureId = furniture.furnitureId
+        const authorities = furniture.authorities
+        let isAuthority = false
+
+        if (authorities.length === 0) isAuthority = true
+        authorities.forEach((authority) => {
+          if (authority === ownData.employeeId) isAuthority = true
+        })
+
+        overlapFurnitureInfo = {
+          furnitureId: furniture.furnitureId,
+          isAuthority: isAuthority
+        }
       }
     }
-    return overlapFurnitureId
+    return overlapFurnitureInfo
   }
 
   /********************　roomとの重なりを判定　****************** */
@@ -227,8 +244,8 @@ const MyIcon: VFC<props> = (props) => {
     const yCoordinate = initialCoordinate.top + data.lastY //自身のY座標
 
     fsUpdateCoordinate(xCoordinate, yCoordinate) //座標の更新
-    const overlapFurnitureId = judgeOverlapFurniture(xCoordinate, yCoordinate) //自身と重なっているfurnitureのIDを取得
-    if (overlapFurnitureId) {
+    const overlapFurnitureInfo = judgeOverlapFurniture(xCoordinate, yCoordinate) //自身と重なっているfurnitureのIDを取得
+    if (overlapFurnitureInfo) {
       //furnitureと重なっている
       //roomのjoinEmployeesから自身のIDを削除
       const roomReq: RoomPutRequest = {
@@ -240,12 +257,18 @@ const MyIcon: VFC<props> = (props) => {
       let roomParams = new URLSearchParams()
       roomParams.append('data', roomReqJSON)
       axios.put(`${URL}room`, roomParams)
+      //furnitureの入室権限があるか判定
+      if (!overlapFurnitureInfo.isAuthority) {
+        setMessage('入室権限がありません。')
+        setTimeout(() => setMessage(false), 2000)
+        return
+      }
       //furnitureのjoinEmployeesに自身のIDを追加
       const furnitureReq: FurnitureRequest = {
         type: 'enterExit',
         officeId: officeId,
         employeeId: ownData.employeeId,
-        furnitureId: overlapFurnitureId
+        furnitureId: overlapFurnitureInfo.furnitureId
       }
       const furnitureReqJSON = JSON.stringify(furnitureReq)
       let furnitureParams = new URLSearchParams()
@@ -332,6 +355,11 @@ const MyIcon: VFC<props> = (props) => {
           <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
             <p>ID：{ownData.employeeId}</p>
             <p>{ownData.employeeName}</p>
+          </div>
+        )}
+        {message && (
+          <div className={Styles.hover}>
+            <p>{message}</p>
           </div>
         )}
       </div>
