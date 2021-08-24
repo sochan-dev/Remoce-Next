@@ -1,4 +1,4 @@
-import React, { VFC, useEffect } from 'react'
+import React, { VFC, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { db } from '../../../firebase'
 import { updateEmployee } from '../../stores/slices/employeesStatusSlice'
@@ -40,6 +40,7 @@ type EmployeeData = {
 const CoworkerIcon: VFC<props> = (props) => {
   const dispatch = useDispatch()
   const { id, officeId, ownData } = props
+  const [isHover, setIsHover] = useState(false)
   const initialCoordinate = {
     left: ownData.xCoordinate,
     top: ownData.yCoordinate
@@ -68,7 +69,15 @@ const CoworkerIcon: VFC<props> = (props) => {
   }, [])
   return (
     <div className={Styles.coworker} style={initialCoordinate}>
-      <AccountCircleIcon className={Styles.icon} />
+      <div onMouseOver={() => setIsHover(true)}>
+        <AccountCircleIcon className={Styles.icon} />
+      </div>
+      {isHover && (
+        <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
+          <p>ID：{ownData.employeeId}</p>
+          <p>{ownData.employeeName}</p>
+        </div>
+      )}
     </div>
   )
 }

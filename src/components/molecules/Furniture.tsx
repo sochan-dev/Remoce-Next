@@ -1,4 +1,4 @@
-import React, { VFC } from 'react'
+import React, { useState, VFC } from 'react'
 import { useDispatch } from 'react-redux'
 import { OBJECTSIZE } from '../organisms/utils/iconSize'
 import {
@@ -24,6 +24,7 @@ type props = {
 
 const Furniture: VFC<props> = (props) => {
   const dispatch = useDispatch()
+  const [isHover, setIsHover] = useState(false)
   const furnitureData = props.furnitureData
   const furnitureSizeStyle = furnitureData.furnitureSize * OBJECTSIZE
   const magnification = props.virtual ? 4 : 1
@@ -52,15 +53,24 @@ const Furniture: VFC<props> = (props) => {
     dispatch(setUpdateFurniture(updateFurniture))
     dispatch(turnUpdateFurniture({ isOpen: true }))
   }
+  const isCloseMsg = furnitureData.isClose ? 'はい' : 'いいえ'
 
   return (
-    <>
-      <div
-        className={Styles.exist}
-        style={furnitureStyle}
-        onDoubleClick={() => onDoubleClick()}
-      ></div>
-    </>
+    <div
+      className={Styles.exist}
+      style={furnitureStyle}
+      onDoubleClick={() => onDoubleClick()}
+      onMouseOver={() => setIsHover(true)}
+      onMouseOut={() => setIsHover(false)}
+    >
+      {isHover && (
+        <div className={Styles.hover}>
+          <p>名前：{furnitureData.furnitureName}</p>
+          <p>詳細：{furnitureData.furnitureDetail}</p>
+          <p>閉鎖：{isCloseMsg}</p>
+        </div>
+      )}
+    </div>
   )
 }
 

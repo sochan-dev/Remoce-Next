@@ -9,6 +9,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  .hover {
+    position: absolute;
+    width: 15rem;
+    padding: 1rem;
+    background-color: antiquewhite;
+    opacity: 0.7;
+    text-align: middle;
+    margin: 0 auto;
+    p {
+      font-size: 12px;
+      padding-top: 8px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  }
 }
 
 .mine {

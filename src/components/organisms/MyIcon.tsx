@@ -1,4 +1,4 @@
-import React, { VFC, useRef, useEffect } from 'react'
+import React, { VFC, useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { db } from '../../../firebase'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
@@ -68,6 +68,7 @@ const MyIcon: VFC<props> = (props) => {
   const furnitureList = getFurniture(selector)
   const { officeId, ownData } = props
   const draggableRef = useRef(null)
+  const [isHover, setIsHover] = useState(false)
   const initialCoordinate = {
     left: ownData.xCoordinate,
     top: ownData.yCoordinate
@@ -324,7 +325,15 @@ const MyIcon: VFC<props> = (props) => {
   return (
     <Draggable nodeRef={draggableRef} onStop={handleStop} bounds="parent">
       <div ref={draggableRef} className={Styles.mine} style={initialCoordinate}>
-        <AccountCircleIcon className={Styles.icon} />
+        <div onMouseOver={() => setIsHover(true)}>
+          <AccountCircleIcon className={Styles.icon} />
+        </div>
+        {isHover && (
+          <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
+            <p>ID：{ownData.employeeId}</p>
+            <p>{ownData.employeeName}</p>
+          </div>
+        )}
       </div>
     </Draggable>
   )
