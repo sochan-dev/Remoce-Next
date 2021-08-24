@@ -14,19 +14,27 @@ export interface EmployeesStatus {
   employees: {
     employeeId: string
     employeeName: string
+    employeePicture: string
     xCoordinate: number
     yCoordinate: number
   }[]
 }
 
-type Employee = {
+type UpdateEmployee = {
   id: number
   employeeData: {
     employeeId: string
     employeeName: string
+    employeePicture: string
     xCoordinate: number
     yCoordinate: number
   }
+}
+
+type Employee = {
+  employeeName: string
+  xCoordinate: number
+  yCoordinate: number
 }
 //signUp関数が受け取るuserの入力情報
 
@@ -68,10 +76,22 @@ export const employeesStatusSlice = createSlice({
     ) => {
       state.employees = action.payload
     },
-    updateEmployee: (state, action: PayloadAction<Employee>) => {
+    updateEmployee: (state, action: PayloadAction<UpdateEmployee>) => {
       state.employees[action.payload.id] = action.payload.employeeData
     },
-    addEmployee: (state, action: PayloadAction<Employee['employeeData']>) => {
+    updateOwnEmployee: (state, action: PayloadAction<Employee>) => {
+      const newOwnEmployee = action.payload
+
+      state.employees = state.employees.map((employee) => {
+        return employee.employeeId === state.yourId
+          ? employee
+          : { ...employee, employeeName: newOwnEmployee.employeeName }
+      })
+    },
+    addEmployee: (
+      state,
+      action: PayloadAction<UpdateEmployee['employeeData']>
+    ) => {
       console.log('store側', action.payload)
       state.employees.push(action.payload)
     }
@@ -92,6 +112,7 @@ export const {
   fetchEmployeesStatus,
   fetchEmployees,
   updateEmployee,
+  updateOwnEmployee,
   addEmployee
 } = employeesStatusSlice.actions
 

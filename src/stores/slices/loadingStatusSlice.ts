@@ -52,15 +52,12 @@ export const loadingStatusSlice = createSlice({
     builder
       .addCase(signUp.pending, (state, action) => {
         state.isLoading = true
-        console.log('pending...(loadingStatusSlice)')
       })
       .addCase(signUp.fulfilled, (state, action) => {
         state.isLoading = false
-        console.log('fulfilled!!(loadingStatusSlice)')
       })
       .addCase(signUp.rejected, (state, action) => {
         state.isLoading = false
-        console.log('rejected!!(loadingStatusSlice)')
       })
   }
 })

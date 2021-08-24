@@ -1,4 +1,4 @@
-import React, { VFC, useRef } from 'react'
+import React, { VFC, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { db } from '../../../firebase'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
@@ -17,6 +17,7 @@ type props = {
   ownData: {
     employeeId: string
     employeeName: string
+    employeePicture: string
     xCoordinate: number
     yCoordinate: number
   }
@@ -24,6 +25,13 @@ type props = {
     officeWidth: number
     officeHeight: number
   }
+}
+
+type EmployeeData = {
+  employee_name: string
+  employee_picture: string
+  employee_x_coordinate: number
+  employee_y_coordinate: number
 }
 
 type OverlapEmployee = {
@@ -46,13 +54,13 @@ type RoomPutRequest = {
 }
 
 type FurnitureRequest = {
+  type: 'enterExit'
   officeId: string
   employeeId: string
   furnitureId: string | string[]
 }
 
 const MyIcon: VFC<props> = (props) => {
-  console.log('MyIcon再レンダリング')
   const selector = useSelector((state) => state)
   const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/'
   const employees = getEmployees(selector)
@@ -198,7 +206,6 @@ const MyIcon: VFC<props> = (props) => {
           ((sensorStartY <= employeeStartY && employeeStartY <= sensorEndY) ||
             (sensorStartY <= employeeEndY && employeeEndY <= sensorEndY))
         ) {
-          console.log('employeeと重なった')
           const halfwayPointX = Math.round((sensorStartX + employeeStartX) / 2)
           const halfwayPointY = Math.round((sensorStartY + employeeStartY) / 2)
           const overlapEmployee: OverlapEmployee = {
@@ -234,6 +241,7 @@ const MyIcon: VFC<props> = (props) => {
       axios.put(`${URL}room`, roomParams)
       //furnitureのjoinEmployeesに自身のIDを追加
       const furnitureReq: FurnitureRequest = {
+        type: 'enterExit',
         officeId: officeId,
         employeeId: ownData.employeeId,
         furnitureId: overlapFurnitureId
@@ -247,6 +255,7 @@ const MyIcon: VFC<props> = (props) => {
       const joinFurnitureList = judgeJoinFurniture()
       if (joinFurnitureList.length > 0) {
         const furnitureReq: FurnitureRequest = {
+          type: 'enterExit',
           officeId: officeId,
           employeeId: ownData.employeeId,
           furnitureId: joinFurnitureList

@@ -21,6 +21,7 @@ type OfficeData = {
 }
 type EmployeeData = {
   employee_name: string
+  employee_picture: string
   employee_x_coordinate: number
   employee_y_coordinate: number
 }
@@ -105,6 +106,7 @@ export const getStaticProps = async ({ params }) => {
             employeeList.push({
               employeeId: employee.id,
               employeeName: employeeData.employee_name,
+              employeePicture: employeeData.employee_picture,
               xCoordinate: employeeData.employee_x_coordinate,
               yCoordinate: employeeData.employee_y_coordinate
             })
@@ -163,7 +165,6 @@ export const getStaticProps = async ({ params }) => {
     })
 
   if (isSuccess) {
-    console.log('employeeList', employeeList)
     return {
       props: {
         officeData: { officeId: officeId, officeName: officeData.office_name },
@@ -185,13 +186,12 @@ export const getStaticProps = async ({ params }) => {
 }
 
 const Office: NextPage<props> = (props) => {
-  console.log('Office再レンダリング')
+  const dispatch = useDispatch()
   const { officeData, yourEmployeeId, employeeList, roomList, furnitureList } =
     props
-  console.log('officeData->', officeData, 'employeeList->', employeeList)
-  const dispatch = useDispatch()
 
   useEffect(() => {
+    //ISRで取得したデータをstoreに格納
     dispatch(
       fetchEmployeesStatus({
         yourId: yourEmployeeId,
@@ -219,10 +219,8 @@ const Office: NextPage<props> = (props) => {
   }, [])
 
   useEffect(() => {
-    const scrollAction = () => {
-      console.log('横スクロール：' + window.scrollX)
-      console.log('縦スクロール：' + window.scrollY)
-    }
+    //スクロールした座標を更新
+    const scrollAction = () => {}
     window.addEventListener('scroll', () => {
       dispatch(setScrollValue({ x: window.scrollX, y: window.scrollY }))
     })
@@ -251,11 +249,11 @@ const Office: NextPage<props> = (props) => {
               empList.push({
                 employeeId: employee.id,
                 employeeName: employeeData.employee_name,
+                employeePicture: employeeData.employee_picture,
                 xCoordinate: employeeData.employee_x_coordinate,
                 yCoordinate: employeeData.employee_y_coordinate
               })
             })
-            console.log('出社してる人', empList)
             dispatch(fetchEmployees(empList))
           })
       })
@@ -270,7 +268,6 @@ const Office: NextPage<props> = (props) => {
       .collection('room')
       .doc('room')
       .onSnapshot(async (snapshot) => {
-        console.log('room listener')
         const rooms = snapshot.data().rooms as RoomsData['rooms']
         const roomList = rooms.map((room) => {
           return {

@@ -127,12 +127,10 @@ export const authStatusSlice = createSlice({
         state.isLoading = true
       })
       .addCase(authentication.fulfilled, (state, action) => {
-        console.log('payload', action.payload)
         if (action.payload) {
           state.userId = action.payload
           state.isLoading = false
         } else {
-          console.log('認証失敗！！！')
           state.isLoading = false
           Router.push('/')
         }

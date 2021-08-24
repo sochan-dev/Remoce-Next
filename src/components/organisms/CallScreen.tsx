@@ -7,7 +7,6 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import Styles from '../../../styles/sass/callScreen.module.scss'
 
 const CallScreen: VFC = () => {
-  console.log('---CallScreenコンポーネント再レンダリング---')
   const [isDisplay, setIsDisplay] = useState(false)
   const [isMinimize, setIsMinimize] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })

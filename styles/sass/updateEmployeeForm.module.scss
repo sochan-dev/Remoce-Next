@@ -1,0 +1,14 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  .previewArea {
+    margin: 0 auto;
+    display: block;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  input[file] {
+    display: none;
+  }
+}

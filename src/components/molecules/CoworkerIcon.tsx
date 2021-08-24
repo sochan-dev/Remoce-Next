@@ -11,6 +11,7 @@ type props = {
   ownData: {
     employeeId: string
     employeeName: string
+    employeePicture: string
     xCoordinate: number
     yCoordinate: number
   }
@@ -23,6 +24,7 @@ type props = {
 type Employee_data = {
   employee_id: string
   employee_name: string
+  employee_picture: string
   employee_x_coordinate: number
   employee_y_coordinate: number
 }
@@ -30,6 +32,7 @@ type Employee_data = {
 type EmployeeData = {
   employeeId: string
   employeeName: string
+  employeePicture: string
   xCoordinate: number
   yCoordinate: number
 }
@@ -49,17 +52,15 @@ const CoworkerIcon: VFC<props> = (props) => {
       .collection('employees')
       .doc(ownData.employeeId)
       .onSnapshot((doc) => {
-        console.log('発火してる')
         const employee = doc.data() as Employee_data
-
-        console.log('coworker_employee', employee)
         const employeeData: EmployeeData = {
           employeeId: doc.id,
           employeeName: employee.employee_name,
+          employeePicture: employee.employee_picture,
           xCoordinate: employee.employee_x_coordinate,
           yCoordinate: employee.employee_y_coordinate
         }
-        console.log('employee', employee)
+
         dispatch(updateEmployee({ id: id, employeeData: employeeData }))
       })
 

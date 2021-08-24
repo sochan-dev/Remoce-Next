@@ -15,7 +15,6 @@ export const getStaticProps = async () => {
 
 const SignUp: NextPage<props> = () => {
   useEffect(() => {
-    console.log('認証')
     auth.onAuthStateChanged((user) => {
       user && Router.push(`/home/${user.uid}`)
     })

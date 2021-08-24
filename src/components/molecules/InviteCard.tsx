@@ -35,11 +35,11 @@ const InviteCard: VFC<props> = (props) => {
       .add({
         is_office: false,
         employee_name: employeeName,
+        employee_picture: '',
         employee_x_coordinate: 20,
         employee_y_coordinate: 20
       })
       .then(async (doc) => {
-        console.log('carddoc->', doc, 'carddoc.id->', doc.id)
         employeeId = doc.id
         await db
           .collection('users')

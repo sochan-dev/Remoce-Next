@@ -3,12 +3,21 @@
 
 %furnitureRoot {
   border: solid 2px black;
+  box-sizing: border-box;
 }
 
 .new {
   @extend %furnitureRoot;
-  position: fixed !important;
+  position: absolute;
   z-index: 8;
+  border: blue 2px solid;
+}
+
+.update {
+  @extend %furnitureRoot;
+  position: absolute;
+  z-index: 8;
+  border: blue 2px solid;
 }
 
 .exist {

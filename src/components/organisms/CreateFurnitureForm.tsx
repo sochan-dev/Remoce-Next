@@ -1,4 +1,4 @@
-import React, { VFC, ChangeEvent } from 'react'
+import React, { VFC, ChangeEvent, Dispatch, SetStateAction } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   useFurnitureRadioControl,
@@ -6,6 +6,7 @@ import {
   useSelectAuthority
 } from '../../hooks'
 import { RadioButtons } from '../molecules'
+import { VirtualArea } from '.'
 import {
   getNewFurniture,
   setNewFurnitureName,
@@ -15,7 +16,7 @@ import {
 import { InputText } from '../atoms'
 import Select from 'react-select'
 import Styles from '../../../styles/sass/createFurnitureForm.module.scss'
-import { OBJECTSIZE } from './utils/iconSize'
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 
 const CreateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()
@@ -27,12 +28,6 @@ const CreateFurnitureForm: VFC = () => {
   const { furnitureName, furnitureDetail } = getNewFurniture(selector)
   const furnitureSize = getNewFurnitureSize(selector)
 
-  const height = furnitureSize * 100 + 300
-
-  const formHeight = {
-    height: height
-  }
-
   const inputFurnitureName = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setNewFurnitureName(e.target.value))
   }
@@ -41,7 +36,7 @@ const CreateFurnitureForm: VFC = () => {
   }
 
   return (
-    <div className={Styles.root} style={formHeight}>
+    <div className={Styles.root}>
       <InputText
         label={'オブジェクト名を入力してください'}
         value={furnitureName}
@@ -66,10 +61,11 @@ const CreateFurnitureForm: VFC = () => {
         isMulti
         options={authorityData.employees}
         onChange={selectAuthority}
-        id="authorities"
-        instanceId="authorities"
+        id="authoritie"
+        instanceId="authoritie"
         value={authorityData.selectedAuthorities}
       />
+      <VirtualArea />
     </div>
   )
 }

@@ -10,6 +10,7 @@ import { db } from '../../firebase'
 
 type Employee_data = {
   employee_name: string
+  employee_picture: string
   employee_x_coordinate: number
   employee_y_coordinate: number
 }
@@ -43,7 +44,8 @@ const useSelectAuthority = () => {
     const authorities: string[] = selectedAuthorities.map((authority) => {
       return authority.value
     })
-    setNewFurnitureAuthorities(authorities)
+    console.log('selectAuthority', authorities)
+    dispatch(setNewFurnitureAuthorities(authorities))
   }
 
   useEffect(() => {

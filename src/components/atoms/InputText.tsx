@@ -1,4 +1,10 @@
-import React, { VFC, useState, ChangeEvent } from 'react'
+import React, {
+  useState,
+  ChangeEvent,
+  forwardRef,
+  MutableRefObject,
+  Ref
+} from 'react'
 import Styles from '../../../styles/sass/inputText.module.scss'
 import classNames from 'classnames'
 
@@ -7,12 +13,14 @@ type props = {
   w?: 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
   value: string
   label: string
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
-const InputText: VFC<props> = (props) => {
+const InputText = forwardRef(function (
+  props: props,
+  ref: Ref<HTMLInputElement>
+) {
   const [isActive, setIsActive] = useState(false)
-
   const handleOnFocus = () => setIsActive(!isActive)
 
   return (
@@ -31,13 +39,14 @@ const InputText: VFC<props> = (props) => {
         type={props.type}
         id={props.label}
         value={props.value}
-        onChange={(e) => props.onChange(e)}
+        onChange={props.onChange ? (e) => props.onChange(e) : undefined}
         onFocus={() => handleOnFocus()}
         onBlur={() => handleOnFocus()}
+        ref={ref}
       />
     </div>
   )
-}
+})
 
 InputText.defaultProps = {
   type: 'text',

@@ -15,7 +15,6 @@ const CallScreenHeader: VFC<props> = (props) => {
     <div className={Styles.root}>
       <IconButton
         onClick={() => {
-          console.log('minimize!!!!!')
           updateIsMinimize(true)
         }}
       >

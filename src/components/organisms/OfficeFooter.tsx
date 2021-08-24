@@ -1,30 +1,72 @@
 import React, { VFC } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ActionButton } from '../atoms'
-import { setCreateDisplay } from '../../stores/slices/newFurnitureSlice'
+import {
+  UpdateEmployeeForm,
+  VersatilityDialog,
+  CreateFurnitureForm
+} from '../organisms'
+import {
+  getAllDialogStatus,
+  turnCreateFurniture,
+  turnUpdateFurniture,
+  turnUpdateEmployee
+} from '../../stores/slices/dialogsStatusSlice'
 import Styles from '../../../styles/sass/officeFooter.module.scss'
+import UpdateFurnitureForm from './UpdateFurnitureForm'
 
-const rootStyle = {
-  position: 'fixed',
-  display: 'flex',
-  bottom: 0,
-  left: 0,
-  width: '100%',
-  height: '50px',
-  border: 'solid 1px black',
-  backgroundColor: 'red',
-  zIndex: 1
-}
-
-const OfficeFooter = () => {
+const OfficeFooter: VFC = () => {
   const dispatch = useDispatch()
-  const handleOnClick = () => {
-    dispatch(setCreateDisplay())
+  const selector = useSelector((state) => state)
+  const dialogsStatus = getAllDialogStatus(selector)
+
+  const handleUpdateEmployeeDialog = () => {
+    dispatch(turnUpdateEmployee())
   }
+  const handleCreateFurnitureDialog = () => {
+    dispatch(turnCreateFurniture())
+  }
+
   return (
-    <div className={Styles.root}>
-      <ActionButton label={'新規作成'} w={10} onClick={handleOnClick} />
-    </div>
+    <>
+      <div className={Styles.root}>
+        <ActionButton
+          label={'オブジェクトを作成'}
+          w={10}
+          onClick={handleCreateFurnitureDialog}
+        />
+        <ActionButton
+          label={'社員情報'}
+          w={10}
+          onClick={handleUpdateEmployeeDialog}
+        />
+      </div>
+
+      {/*--------ダイアログ-------- */}
+      <VersatilityDialog
+        isOpen={dialogsStatus.updateEmployee}
+        setIsOpen={turnUpdateEmployee}
+        maxWidth={'md'}
+      >
+        <UpdateEmployeeForm />
+      </VersatilityDialog>
+
+      <VersatilityDialog
+        isOpen={dialogsStatus.createFurniture}
+        setIsOpen={turnCreateFurniture}
+        maxWidth={'md'}
+      >
+        <CreateFurnitureForm />
+      </VersatilityDialog>
+
+      <VersatilityDialog
+        isOpen={dialogsStatus.updateFurniture}
+        setIsOpen={turnUpdateFurniture}
+        maxWidth={'md'}
+      >
+        <UpdateFurnitureForm />
+      </VersatilityDialog>
+    </>
   )
 }
 

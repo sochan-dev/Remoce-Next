@@ -9,7 +9,6 @@ import { CoworkerIcon } from '../molecules'
 import { MyIcon } from '../organisms'
 
 const ShowEmployeesArea: VFC = () => {
-  console.log('ShowEmployeesArea再レンダリング')
   const selector = useSelector((state) => state)
   const { employees, yourId } = getEmployeesStatus(selector)
   const officeId = getOfficeId(selector)

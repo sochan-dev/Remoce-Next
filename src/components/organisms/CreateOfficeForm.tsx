@@ -39,11 +39,11 @@ const CreateOfficeHome: VFC = () => {
           .add({
             is_office: false,
             employee_name: employeeName,
+            employee_picture: '',
             employee_x_coordinate: 20,
             employee_y_coordinate: 20
           })
           .then(async (doc) => {
-            console.log('doc->', doc, 'doc.id->', doc.id)
             employeeId = doc.id
             await db
               .collection('users')
@@ -57,9 +57,7 @@ const CreateOfficeHome: VFC = () => {
               })
           })
       })
-    console.log(router, Router)
     router.push(`/office/${officeId}/${employeeId}`)
-    //``
   }
 
   return (

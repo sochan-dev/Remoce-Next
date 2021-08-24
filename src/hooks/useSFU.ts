@@ -8,7 +8,6 @@ import {
   getOwnEmployeeData
 } from '../stores/slices/employeesStatusSlice'
 import Peer, { SfuRoom } from 'skyway-js'
-import { database } from 'firebase-admin'
 
 type EmployeeStatus = {
   employeeId: string
@@ -118,12 +117,10 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   useEffect(() => {
-    console.log('useEffect内sfuRoomid', sfuRoomId)
     sfuRoomId !== '' ? setDisplay(true) : setDisplay(false)
   }, [sfuRoomId])
 
   useEffect(() => {
-    console.log('==========useEffect起動==============-')
     if (sfuRoomId !== '') {
       console.log('sfuRoomId', sfuRoomId)
       handleJoin(sfuRoomId)
@@ -133,14 +130,12 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }, [sfuRoomId])
 
   const setRoomEvent = () => {
-    console.log('-------------------setRoomEvent------------------------------')
     //room.removeAllListeners()
     room.on('open', () => {
       console.log('!!openイベント発火!!')
     })
 
     room.on('stream', async (stream) => {
-      console.log('stream受信！！！！', stream)
       const id = stream.peerId
       const video = stream
       let isUpdate = true
@@ -184,7 +179,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
       console.log('dataイベント受信', src, data)
       switch (data.type) {
         case 'add':
-          console.log('switch-add通過')
           setRemoteUsersInfo((beforeUserInfo) => {
             return beforeUserInfo.map((beforeUser) => {
               return beforeUser.id === src
@@ -194,7 +188,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
           })
           break
         case 'update':
-          console.log('switch-update通過')
           setRemoteUsersInfo((beforeUserInfo) => {
             return beforeUserInfo.map((beforeInfo) => {
               return beforeInfo.id === src
@@ -219,8 +212,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   const handleJoin = async (sfuRoomId: string) => {
-    console.log('handleJoin')
-
     await navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((localStream) => {
@@ -239,8 +230,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   const handleLeave = () => {
-    console.log('handleLeave')
-
     if (room) {
       room.close()
       localVideo.getTracks().forEach((track) => track.stop())
@@ -249,13 +238,11 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   const handleDestroy = () => {
-    console.log('破棄')
     peer.destroy()
     setRemoteUsersInfo([])
   }
 
   const handleShare = async () => {
-    console.log('共有')
     const md = navigator.mediaDevices as any //型が正しくても（：MediaStream）getDisplayMediaを見つけてくれない。現状対処法無い。
     const localSharedScreen = await md.getDisplayMedia({
       video: true,
@@ -313,7 +300,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   const handleTurnVideo = (isEnabled: boolean) => {
-    console.log('handleTurnVideo', isEnabled)
     if (localVideo) localVideo.getVideoTracks()[0].enabled = isEnabled
     const sendData: UpdateStatus = {
       type: 'update',
@@ -324,7 +310,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
     room.send(sendData)
   }
   const handleTurnVoice = (isEnabled: boolean) => {
-    console.log('handleTurnVoice', isEnabled)
     if (localVideo) localVideo.getAudioTracks()[0].enabled = isEnabled
     const sendData: UpdateStatus = {
       type: 'update',

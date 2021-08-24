@@ -15,10 +15,6 @@ type props = {
 }
 
 const UserVideo: VFC<props> = (props) => {
-  console.log(
-    '---UserVideoコンポーネント再レンダリング---',
-    props.employeeStatus
-  )
   const { video, userId, employeeStatus } = props
   const remoteRef = useRef<HTMLVideoElement>(null)
 

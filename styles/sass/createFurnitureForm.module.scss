@@ -1,12 +1,11 @@
 @charset "UTF-8";
 @import './variables.scss';
 .root {
-  position: fixed;
-  bottom: 40px;
-  left: 0;
-  width: 400px;
-  background-color: white;
-  opacity: 0.4;
-  padding: 20px;
-  z-index: 6;
+  .virtualArea {
+    margin: 0 auto;
+    background-color: azure;
+    width: 600px;
+    height: 300px;
+    border: 1px black solid;
+  }
 }

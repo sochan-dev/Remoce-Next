@@ -8,27 +8,33 @@ import { createSelector } from 'reselect'
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
+
+type UpdateInfo = {
+  furnitureId: string
+  position: {
+    x: number
+    y: number
+  }
+}
 export interface NewFurniture {
-  isCreate: boolean
-  isDisplay: boolean
   furnitureName: string
   furnitureDetail: string
   furnitureSize: number
   isClose: boolean
   authorities: string[]
+  updateInfo: UpdateInfo | false
 }
 
 /*////////////////////////////////////////////////
   stateの初期値
 /*/ ///////////////////////////////////////////////
 const initialState: NewFurniture = {
-  isCreate: false,
-  isDisplay: false,
   furnitureName: '',
   furnitureDetail: '',
   furnitureSize: 2,
   isClose: false,
-  authorities: []
+  authorities: [],
+  updateInfo: false
 }
 
 /*////////////////////////////////////////////////
@@ -47,10 +53,6 @@ export const newFurnitureSlice = createSlice({
   initialState,
   //reducer
   reducers: {
-    setCreateDisplay: (state) => {
-      state.isCreate = !state.isCreate
-      state.isDisplay = !state.isDisplay
-    },
     setNewFurnitureName: (state, action: PayloadAction<string>) => {
       state.furnitureName = action.payload
     },
@@ -64,19 +66,32 @@ export const newFurnitureSlice = createSlice({
       state.isClose = action.payload
     },
     setNewFurnitureAuthorities: (state, action: PayloadAction<string[]>) => {
+      console.log('set')
       state.authorities = action.payload
     },
-    clearIsCreate: (state) => {
-      state.isCreate = false
+    setUpdateFurniture: (state, action: PayloadAction<NewFurniture>) => {
+      const updateFurniture = action.payload
+      state.furnitureName = updateFurniture.furnitureName
+      state.furnitureDetail = updateFurniture.furnitureDetail
+      state.furnitureSize = updateFurniture.furnitureSize
+      state.isClose = updateFurniture.isClose
+      state.authorities = updateFurniture.authorities
+      state.updateInfo = updateFurniture.updateInfo
     },
+    setUpdatePosition: (
+      state,
+      action: PayloadAction<{ x: number; y: number }>
+    ) => {
+      if (state.updateInfo) state.updateInfo.position = action.payload
+    },
+
     clearNewFurniture: (state) => {
-      state.isCreate = false
-      state.isDisplay = false
       state.furnitureName = ''
       state.furnitureDetail = ''
       state.furnitureSize = 2
       state.isClose = false
       state.authorities = []
+      state.updateInfo = false
     }
   },
   //AsyncThunkを扱うreducer
@@ -92,13 +107,15 @@ export const newFurnitureSlice = createSlice({
   Actions
 /*/ ///////////////////////////////////////////////
 export const {
-  setCreateDisplay,
+  //setCreateDisplay,
   setNewFurnitureName,
   setNewFurnitureDetail,
   setNewFurnitureSize,
   setNewFurnitureIsClose,
   setNewFurnitureAuthorities,
-  clearIsCreate,
+  setUpdateFurniture,
+  setUpdatePosition,
+  //clearIsCreate,
   clearNewFurniture
 } = newFurnitureSlice.actions
 
@@ -108,14 +125,6 @@ export const {
 export const newFurnitureSelector = (state): NewFurniture =>
   state.newFurnitureStatus
 
-export const getIsCreate = createSelector(
-  newFurnitureSelector,
-  (state) => state.isCreate
-)
-export const getIsDisplay = createSelector(
-  newFurnitureSelector,
-  (state) => state.isDisplay
-)
 export const getFurnitureName = createSelector(
   newFurnitureSelector,
   (state) => state.furnitureName
@@ -136,6 +145,9 @@ export const getNewFurnitureAuthorities = createSelector(
   newFurnitureSelector,
   (state) => state.authorities
 )
-
+export const getUpdateInfo = createSelector(
+  newFurnitureSelector,
+  (state) => state.updateInfo
+)
 //エクスポート
 export default newFurnitureSlice.reducer

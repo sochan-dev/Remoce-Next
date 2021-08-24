@@ -45,7 +45,6 @@ export const getStaticProps = async ({ params }) => {
     .get()
     .then(async (snapshot) => {
       if (!snapshot.empty) {
-        console.log('---------------not empty')
         for await (let childSnapshot of snapshot.docs) {
           const employee = childSnapshot.data() as employeeData
           await sdb
@@ -79,7 +78,6 @@ export const getStaticProps = async ({ params }) => {
     .get()
     .then(async (snapshot) => {
       if (Object.keys(snapshot.data()).length !== 0) {
-        console.log('--------------------exist')
         for await (let officeId of snapshot.data().invited_office) {
           await sdb
             .collection('offices')

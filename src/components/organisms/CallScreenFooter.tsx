@@ -1,4 +1,4 @@
-import React, { VFC, useState, Dispatch } from 'react'
+import React, { VFC, useState, Dispatch, SetStateAction } from 'react'
 import IconButton from '@material-ui/core/IconButton'
 import VideocamOutlinedIcon from '@material-ui/icons/VideocamOutlined' //video-on
 import VideocamOffOutlinedIcon from '@material-ui/icons/VideocamOffOutlined' //video-off
@@ -24,7 +24,7 @@ const CallScreenFooter: VFC<props> = (props) => {
   const { handleTurnVideo, handleTurnVoice, handleShare, handleShareClose } =
     props.handles
 
-  const turnDisplay = (setState: Dispatch<React.SetStateAction<boolean>>) => {
+  const turnDisplay = (setState: Dispatch<SetStateAction<boolean>>) => {
     setState((beforeState) => !beforeState)
   }
 

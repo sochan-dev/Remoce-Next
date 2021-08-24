@@ -17,8 +17,6 @@ type props = {
 }
 
 const VideoArea: VFC<props> = (props) => {
-  console.log('---VideoAreaコンポーネント再レンダリング---', props.remotesInfo)
-
   const { remotesInfo } = props
   return (
     <>

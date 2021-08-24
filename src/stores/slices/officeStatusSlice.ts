@@ -4,7 +4,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AppDispatch, AppThunk, RootState } from '..'
 import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
 import { createSelector } from 'reselect'
-import internal from 'stream'
 
 /*////////////////////////////////////////////////
   型宣言
