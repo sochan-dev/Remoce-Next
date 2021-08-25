@@ -25,6 +25,7 @@ type Employee_data = {
   employee_id: string
   employee_name: string
   employee_picture: string
+  edit_permission: boolean
   employee_x_coordinate: number
   employee_y_coordinate: number
 }
@@ -32,6 +33,7 @@ type Employee_data = {
 type EmployeeData = {
   employeeId: string
   employeeName: string
+  editPermission: boolean
   employeePicture: string
   xCoordinate: number
   yCoordinate: number
@@ -58,6 +60,7 @@ const CoworkerIcon: VFC<props> = (props) => {
           employeeId: doc.id,
           employeeName: employee.employee_name,
           employeePicture: employee.employee_picture,
+          editPermission: employee.edit_permission,
           xCoordinate: employee.employee_x_coordinate,
           yCoordinate: employee.employee_y_coordinate
         }

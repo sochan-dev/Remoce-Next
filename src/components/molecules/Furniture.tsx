@@ -1,12 +1,11 @@
 import React, { useState, VFC } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { OBJECTSIZE } from '../organisms/utils/iconSize'
-import {
-  setUpdateFurniture,
-  setNewFurnitureName
-} from '../../stores/slices/newFurnitureSlice'
+import { setUpdateFurniture } from '../../stores/slices/newFurnitureSlice'
+import { getEditPermission } from '../../stores/slices/employeesStatusSlice'
 import Styles from '../../../styles/sass/furniture.module.scss'
 import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
+
 type props = {
   virtual?: true
   furnitureData: {
@@ -23,7 +22,9 @@ type props = {
 }
 
 const Furniture: VFC<props> = (props) => {
+  const { virtual } = props
   const dispatch = useDispatch()
+  const selector = useSelector((state) => state)
   const [isHover, setIsHover] = useState(false)
   const furnitureData = props.furnitureData
   const furnitureSizeStyle = furnitureData.furnitureSize * OBJECTSIZE
@@ -36,6 +37,9 @@ const Furniture: VFC<props> = (props) => {
   }
 
   const onDoubleClick = () => {
+    const editPermission = getEditPermission(selector)
+
+    if (virtual || !editPermission) return
     const updateFurniture = {
       furnitureName: furnitureData.furnitureName,
       furnitureDetail: furnitureData.furnitureDetail,

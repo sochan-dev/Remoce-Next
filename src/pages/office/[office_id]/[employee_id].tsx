@@ -19,11 +19,26 @@ type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeData = {
   office_name: string
 }
-type EmployeeData = {
+type Employee_data = {
   employee_name: string
   employee_picture: string
+  edit_permission: boolean
   employee_x_coordinate: number
   employee_y_coordinate: number
+}
+
+type EmployeeData = {
+  employeeId: string
+  employeeName: string
+  employeePicture: string
+  editPermission: boolean
+  xCoordinate: number
+  yCoordinate: number
+}
+
+type EmployeeDataList = {
+  yourId: string
+  employees: EmployeeData[]
 }
 
 type RoomsData = {
@@ -72,7 +87,7 @@ export const getStaticProps = async ({ params }) => {
   const employeeId = params.employee_id
   let isSuccess: boolean
   let officeData: OfficeData
-  let employeeList = []
+  let employeeList: EmployeeData[] = []
   const roomList = []
   const furnitureList: FurnitureList = []
 
@@ -102,11 +117,12 @@ export const getStaticProps = async ({ params }) => {
         .get()
         .then((employeesData) => {
           employeesData.forEach((employee) => {
-            const employeeData = employee.data() as EmployeeData
+            const employeeData = employee.data() as Employee_data
             employeeList.push({
               employeeId: employee.id,
               employeeName: employeeData.employee_name,
               employeePicture: employeeData.employee_picture,
+              editPermission: employeeData.edit_permission,
               xCoordinate: employeeData.employee_x_coordinate,
               yCoordinate: employeeData.employee_y_coordinate
             })
@@ -165,6 +181,7 @@ export const getStaticProps = async ({ params }) => {
     })
 
   if (isSuccess) {
+    console.log('ISREditPermission', employeeList)
     return {
       props: {
         officeData: { officeId: officeId, officeName: officeData.office_name },
@@ -245,11 +262,12 @@ const Office: NextPage<props> = (props) => {
           .get()
           .then((employeesData) => {
             employeesData.forEach((employee) => {
-              const employeeData = employee.data() as EmployeeData
+              const employeeData = employee.data() as Employee_data
               empList.push({
                 employeeId: employee.id,
                 employeeName: employeeData.employee_name,
                 employeePicture: employeeData.employee_picture,
+                editPermission: employeeData.edit_permission,
                 xCoordinate: employeeData.employee_x_coordinate,
                 yCoordinate: employeeData.employee_y_coordinate
               })

@@ -8,13 +8,12 @@
   width: 100%;
   background-color: brown;
   z-index: 11;
-  .createFunitureArea {
+  display: flex;
+  .message {
     position: absolute;
-    bottom: 40px;
-    left: 0;
-    width: 400px;
-    height: 500px;
-
-    background-color: black;
+    top: -20px;
+    background-color: antiquewhite;
+    opacity: 0.7;
+    font-size: 12px;
   }
 }

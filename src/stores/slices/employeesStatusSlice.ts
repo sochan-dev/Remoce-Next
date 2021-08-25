@@ -15,6 +15,7 @@ export interface EmployeesStatus {
     employeeId: string
     employeeName: string
     employeePicture: string
+    editPermission: boolean
     xCoordinate: number
     yCoordinate: number
   }[]
@@ -26,6 +27,7 @@ type UpdateEmployee = {
     employeeId: string
     employeeName: string
     employeePicture: string
+    editPermission: boolean
     xCoordinate: number
     yCoordinate: number
   }
@@ -74,6 +76,7 @@ export const employeesStatusSlice = createSlice({
       state,
       action: PayloadAction<EmployeesStatus['employees']>
     ) => {
+      console.log('permissionTest', action.payload)
       state.employees = action.payload
     },
     updateEmployee: (state, action: PayloadAction<UpdateEmployee>) => {
@@ -143,6 +146,16 @@ export const getOwnEmployeeData = createSelector(
 export const getEmployees = createSelector(
   EmployeesStatusSelector,
   (state) => state.employees
+)
+
+export const getEditPermission = createSelector(
+  EmployeesStatusSelector,
+  (state) => {
+    const myId = state.yourId
+
+    return state.employees.filter((employee) => employee.employeeId === myId)[0]
+      .editPermission
+  }
 )
 //エクスポート
 export default employeesStatusSlice.reducer
