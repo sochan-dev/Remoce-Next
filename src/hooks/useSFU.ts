@@ -1,4 +1,3 @@
-import { EmployeesStatus } from './../stores/slices/employeesStatusSlice'
 import { getFurniture } from './../stores/slices/furnitureStatusSlice'
 import { useState, useEffect, useRef, SetStateAction, Dispatch } from 'react'
 import { useSelector } from 'react-redux'
@@ -8,6 +7,7 @@ import {
   getOwnEmployeeData
 } from '../stores/slices/employeesStatusSlice'
 import Peer, { SfuRoom } from 'skyway-js'
+import { sendData } from 'next/dist/next-server/server/api-utils'
 
 type EmployeeStatus = {
   employeeId: string
@@ -57,7 +57,7 @@ type UpdateStatus = {
 
 type StatusData = AddStatus | UpdateStatus
 
-let localVideo: MediaStream
+let localVideo: MediaStream = null
 let room: SfuRoom
 
 const judgeJoinRoom = (rooms: Rooms, employeeId: string) => {
@@ -122,10 +122,17 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
 
   useEffect(() => {
     if (sfuRoomId !== '') {
-      console.log('sfuRoomId', sfuRoomId)
+      console.log('通過２', sfuRoomId)
       handleJoin(sfuRoomId)
     } else {
       handleLeave()
+      if (localVideo) {
+        console.log('通過sfu２')
+        localVideo.getTracks().forEach((track) => track.stop())
+        localVideoRef.current.pause()
+        localVideoRef.current.srcObject = null
+        localVideo = null
+      }
     }
   }, [sfuRoomId])
 
@@ -205,35 +212,45 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
       }
     })
 
-    room.once('close', () => {
+    room.on('close', () => {
       console.log(`!!closeイベント発火$!!`)
+      if (localVideo) localVideo.getTracks().forEach((track) => track.stop())
+      if (localVideoRef.current) {
+        localVideoRef.current.pause()
+        localVideoRef.current.srcObject = null
+      }
+      localVideo = null
       setRemoteUsersInfo([])
+      setDisplay(false)
     })
   }
 
   const handleJoin = async (sfuRoomId: string) => {
-    await navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((localStream) => {
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = localStream
-          localVideo = localStream
-        }
+    let sendVideo: MediaStream
+    if (localVideo) {
+      sendVideo = localVideo
+    } else {
+      sendVideo = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
       })
-      .then(() => {
-        room = peer.joinRoom(sfuRoomId, { mode: 'sfu', stream: localVideo })
-        setRoomEvent()
-      })
-      .catch((err) => {
-        console.error('device error', err)
-      })
+      localVideo = sendVideo
+    }
+
+    if (localVideoRef.current) localVideoRef.current.srcObject = sendVideo
+    room = peer.joinRoom(sfuRoomId, { mode: 'sfu', stream: sendVideo })
+    setRoomEvent()
   }
 
   const handleLeave = () => {
     if (room) {
       room.close()
-      localVideo.getTracks().forEach((track) => track.stop())
-      if (localVideoRef.current) localVideoRef.current.srcObject = null
+      if (localVideo) localVideo.getTracks().forEach((track) => track.stop())
+      if (localVideoRef.current) {
+        localVideoRef.current.pause()
+        localVideoRef.current.srcObject = null
+      }
+      localVideo = null
     }
   }
 

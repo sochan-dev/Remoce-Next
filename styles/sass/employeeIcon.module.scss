@@ -3,12 +3,13 @@
 
 %employeeRoot {
   position: absolute;
-  width: 80px;
-  height: 80px;
-  border: solid 2px whitesmoke;
+  width: 150px;
+  height: 150px;
+
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 50%;
   .hover {
     position: absolute;
     width: 15rem;
@@ -24,20 +25,31 @@
       text-align: center;
     }
   }
+  .icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px gray solid;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    object-fit: cover;
+  }
 }
 
 .mine {
   @extend %employeeRoot;
   z-index: 15;
-  .icon {
-    color: red;
-  }
+}
+
+.mineSensor {
+  background-color: rgba($color: skyblue, $alpha: 0.5);
 }
 
 .coworker {
   @extend %employeeRoot;
   z-index: 9;
-  .icon {
-    color: blue;
-  }
+}
+.coworkerSensor {
+  background-color: rgba($color: gray, $alpha: 0.5);
 }

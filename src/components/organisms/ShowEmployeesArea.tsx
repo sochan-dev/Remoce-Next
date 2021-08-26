@@ -1,4 +1,4 @@
-import React, { VFC, useEffect, useRef } from 'react'
+import React, { VFC, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getEmployeesStatus } from '../../stores/slices/employeesStatusSlice'
 import {
@@ -11,6 +11,7 @@ import { MyIcon } from '../organisms'
 const ShowEmployeesArea: VFC = () => {
   const selector = useSelector((state) => state)
   const { employees, yourId } = getEmployeesStatus(selector)
+  const [isDrag, setIsDrag] = useState(false)
   const officeId = getOfficeId(selector)
   const officeSize = getOfficeSize(selector)
 
@@ -24,6 +25,8 @@ const ShowEmployeesArea: VFC = () => {
             officeId={officeId}
             ownData={employee}
             officeSize={officeSize}
+            isDrag={isDrag}
+            setIsDrag={setIsDrag}
           />
         ) : (
           <CoworkerIcon
@@ -32,6 +35,8 @@ const ShowEmployeesArea: VFC = () => {
             officeId={officeId}
             ownData={employee}
             officeSize={officeSize}
+            isDrag={isDrag}
+            setIsDrag={setIsDrag}
           />
         )
       )}

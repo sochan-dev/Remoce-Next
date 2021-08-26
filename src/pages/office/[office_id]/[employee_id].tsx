@@ -118,6 +118,8 @@ export const getStaticProps = async ({ params }) => {
         .then((employeesData) => {
           employeesData.forEach((employee) => {
             const employeeData = employee.data() as Employee_data
+            const employeePictureRef = employeeData.employee_picture
+
             employeeList.push({
               employeeId: employee.id,
               employeeName: employeeData.employee_name,

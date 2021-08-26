@@ -1,30 +1,45 @@
-import React, { VFC, useState, useRef, useEffect } from 'react'
+import React, {
+  VFC,
+  useState,
+  useRef,
+  useEffect,
+  Dispatch,
+  SetStateAction
+} from 'react'
 import { useSelector } from 'react-redux'
-import { db } from '../../../firebase'
+import { db, storage } from '../../../firebase'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { getEmployees } from '../../stores/slices/employeesStatusSlice'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import { ICONSIZE, SENSORSIZE, OBJECTSIZE } from './utils/iconSize'
+import { ICONSIZE, SENSORSIZE, OBJECTSIZE, ROOMSIZE } from './utils/iconSize'
 import Styles from '../../../styles/sass/employeeIcon.module.scss'
 import { getRooms } from '../../stores/slices/roomsStatusSlice'
 import axios from 'axios'
 import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import { judgeLargerTarget } from './utils/judgeOverlap'
+import userIcon from '../../../public/image/initial-user-icon.png'
+import classNames from 'classnames'
+
+type OwnData = {
+  employeeId: string
+  employeeName: string
+  employeePicture: string
+  xCoordinate: number
+  yCoordinate: number
+}
+
+type OfficeSize = {
+  officeWidth: number
+  officeHeight: number
+}
 
 type props = {
   id: number
   officeId: string
-  ownData: {
-    employeeId: string
-    employeeName: string
-    employeePicture: string
-    xCoordinate: number
-    yCoordinate: number
-  }
-  officeSize: {
-    officeWidth: number
-    officeHeight: number
-  }
+  isDrag: boolean
+  setIsDrag: Dispatch<SetStateAction<boolean>>
+  ownData: OwnData
+  officeSize: OfficeSize
 }
 
 type EmployeeData = {
@@ -71,14 +86,24 @@ const MyIcon: VFC<props> = (props) => {
   const employees = getEmployees(selector)
   const rooms = getRooms(selector)
   const furnitureList = getFurniture(selector)
-  const { officeId, ownData } = props
+  const { officeId, ownData, isDrag, setIsDrag } = props
   const draggableRef = useRef(null)
   const [isHover, setIsHover] = useState(false)
   const [message, setMessage] = useState<false | string>(false)
+  const [iconURL, setIconURL] = useState(userIcon)
   const initialCoordinate = {
     left: ownData.xCoordinate,
     top: ownData.yCoordinate
   }
+  const pictureRef = ownData.employeePicture
+  useEffect(() => {
+    if (pictureRef !== '') {
+      const imgRef = storage.ref().child(pictureRef)
+      imgRef.getDownloadURL().then((url) => {
+        setIconURL(url)
+      })
+    }
+  }, [pictureRef])
 
   ///////////////////////////////////////////////////////
   /********************　座標の更新　****************** */
@@ -116,14 +141,27 @@ const MyIcon: VFC<props> = (props) => {
     })
     return joinFurnitureList
   }
+  /********************　重なったemployee（Coworker）がroomと重なっているか判定　****************** */
+  const judgeEmployeeOverlapRoom = (employeeId: string) => {
+    let isOverlap = false
+    for (let room of rooms) {
+      if (isOverlap) break
+      for (let joinEmployeeId of room.joinEmployees) {
+        if (isOverlap) break
+        if (employeeId === joinEmployeeId) isOverlap = true
+      }
+    }
+    return isOverlap
+  }
   /********************　重なったemployee（Coworker）がFurnitureと重なっているか判定　****************** */
   const judgeEmployeeOverlapFurniture = (employeeId: string) => {
     let isOverlap = false
     for (let furniture of furnitureList) {
-      if (isOverlap) continue
-      furniture.joinEmployees.forEach((joinEmployeeId) => {
+      if (isOverlap) break
+      for (let joinEmployeeId of furniture.joinEmployees) {
+        if (isOverlap) break
         if (joinEmployeeId === employeeId) isOverlap = true
-      })
+      }
     }
     return isOverlap
   }
@@ -178,23 +216,22 @@ const MyIcon: VFC<props> = (props) => {
     let overlapRoomIds: string[] = []
     const ownStartX = xCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
     const ownStartY = yCoordinate + (SENSORSIZE / 2 - ICONSIZE / 2)
-    const ownEndX = ownStartX + ICONSIZE
-    const ownEndY = ownStartY + ICONSIZE
+    const ownCenterX = ownStartX + ICONSIZE / 2
+    const ownCenterY = ownStartY + ICONSIZE / 2
 
     rooms.forEach((room) => {
       const roomStartX = room.roomX
       const roomStartY = room.roomY
-      const roomEndX = roomStartX + SENSORSIZE + 20
-      const roomEndY = roomStartY + SENSORSIZE + 20
+      const roomCenterX = roomStartX + ROOMSIZE / 2
+      const roomCenterY = roomStartY + ROOMSIZE / 2
 
-      if (
-        ((ownStartX <= roomStartX && roomStartX <= ownEndX) ||
-          (roomEndX <= ownEndX && ownStartX <= roomEndX) ||
-          (roomStartX <= ownStartX && ownEndX <= roomEndX)) &&
-        ((ownStartY <= roomStartY && roomStartY <= ownEndY) ||
-          (roomEndY <= ownEndY && ownStartY <= roomEndY) ||
-          (roomStartY <= ownStartY && ownEndY <= roomEndY))
-      ) {
+      const crotchNum = ownCenterX - roomCenterX
+      const hookNum = ownCenterY - roomCenterY
+      const bowstringNum = crotchNum * crotchNum + hookNum * hookNum
+      console.log('crotch', crotchNum, 'hook', hookNum)
+      const radiusSum = ICONSIZE / 2 + ROOMSIZE / 2
+
+      if (bowstringNum <= radiusSum * radiusSum) {
         overlapRoomIds.push(room.roomId)
       }
     })
@@ -209,27 +246,44 @@ const MyIcon: VFC<props> = (props) => {
     let overlapEmployees: OverlapEmployee[] = []
     const sensorStartX = xCoordinate
     const sensorStartY = yCoordinate
-    const sensorEndX = sensorStartX + SENSORSIZE
-    const sensorEndY = sensorStartY + SENSORSIZE
+    const sensorCenterX = sensorStartX + SENSORSIZE / 2
+    const sensorCenterY = sensorStartY + SENSORSIZE / 2
     employees.forEach((employee) => {
       if (ownData.employeeId !== employee.employeeId) {
         const employeeStartX = employee.xCoordinate
         const employeeStartY = employee.yCoordinate
-        const employeeEndX = employeeStartX + SENSORSIZE
-        const employeeEndY = employeeStartY + SENSORSIZE
+        const employeeCenterX = employeeStartX + SENSORSIZE / 2
+        const employeeCenterY = employeeStartY + SENSORSIZE / 2
 
-        if (
-          ((sensorStartX <= employeeStartX && employeeStartX <= sensorEndX) ||
-            (sensorStartX <= employeeEndX && employeeEndX <= sensorEndX)) &&
-          ((sensorStartY <= employeeStartY && employeeStartY <= sensorEndY) ||
-            (sensorStartY <= employeeEndY && employeeEndY <= sensorEndY))
-        ) {
-          const halfwayPointX = Math.round((sensorStartX + employeeStartX) / 2)
-          const halfwayPointY = Math.round((sensorStartY + employeeStartY) / 2)
+        const crotchNum = sensorCenterX - employeeCenterX
+        const hookNum = sensorCenterY - employeeCenterY
+        const bowstringNum = crotchNum * crotchNum + hookNum * hookNum
+        console.log('crotch', crotchNum, 'hook', hookNum)
+        const radiusSum = SENSORSIZE //二つの円の半径の合計
+        if (bowstringNum <= radiusSum * radiusSum) {
+          const wayX =
+            sensorCenterX <= employeeCenterX
+              ? Math.round(Math.abs(crotchNum / 2))
+              : Math.round(Math.abs(crotchNum / 2)) * -1
+          const wayY =
+            sensorCenterY <= employeeCenterY
+              ? Math.round(Math.abs(hookNum / 2))
+              : Math.round(Math.abs(hookNum / 2)) * -1
+          const halfwayPointX = Math.round(
+            (sensorCenterX + employeeCenterX) / 2
+          )
+          const halfwayPointY = Math.round(
+            (sensorCenterY + employeeCenterY) / 2
+          )
+          console.log('wayX', wayX, 'wayY', wayY)
           const overlapEmployee: OverlapEmployee = {
             employeeId: employee.employeeId,
-            halfwayPointX: halfwayPointX,
-            halfwayPointY: halfwayPointY
+            halfwayPointX:
+              halfwayPointX -
+              ROOMSIZE / 2 /*sensorCenterX + wayX - ROOMSIZE / 2*/,
+            halfwayPointY:
+              halfwayPointY -
+              ROOMSIZE / 2 /*sensorCenterY + wayY - ROOMSIZE / 2*/
           }
           overlapEmployees.push(overlapEmployee)
         }
@@ -240,6 +294,7 @@ const MyIcon: VFC<props> = (props) => {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handleStop = (_: DraggableEvent, data: DraggableData) => {
+    setIsDrag(false)
     const xCoordinate = initialCoordinate.left + data.lastX //自身のX座標
     const yCoordinate = initialCoordinate.top + data.lastY //自身のY座標
 
@@ -298,8 +353,11 @@ const MyIcon: VFC<props> = (props) => {
           //重なっているemployeeがいる
 
           for (let overlapEmployee of overlapEmployees) {
-            //ここで重なってるEmployeeがFurnitureに所属していないか確認。していたらcontinue
-            if (judgeEmployeeOverlapFurniture(overlapEmployee.employeeId)) {
+            //ここで重なってるEmployeeがFurnitureかroomに所属していないか確認。していたらcontinue
+            if (
+              judgeEmployeeOverlapFurniture(overlapEmployee.employeeId) ||
+              judgeEmployeeOverlapRoom(overlapEmployee.employeeId)
+            ) {
               continue
             }
             //重なっている人数分room作成のリクエストする。
@@ -343,13 +401,31 @@ const MyIcon: VFC<props> = (props) => {
       }
     }
   }
+
+  const imgStyle = {
+    backgroundImage: `url(${iconURL})`,
+    backgroundSize: 'cover'
+  }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
-    <Draggable nodeRef={draggableRef} onStop={handleStop} bounds="parent">
-      <div ref={draggableRef} className={Styles.mine} style={initialCoordinate}>
-        <div onMouseOver={() => setIsHover(true)}>
-          <AccountCircleIcon className={Styles.icon} />
+    <Draggable
+      nodeRef={draggableRef}
+      onStop={handleStop}
+      onStart={() => setIsDrag(true)}
+      bounds="parent"
+    >
+      <div
+        ref={draggableRef}
+        className={classNames(Styles.mine, isDrag && Styles.mineSensor)}
+        style={initialCoordinate}
+      >
+        <div
+          onMouseOver={() => setIsHover(true)}
+          className={Styles.icon}
+          style={imgStyle}
+        >
+          {/*<img src={iconURL} alt="" className={Styles.icon} />*/}
         </div>
         {isHover && (
           <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>

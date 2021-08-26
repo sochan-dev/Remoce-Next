@@ -1,24 +1,37 @@
-import React, { VFC, useEffect, useState } from 'react'
+import React, {
+  VFC,
+  useEffect,
+  useState,
+  Dispatch,
+  SetStateAction
+} from 'react'
 import { useDispatch } from 'react-redux'
-import { db } from '../../../firebase'
+import { db, storage } from '../../../firebase'
 import { updateEmployee } from '../../stores/slices/employeesStatusSlice'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import Styles from '../../../styles/sass/employeeIcon.module.scss'
+import userIcon from '../../../public/image/initial-user-icon.png'
+import classNames from 'classnames'
+
+type OwnData = {
+  employeeId: string
+  employeeName: string
+  employeePicture: string
+  xCoordinate: number
+  yCoordinate: number
+}
+type OfficeSize = {
+  officeWidth: number
+  officeHeight: number
+}
 
 type props = {
   id: number
   officeId: string
-  ownData: {
-    employeeId: string
-    employeeName: string
-    employeePicture: string
-    xCoordinate: number
-    yCoordinate: number
-  }
-  officeSize: {
-    officeWidth: number
-    officeHeight: number
-  }
+  isDrag: boolean
+  setIsDrag: Dispatch<SetStateAction<boolean>>
+  ownData: OwnData
+  officeSize: OfficeSize
 }
 
 type Employee_data = {
@@ -41,13 +54,22 @@ type EmployeeData = {
 
 const CoworkerIcon: VFC<props> = (props) => {
   const dispatch = useDispatch()
-  const { id, officeId, ownData } = props
+  const { id, officeId, ownData, isDrag, setIsDrag } = props
   const [isHover, setIsHover] = useState(false)
+  const [iconURL, setIconURL] = useState(userIcon)
   const initialCoordinate = {
     left: ownData.xCoordinate,
     top: ownData.yCoordinate
   }
-
+  const pictureRef = ownData.employeePicture
+  useEffect(() => {
+    if (pictureRef !== '') {
+      const imgRef = storage.ref().child(pictureRef)
+      imgRef.getDownloadURL().then((url) => {
+        setIconURL(url)
+      })
+    }
+  }, [pictureRef])
   useEffect(() => {
     const unsubscribe = db
       .collection('offices')
@@ -70,10 +92,22 @@ const CoworkerIcon: VFC<props> = (props) => {
 
     return unsubscribe
   }, [])
+  const imgStyle = {
+    backgroundImage: `url(${iconURL})`,
+    backgroundSize: 'cover'
+  }
+
   return (
-    <div className={Styles.coworker} style={initialCoordinate}>
-      <div onMouseOver={() => setIsHover(true)}>
-        <AccountCircleIcon className={Styles.icon} />
+    <div
+      className={classNames(Styles.coworker, isDrag && Styles.coworkerSensor)}
+      style={initialCoordinate}
+    >
+      <div
+        onMouseOver={() => setIsHover(true)}
+        className={Styles.icon}
+        style={imgStyle}
+      >
+        {/*<img src={iconURL} alt="" className={Styles.icon} />*/}
       </div>
       {isHover && (
         <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
