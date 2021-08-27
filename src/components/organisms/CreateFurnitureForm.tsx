@@ -1,17 +1,17 @@
-import React, { VFC, ChangeEvent, Dispatch, SetStateAction } from 'react'
+import React, { VFC, ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   useFurnitureRadioControl,
   useIsCloseRadioControl,
-  useSelectAuthority
+  useSelectAuthority,
+  useSelectColor
 } from '../../hooks'
 import { RadioButtons } from '../molecules'
 import { VirtualArea } from '.'
 import {
   getNewFurniture,
   setNewFurnitureName,
-  setNewFurnitureDetail,
-  getNewFurnitureSize
+  setNewFurnitureDetail
 } from '../../stores/slices/newFurnitureSlice'
 import { InputText } from '../atoms'
 import Select from 'react-select'
@@ -25,8 +25,8 @@ const CreateFurnitureForm: VFC = () => {
     useFurnitureRadioControl()
   const [changeIsClose, isCloseRadioList] = useIsCloseRadioControl()
   const [authorityData, selectAuthority] = useSelectAuthority()
+  const [selectedColor, selectColor, colors] = useSelectColor()
   const { furnitureName, furnitureDetail } = getNewFurniture(selector)
-  const furnitureSize = getNewFurnitureSize(selector)
 
   const inputFurnitureName = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setNewFurnitureName(e.target.value))
@@ -56,6 +56,13 @@ const CreateFurnitureForm: VFC = () => {
         onChange={changeIsClose}
         name={'isClose'}
         radioList={isCloseRadioList}
+      />
+      <Select
+        options={colors}
+        onChange={selectColor}
+        id="colors"
+        instanceId="colors"
+        value={selectedColor}
       />
       <Select
         isMulti

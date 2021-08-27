@@ -18,6 +18,16 @@ export interface RoomsStatus {
     joinEmployees: string[]
   }[]
 }
+
+type Room_data = {
+  room_id: string
+  x_coordinate: number
+  y_coordinate: number
+  join_employees: string[]
+}
+type Rooms_data = {
+  rooms: Room_data[]
+}
 //signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
@@ -31,11 +41,28 @@ const initialState: RoomsStatus = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-//サインアップ
-export const f = createAsyncThunk<boolean>(
-  'roomsStatus/fetchRooms',
-  async () => {
-    return false
+//roomsの取得
+export const asyncFetchRooms = createAsyncThunk<RoomsStatus['rooms'], string>(
+  'roomsStatus/asyncFetchRooms',
+  async (officeId) => {
+    const snapshot = await db
+      .collection('offices')
+      .doc(officeId)
+      .collection('room')
+      .doc('room')
+      .get()
+
+    const rooms_data = snapshot.data() as Rooms_data
+    const roomsData: RoomsStatus['rooms'] = []
+    rooms_data.rooms.forEach((room_data) => {
+      roomsData.push({
+        roomId: room_data.room_id,
+        roomX: room_data.x_coordinate,
+        roomY: room_data.y_coordinate,
+        joinEmployees: room_data.join_employees
+      })
+    })
+    return roomsData
   }
 )
 
@@ -55,9 +82,11 @@ export const roomsStatusSlice = createSlice({
   extraReducers: (builder) => {
     //signUp関数
     builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
+      .addCase(asyncFetchRooms.pending, (state, action) => {})
+      .addCase(asyncFetchRooms.fulfilled, (state, action) => {
+        state.rooms = action.payload
+      })
+      .addCase(asyncFetchRooms.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////

@@ -6,14 +6,22 @@ import { sdb } from '../../../../ServerSideApp'
 import { OfficeTemplate } from '../../../components/templates'
 import {
   fetchEmployeesStatus,
-  fetchEmployees
+  fetchEmployees,
+  asyncFetchEmployees
 } from '../../../stores/slices/employeesStatusSlice'
-import { fetchFurniture } from '../../../stores/slices/furnitureStatusSlice'
 import {
+  asyncFetchFurniture,
+  fetchFurniture
+} from '../../../stores/slices/furnitureStatusSlice'
+import {
+  asyncFetchOffice,
   fetchOffice,
   setScrollValue
 } from '../../../stores/slices/officeStatusSlice'
-import { fetchRooms } from '../../../stores/slices/roomsStatusSlice'
+import {
+  asyncFetchRooms,
+  fetchRooms
+} from '../../../stores/slices/roomsStatusSlice'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeData = {
@@ -55,6 +63,7 @@ type Furniture = {
   furniture_name: string
   furniture_detail: string
   furniture_size: number
+  furniture_color: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
   is_close: boolean
   authorities: string[]
   x_coordinate: number
@@ -68,6 +77,7 @@ type FurnitureList = {
   furnitureName: string
   furnitureDetail: string
   furnitureSize: number
+  furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
   isClose: boolean
   authorities: string[]
   xCoordinate: number
@@ -173,6 +183,7 @@ export const getStaticProps = async ({ params }) => {
           furnitureName: furniture.furniture_name,
           furnitureDetail: furniture.furniture_detail,
           furnitureSize: furniture.furniture_size,
+          furnitureColor: furniture.furniture_color,
           isClose: furniture.is_close,
           authorities: furniture.authorities,
           xCoordinate: furniture.x_coordinate,
@@ -248,6 +259,13 @@ const Office: NextPage<props> = (props) => {
   }, [])
 
   useEffect(() => {
+    dispatch(asyncFetchOffice(officeData.officeId))
+    dispatch(asyncFetchEmployees(officeData.officeId))
+    dispatch(asyncFetchRooms(officeData.officeId))
+    dispatch(asyncFetchFurniture(officeData.officeId))
+  }, [])
+
+  useEffect(() => {
     const unsubscribe = db
       .collection('offices')
       .doc(officeData.officeId)
@@ -317,6 +335,7 @@ const Office: NextPage<props> = (props) => {
             furnitureName: furniture.furniture_name,
             furnitureDetail: furniture.furniture_detail,
             furnitureSize: furniture.furniture_size,
+            furnitureColor: furniture.furniture_color,
             isClose: furniture.is_close,
             authorities: furniture.authorities,
             xCoordinate: furniture.x_coordinate,

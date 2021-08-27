@@ -7,7 +7,8 @@ import axios from 'axios'
 import {
   getNewFurnitureSize,
   getNewFurniture,
-  clearNewFurniture
+  clearNewFurniture,
+  getNewFurnitureColor
 } from '../../stores/slices/newFurnitureSlice'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import {
@@ -18,12 +19,14 @@ import {
 import { OBJECTSIZE } from './utils/iconSize'
 import Styles from '../../../styles/sass/furniture.module.scss'
 import { turnCreateFurniture } from '../../stores/slices/dialogsStatusSlice'
+import classNames from 'classnames'
 
 type PostRequest = {
   officeId: string
   furnitureName: string
   furnitureDetail: string
   furnitureSize: number
+  furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
   isClose: boolean
   authorities: string[]
   xCoordinate: number
@@ -35,6 +38,7 @@ const virtualSize = OBJECTSIZE / 4
 const NewFurniture: VFC = () => {
   const dispatch = useDispatch()
   const selector = useSelector((state) => state)
+  const furnitureColor = getNewFurnitureColor(selector)
   const [message, setMessage] = useState('')
   const draggableRef = useRef(null)
   const URL =
@@ -102,6 +106,7 @@ const NewFurniture: VFC = () => {
         furnitureName: newFurniture.furnitureName,
         furnitureDetail: newFurniture.furnitureDetail,
         furnitureSize: newFurniture.furnitureSize,
+        furnitureColor: newFurniture.furnitureColor,
         isClose: newFurniture.isClose,
         authorities: newFurniture.authorities,
         xCoordinate: xCoordinate * 4,
@@ -130,7 +135,11 @@ const NewFurniture: VFC = () => {
       bounds="parent"
       grid={[5, 5]}
     >
-      <div ref={draggableRef} className={Styles.new} style={newFurnitureStyle}>
+      <div
+        ref={draggableRef}
+        className={classNames(Styles.new, Styles[furnitureColor])}
+        style={newFurnitureStyle}
+      >
         {message}
       </div>
     </Draggable>

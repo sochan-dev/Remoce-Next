@@ -7,7 +7,8 @@ import {
   setNewFurnitureDetail,
   setNewFurnitureSize,
   setNewFurnitureIsClose,
-  setNewFurnitureAuthorities
+  setNewFurnitureAuthorities,
+  setNewFurnitureColor
 } from '../stores//slices/newFurnitureSlice'
 import { db } from '../../firebase'
 
@@ -23,17 +24,58 @@ type Employees = {
   value: string
 }[]
 
-type Furniture = {
-  room_id: string
-  furniture_name: string
-  furniture_detail: string
-  furniture_size: number
-  is_close: boolean
-  authorities: string[]
-  x_coordinate: number
-  y_coordinate: number
-  join_employees: []
-}
+type Color =
+  | {
+      label: '白色'
+      value: 'white'
+    }
+  | {
+      label: '黒色'
+      value: 'black'
+    }
+  | {
+      label: '赤色'
+      value: 'red'
+    }
+  | {
+      label: '青色'
+      value: 'blue'
+    }
+  | {
+      label: '黄色'
+      value: 'yellow'
+    }
+  | {
+      label: '緑色'
+      value: 'green'
+    }
+
+const colors: Color[] = [
+  {
+    label: '白色',
+    value: 'white'
+  },
+  {
+    label: '黒色',
+    value: 'black'
+  },
+  {
+    label: '赤色',
+    value: 'red'
+  },
+  {
+    label: '青色',
+    value: 'blue'
+  },
+  {
+    label: '黄色',
+    value: 'yellow'
+  },
+  {
+    label: '緑色',
+    value: 'green'
+  }
+]
 
 const useUpdateFurniture = () => {
   const selector = useSelector((state) => state)
@@ -42,12 +84,12 @@ const useUpdateFurniture = () => {
     furnitureName,
     furnitureDetail,
     furnitureSize,
+    furnitureColor,
     isClose,
     authorities
   } = getNewFurniture(selector)
   const [employees, setEmployees] = useState<Employees>([]) //候補のメンバーを格納。照合処理に使う
   const officeId = getOfficeId(selector)
-
   useEffect(() => {
     db.collection('offices')
       .doc(officeId)
@@ -66,7 +108,9 @@ const useUpdateFurniture = () => {
         setEmployees(employeeList)
       })
   }, [])
-
+  const selectedColor = colors.filter((c) => {
+    if (c.value === furnitureColor) return c
+  })[0]
   const selectedAuthorities = authorities.map((authority) => {
     let label: string
     employees.forEach((employee) => {
@@ -119,6 +163,10 @@ const useUpdateFurniture = () => {
     furnitureDetail: furnitureDetail,
     furnitureSize: furnitureSizeRadioList,
     isClose: isCloseRadioList,
+    furnitureColor: {
+      selectedColor: selectedColor,
+      colors: colors
+    },
     authorities: {
       selectedAuthorities: selectedAuthorities,
       employees: employees
@@ -152,7 +200,9 @@ const useUpdateFurniture = () => {
       }
       dispatch(setNewFurnitureIsClose(newIsClose))
     },
-
+    setFurnitureColor: (selectColor: Color) => {
+      dispatch(setNewFurnitureColor(selectColor.value))
+    },
     setAuthorities: (
       selectedAuthorities: { value: string; label: string }[]
     ) => {

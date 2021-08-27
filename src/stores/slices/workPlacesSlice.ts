@@ -10,9 +10,9 @@ import { createSelector } from 'reselect'
 /*/ ///////////////////////////////////////////////
 //stateの初期値
 
-export type store = { workplaces: workPlaces }
+export type store = { workplaces: WorkPlaces }
 
-export interface workPlaces {
+export interface WorkPlaces {
   officeDataList: {
     employeeId: string
     employeeName: string
@@ -22,10 +22,16 @@ export interface workPlaces {
   }[]
 }
 
+type Employee_data = {
+  employee_id: string
+  employee_name: string
+  office_id: string
+}
+
 /*////////////////////////////////////////////////
   stateの初期値
 /*/ ///////////////////////////////////////////////
-const initialState: workPlaces = {
+const initialState: WorkPlaces = {
   officeDataList: []
 }
 
@@ -33,8 +39,39 @@ const initialState: workPlaces = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-export const f = createAsyncThunk<boolean>('workPlaces/fetchO', async () => {
-  return false
+export const asyncFetchWorkPlaces = createAsyncThunk<
+  WorkPlaces['officeDataList'],
+  string
+>('workPlaces/asyncFetchWorkPlaces', async (userId) => {
+  const belongOfficeList: WorkPlaces['officeDataList'] = []
+  await db
+    .collection('users')
+    .doc(userId)
+    .collection('employee_to_office')
+    .get()
+    .then(async (snapshot) => {
+      if (!snapshot.empty) {
+        for await (let childSnapshot of snapshot.docs) {
+          const employee = childSnapshot.data() as Employee_data
+          await db
+            .collection('offices')
+            .doc(employee.office_id)
+            .get()
+            .then((snapshot) => {
+              belongOfficeList.push({
+                employeeId: employee.employee_id,
+                employeeName: employee.employee_name,
+                officeId: employee.office_id,
+                officeName: snapshot.data().office_name,
+                officePicture: snapshot.data().office_picture
+                  ? snapshot.data().office_picture
+                  : false
+              })
+            })
+        }
+      }
+    })
+  return belongOfficeList
 })
 
 /*////////////////////////////////////////////////
@@ -47,7 +84,7 @@ export const workPlaceSlices = createSlice({
   reducers: {
     fetchWorkPlaces: (
       state,
-      action: PayloadAction<workPlaces['officeDataList']>
+      action: PayloadAction<WorkPlaces['officeDataList']>
     ) => {
       state.officeDataList = action.payload
     }
@@ -55,9 +92,11 @@ export const workPlaceSlices = createSlice({
   //AsyncThunkを扱うreducer
   extraReducers: (builder) => {
     builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
+      .addCase(asyncFetchWorkPlaces.pending, (state, action) => {})
+      .addCase(asyncFetchWorkPlaces.fulfilled, (state, action) => {
+        state.officeDataList = action.payload
+      })
+      .addCase(asyncFetchWorkPlaces.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////
@@ -68,7 +107,7 @@ export const { fetchWorkPlaces } = workPlaceSlices.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const WorkPlaceSelector = (state): workPlaces[`officeDataList`] =>
+export const WorkPlaceSelector = (state): WorkPlaces[`officeDataList`] =>
   state.workPlaces.officeDataList
 
 export const getWorkPlace = createSelector(WorkPlaceSelector, (state) => state)

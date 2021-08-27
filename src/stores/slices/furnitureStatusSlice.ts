@@ -15,6 +15,7 @@ export interface FurnitureStatus {
     furnitureName: string
     furnitureDetail: string
     furnitureSize: number
+    furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
     isClose: boolean
     authorities: string[]
     xCoordinate: number
@@ -23,6 +24,18 @@ export interface FurnitureStatus {
   }[]
 }
 
+type Furniture_data = {
+  roomId: string
+  furniture_name: string
+  furniture_detail: string
+  furniture_size: number
+  furniture_color: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
+  is_close: boolean
+  authorities: string[]
+  x_coordinate: number
+  y_coordinate: number
+  join_employees: string[]
+}
 //signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
@@ -36,13 +49,36 @@ const initialState: FurnitureStatus = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-//サインアップ
-export const f = createAsyncThunk<boolean>(
-  'furnitureStatus/fetchRooms',
-  async () => {
-    return false
-  }
-)
+//オブジェクト情報の取得
+export const asyncFetchFurniture = createAsyncThunk<
+  FurnitureStatus['furniture'],
+  string
+>('furnitureStatus/asyncFetchFurniture', async (officeId) => {
+  const snapshots = await db
+    .collection('offices')
+    .doc(officeId)
+    .collection('furniture')
+    .get()
+
+  const furnitureData: FurnitureStatus['furniture'] = []
+  snapshots.forEach((snapshot) => {
+    const furniture_data = snapshot.data() as Furniture_data
+    furnitureData.push({
+      furnitureId: snapshot.id,
+      roomId: furniture_data.roomId,
+      furnitureName: furniture_data.furniture_name,
+      furnitureDetail: furniture_data.furniture_detail,
+      furnitureSize: furniture_data.furniture_size,
+      furnitureColor: furniture_data.furniture_color,
+      isClose: furniture_data.is_close,
+      authorities: furniture_data.authorities,
+      xCoordinate: furniture_data.x_coordinate,
+      yCoordinate: furniture_data.y_coordinate,
+      joinEmployees: furniture_data.join_employees
+    })
+  })
+  return furnitureData
+})
 
 /*////////////////////////////////////////////////
   createSlice
@@ -63,9 +99,11 @@ export const furnitureStatusSlice = createSlice({
   extraReducers: (builder) => {
     //signUp関数
     builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
+      .addCase(asyncFetchFurniture.pending, (state, action) => {})
+      .addCase(asyncFetchFurniture.fulfilled, (state, action) => {
+        state.furniture = action.payload
+      })
+      .addCase(asyncFetchFurniture.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////

@@ -46,14 +46,28 @@ type FetchOfficeSizePayload = {
 }
 
 type ScrollValue = { x: number; y: number }
+
+type Office_data = {
+  office_name: string
+}
+
 /*////////////////////////////////////////////////
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-//サインアップ
-export const f = createAsyncThunk<boolean>('officeStatus/fetchO', async () => {
-  return false
-})
+//オフィス情報の取得
+export const asyncFetchOffice = createAsyncThunk<FetchOfficePayload, string>(
+  'officeStatus/asyncFetchOffice',
+  async (officeId) => {
+    const snapshot = await db.collection('offices').doc(officeId).get()
+    const office_data = snapshot.data() as Office_data
+
+    return {
+      officeId: snapshot.id,
+      officeName: office_data.office_name
+    }
+  }
+)
 
 /*////////////////////////////////////////////////
   createSlice
@@ -86,9 +100,12 @@ export const officeStatusSlice = createSlice({
   extraReducers: (builder) => {
     //signUp関数
     builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
+      .addCase(asyncFetchOffice.pending, (state, action) => {})
+      .addCase(asyncFetchOffice.fulfilled, (state, action) => {
+        state.officeId = action.payload.officeId
+        state.officeName = action.payload.officeName
+      })
+      .addCase(asyncFetchOffice.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////

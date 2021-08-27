@@ -15,6 +15,7 @@ const UpdateFurnitureForm: VFC = () => {
     furnitureDetail,
     furnitureSize,
     isClose,
+    furnitureColor,
     authorities
   } = formControls
   const {
@@ -22,6 +23,7 @@ const UpdateFurnitureForm: VFC = () => {
     setFurnitureDetail,
     setFurnitureSize,
     setIsClose,
+    setFurnitureColor,
     setAuthorities
   } = changeFunctions
 
@@ -55,6 +57,13 @@ const UpdateFurnitureForm: VFC = () => {
           onChange={setIsClose}
           name={'isClose'}
           radioList={isClose}
+        />
+        <Select
+          options={furnitureColor.colors}
+          onChange={setFurnitureColor}
+          id="colors"
+          instanceId="colors"
+          value={furnitureColor.selectedColor}
         />
         <Select
           isMulti

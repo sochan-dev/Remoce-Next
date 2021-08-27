@@ -2,7 +2,7 @@
 @import './variables.scss';
 
 %furnitureRoot {
-  border: solid 2px black;
+  border-width: 1px;
   box-sizing: border-box;
 }
 
@@ -10,14 +10,14 @@
   @extend %furnitureRoot;
   position: absolute;
   z-index: 8;
-  border: blue 2px solid;
+  border-width: 2px;
 }
 
 .update {
   @extend %furnitureRoot;
   position: absolute;
   z-index: 8;
-  border: blue 2px solid;
+  border-width: 2px;
 }
 
 .exist {
@@ -38,4 +38,29 @@
       text-align: center;
     }
   }
+}
+
+.white {
+  background-color: darken(white, 15%);
+  border: solid darken(white, 30%);
+}
+.black {
+  background-color: lighten(black, 50%);
+  border: solid lighten(black, 35%);
+}
+.red {
+  background-color: lighten(red, 30%);
+  border: solid lighten(red, 15%);
+}
+.blue {
+  background-color: lighten(blue, 30%);
+  border: solid lighten(blue, 15%);
+}
+.yellow {
+  background-color: lighten(yellow, 40%);
+  border: solid lighten(yellow, 15%);
+}
+.green {
+  background-color: lighten(green, 50%);
+  border: solid lighten(green, 15%);
 }

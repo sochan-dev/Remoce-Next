@@ -14,7 +14,8 @@ import axios from 'axios'
 import {
   setUpdatePosition,
   getNewFurniture,
-  clearNewFurniture
+  clearNewFurniture,
+  getNewFurnitureColor
 } from '../../stores/slices/newFurnitureSlice'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import {
@@ -25,6 +26,8 @@ import {
 import { OBJECTSIZE } from './utils/iconSize'
 import Styles from '../../../styles/sass/furniture.module.scss'
 import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
+import classNames from 'classnames'
+import NewFurniture from './NewFurniture'
 
 type props = {
   exe: boolean
@@ -39,6 +42,7 @@ type PutRequest = {
   furnitureDetail: string
   furnitureSize: number
   isClose: boolean
+  furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
   authorities: string[]
   xCoordinate: number
   yCoordinate: number
@@ -52,6 +56,7 @@ const UpdateFurniture: VFC<props> = (props) => {
   const { exe, setExe } = props
   const selector = useSelector((state) => state)
   const updateFurniture = getNewFurniture(selector)
+  const furnitureColor = getNewFurnitureColor(selector)
   if (!updateFurniture.updateInfo) return
   useEffect(() => {
     if (exe) {
@@ -143,6 +148,7 @@ const UpdateFurniture: VFC<props> = (props) => {
         furnitureDetail: newFurniture.furnitureDetail,
         furnitureSize: newFurniture.furnitureSize,
         isClose: newFurniture.isClose,
+        furnitureColor: newFurniture.furnitureColor,
         authorities: newFurniture.authorities,
         xCoordinate: xCoordinate * 4,
         yCoordinate: yCoordinate * 4
@@ -175,7 +181,7 @@ const UpdateFurniture: VFC<props> = (props) => {
     >
       <div
         ref={draggableRef}
-        className={Styles.update}
+        className={classNames(Styles.update, Styles[furnitureColor])}
         style={updateFurnitureStyle}
       >
         {message}

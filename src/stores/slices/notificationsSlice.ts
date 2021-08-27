@@ -9,7 +9,7 @@ import { createSelector } from 'reselect'
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
-export interface notifications {
+export interface Notifications {
   invites: {
     officeId: string
     officeName: string
@@ -20,7 +20,7 @@ export interface notifications {
 /*////////////////////////////////////////////////
   stateの初期値
 /*/ ///////////////////////////////////////////////
-const initialState: notifications = {
+const initialState: Notifications = {
   invites: []
 }
 
@@ -28,8 +28,32 @@ const initialState: notifications = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-export const f = createAsyncThunk<boolean>('notifications/fetchO', async () => {
-  return false
+export const asyncFetchInvites = createAsyncThunk<
+  Notifications['invites'],
+  string
+>('notifications/asyncFetchInvites', async (userId) => {
+  const invitedOfficeList: Notifications['invites'] = []
+  db.collection('users')
+    .doc(userId)
+    .get()
+    .then(async (snapshot) => {
+      if (Object.keys(snapshot.data()).length !== 0) {
+        for await (let officeId of snapshot.data().invited_office) {
+          await db
+            .collection('offices')
+            .doc(officeId)
+            .get()
+            .then((officeData) => {
+              invitedOfficeList.push({
+                officeId: officeId,
+                officeName: officeData.data().office_name
+              })
+            })
+        }
+      }
+    })
+
+  return invitedOfficeList
 })
 
 /*////////////////////////////////////////////////
@@ -40,7 +64,7 @@ export const notificationsSlices = createSlice({
   initialState,
   //reducer
   reducers: {
-    fetchInvites: (state, action: PayloadAction<notifications['invites']>) => {
+    fetchInvites: (state, action: PayloadAction<Notifications['invites']>) => {
       state.invites = action.payload
     },
     deleteInvite: (state, action: PayloadAction<string>) => {
@@ -52,9 +76,11 @@ export const notificationsSlices = createSlice({
   //AsyncThunkを扱うreducer
   extraReducers: (builder) => {
     builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
+      .addCase(asyncFetchInvites.pending, (state, action) => {})
+      .addCase(asyncFetchInvites.fulfilled, (state, action) => {
+        state.invites = action.payload
+      })
+      .addCase(asyncFetchInvites.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////
@@ -65,7 +91,7 @@ export const { fetchInvites, deleteInvite } = notificationsSlices.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const invitesSelector = (state): notifications[`invites`] =>
+export const invitesSelector = (state): Notifications[`invites`] =>
   state.notifications.invites
 
 export const getInvites = createSelector(invitesSelector, (state) => state)

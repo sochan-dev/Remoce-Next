@@ -5,6 +5,7 @@ import { setUpdateFurniture } from '../../stores/slices/newFurnitureSlice'
 import { getEditPermission } from '../../stores/slices/employeesStatusSlice'
 import Styles from '../../../styles/sass/furniture.module.scss'
 import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
+import classNames from 'classnames'
 
 type props = {
   virtual?: true
@@ -14,6 +15,7 @@ type props = {
     furnitureName: string
     furnitureDetail: string
     furnitureSize: number
+    furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
     isClose: boolean
     authorities: string[]
     xCoordinate: number
@@ -37,6 +39,7 @@ const Furniture: VFC<props> = (props) => {
   }
 
   const onDoubleClick = () => {
+    console.log('doubleClick')
     const editPermission = getEditPermission(selector)
 
     if (virtual || !editPermission) return
@@ -44,6 +47,7 @@ const Furniture: VFC<props> = (props) => {
       furnitureName: furnitureData.furnitureName,
       furnitureDetail: furnitureData.furnitureDetail,
       furnitureSize: furnitureData.furnitureSize,
+      furnitureColor: furnitureData.furnitureColor,
       isClose: furnitureData.isClose,
       authorities: furnitureData.authorities,
       updateInfo: {
@@ -61,14 +65,14 @@ const Furniture: VFC<props> = (props) => {
 
   return (
     <div
-      className={Styles.exist}
+      className={classNames(Styles.exist, Styles[furnitureData.furnitureColor])}
       style={furnitureStyle}
       onDoubleClick={() => onDoubleClick()}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
     >
       {isHover && (
-        <div className={Styles.hover}>
+        <div className={Styles.hover} onDoubleClick={() => onDoubleClick()}>
           <p>名前：{furnitureData.furnitureName}</p>
           <p>詳細：{furnitureData.furnitureDetail}</p>
           <p>閉鎖：{isCloseMsg}</p>

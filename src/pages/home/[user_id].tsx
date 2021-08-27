@@ -5,8 +5,14 @@ import { HomeTemplate } from '../../components/templates'
 import { sdb } from '../../../ServerSideApp'
 import { db } from '../../../firebase'
 import { authentication } from '../../stores/slices/authStatusSlice'
-import { fetchWorkPlaces } from '../../stores/slices/workPlacesSlice'
-import { fetchInvites } from '../../stores/slices/notificationsSlice'
+import {
+  asyncFetchWorkPlaces,
+  fetchWorkPlaces
+} from '../../stores/slices/workPlacesSlice'
+import {
+  asyncFetchInvites,
+  fetchInvites
+} from '../../stores/slices/notificationsSlice'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeDataList = {
@@ -115,7 +121,7 @@ export const getStaticProps = async ({ params }) => {
 
 const HomePage: NextPage<props> = (props) => {
   const dispatch = useDispatch()
-  const { belongOfficeList, invitedOfficeList } = props
+  const { belongOfficeList, invitedOfficeList, uid } = props
 
   useEffect(() => {
     dispatch(fetchWorkPlaces(belongOfficeList))
@@ -124,6 +130,11 @@ const HomePage: NextPage<props> = (props) => {
 
   useEffect(() => {
     dispatch(authentication())
+  }, [])
+
+  useEffect(() => {
+    dispatch(asyncFetchWorkPlaces(uid))
+    dispatch(asyncFetchInvites(uid))
   }, [])
 
   return (

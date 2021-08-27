@@ -20,6 +20,7 @@ export interface NewFurniture {
   furnitureName: string
   furnitureDetail: string
   furnitureSize: number
+  furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
   isClose: boolean
   authorities: string[]
   updateInfo: UpdateInfo | false
@@ -32,6 +33,7 @@ const initialState: NewFurniture = {
   furnitureName: '',
   furnitureDetail: '',
   furnitureSize: 2,
+  furnitureColor: 'white',
   isClose: false,
   authorities: [],
   updateInfo: false
@@ -62,6 +64,12 @@ export const newFurnitureSlice = createSlice({
     setNewFurnitureSize: (state, action: PayloadAction<number>) => {
       state.furnitureSize = action.payload
     },
+    setNewFurnitureColor: (
+      state,
+      action: PayloadAction<NewFurniture['furnitureColor']>
+    ) => {
+      state.furnitureColor = action.payload
+    },
     setNewFurnitureIsClose: (state, action: PayloadAction<boolean>) => {
       state.isClose = action.payload
     },
@@ -74,6 +82,7 @@ export const newFurnitureSlice = createSlice({
       state.furnitureName = updateFurniture.furnitureName
       state.furnitureDetail = updateFurniture.furnitureDetail
       state.furnitureSize = updateFurniture.furnitureSize
+      state.furnitureColor = updateFurniture.furnitureColor
       state.isClose = updateFurniture.isClose
       state.authorities = updateFurniture.authorities
       state.updateInfo = updateFurniture.updateInfo
@@ -89,6 +98,7 @@ export const newFurnitureSlice = createSlice({
       state.furnitureName = ''
       state.furnitureDetail = ''
       state.furnitureSize = 2
+      state.furnitureColor = 'white'
       state.isClose = false
       state.authorities = []
       state.updateInfo = false
@@ -111,6 +121,7 @@ export const {
   setNewFurnitureName,
   setNewFurnitureDetail,
   setNewFurnitureSize,
+  setNewFurnitureColor,
   setNewFurnitureIsClose,
   setNewFurnitureAuthorities,
   setUpdateFurniture,
@@ -136,6 +147,10 @@ export const getNewFurniture = createSelector(
 export const getNewFurnitureSize = createSelector(
   newFurnitureSelector,
   (state) => state.furnitureSize
+)
+export const getNewFurnitureColor = createSelector(
+  newFurnitureSelector,
+  (state) => state.furnitureColor
 )
 export const getNewFurnitureIsClose = createSelector(
   newFurnitureSelector,

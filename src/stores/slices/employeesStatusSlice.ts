@@ -38,6 +38,14 @@ type Employee = {
   xCoordinate: number
   yCoordinate: number
 }
+
+type Employee_data = {
+  employee_name: string
+  employee_picture: string
+  edit_permission: boolean
+  employee_x_coordinate: number
+  employee_y_coordinate: number
+}
 //signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
@@ -52,13 +60,32 @@ const initialState: EmployeesStatus = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-//サインアップ
-export const f = createAsyncThunk<boolean>(
-  'employeeStatus/fetchEmployees',
-  async () => {
-    return false
-  }
-)
+//社員情報の取得
+export const asyncFetchEmployees = createAsyncThunk<
+  EmployeesStatus['employees'],
+  string
+>('employeeStatus/asyncFetchEmployees', async (officeId) => {
+  const snapshots = await db
+    .collection('offices')
+    .doc(officeId)
+    .collection('employees')
+    .get()
+
+  const employeesData: EmployeesStatus['employees'] = []
+  snapshots.forEach((snapshot) => {
+    const employeeData = snapshot.data() as Employee_data
+    employeesData.push({
+      employeeId: snapshot.id,
+      employeeName: employeeData.employee_name,
+      employeePicture: employeeData.employee_picture,
+      editPermission: employeeData.edit_permission,
+      xCoordinate: employeeData.employee_x_coordinate,
+      yCoordinate: employeeData.employee_y_coordinate
+    })
+  })
+
+  return employeesData
+})
 
 /*////////////////////////////////////////////////
   createSlice
@@ -103,9 +130,11 @@ export const employeesStatusSlice = createSlice({
   extraReducers: (builder) => {
     //signUp関数
     builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
+      .addCase(asyncFetchEmployees.pending, (state, action) => {})
+      .addCase(asyncFetchEmployees.fulfilled, (state, action) => {
+        state.employees = action.payload
+      })
+      .addCase(asyncFetchEmployees.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////
