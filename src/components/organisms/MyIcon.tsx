@@ -80,6 +80,14 @@ type FurnitureRequest = {
   furnitureId: string | string[]
 }
 
+const dragAreaStyle = {
+  width: '34px',
+  height: '34px',
+  borderRadius: '50%',
+  zIndex: 16,
+  position: 'absolute' as 'absolute'
+}
+
 const MyIcon: VFC<props> = (props) => {
   const selector = useSelector((state) => state)
   const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/'
@@ -404,8 +412,10 @@ const MyIcon: VFC<props> = (props) => {
 
   const imgStyle = {
     backgroundImage: `url(${iconURL})`,
-    backgroundSize: 'cover'
+    backgroundSize: 'cover',
+    position: 'absolute' as 'absolute'
   }
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
@@ -414,6 +424,7 @@ const MyIcon: VFC<props> = (props) => {
       onStop={handleStop}
       onStart={() => setIsDrag(true)}
       bounds="parent"
+      handle=".dragArea"
     >
       <div
         ref={draggableRef}
@@ -422,10 +433,10 @@ const MyIcon: VFC<props> = (props) => {
       >
         <div
           onMouseOver={() => setIsHover(true)}
-          className={Styles.icon}
+          className={classNames('dragArea', Styles.icon)}
           style={imgStyle}
         >
-          {/*<img src={iconURL} alt="" className={Styles.icon} />*/}
+          <div className="dragArea" style={dragAreaStyle}></div>
         </div>
         {isHover && (
           <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
