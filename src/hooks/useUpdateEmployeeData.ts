@@ -5,7 +5,7 @@ import {
   updateOwnEmployee
 } from '../stores/slices/employeesStatusSlice'
 import { getOfficeId } from '../stores/slices/officeStatusSlice'
-import { db, storage } from '../../firebase'
+import { db, storage, auth } from '../../firebase'
 import loadImage from 'blueimp-load-image'
 import userIcon from '../../public/image/initial-user-icon.png'
 
@@ -66,14 +66,28 @@ const useUpdateEmployeeData = () => {
 
   const updateEmployee = async (afterFunction?: () => any) => {
     if (isUpdateEmployee) {
-      await db
+      let uid = ''
+      auth.onAuthStateChanged((user) => {
+        uid = user.uid
+      })
+      const employeeRef = db
         .collection('offices')
         .doc(officeId)
         .collection('employees')
         .doc(employeeId)
-        .update({
+      const employeeToUserRef = db
+        .collection('users')
+        .doc(uid)
+        .collection('employee_to_office')
+        .doc(employeeId)
+      await db.runTransaction(async (transaction) => {
+        transaction.update(employeeRef, {
           employee_name: employeeName
         })
+        transaction.update(employeeToUserRef, {
+          employee_name: employeeName
+        })
+      })
     }
 
     if (isUpload) {
