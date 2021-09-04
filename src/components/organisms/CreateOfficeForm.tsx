@@ -1,10 +1,10 @@
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import React, { VFC, useState, ChangeEvent } from 'react'
 import { useSelector } from 'react-redux'
 import { getAuthStatus } from '../../stores/slices/authStatusSlice'
 import { InputText, ActionButton } from '../atoms'
 import Blanks from '../../../styles/sass/blanks.module.scss'
-import { db } from '../../../firebase'
+import { db, realTimeDB } from '../../../firebase'
 
 const CreateOfficeHome: VFC = () => {
   const router = useRouter()
@@ -37,11 +37,13 @@ const CreateOfficeHome: VFC = () => {
           .doc(officeId)
           .collection('employees')
           .add({
+            uid: userId,
             is_office: false,
             employee_name: employeeName,
             employee_picture: '',
             employee_x_coordinate: 20,
-            employee_y_coordinate: 20
+            employee_y_coordinate: 20,
+            edit_permission: true
           })
           .then(async (doc) => {
             employeeId = doc.id
@@ -55,6 +57,22 @@ const CreateOfficeHome: VFC = () => {
                 employee_id: employeeId,
                 employee_name: employeeName
               })
+          })
+          .then(async () => {
+            await db
+              .collection('offices')
+              .doc(officeId)
+              .collection('room')
+              .doc('room')
+              .set({
+                rooms: []
+              })
+          })
+          .then(async () => {
+            await realTimeDB.ref(`status/${employeeId}`).set({
+              status: false,
+              officeId: officeId
+            })
           })
       })
     router.push(`/office/${officeId}/${employeeId}`)

@@ -2,7 +2,7 @@ import React, { VFC, useState, ChangeEvent } from 'react'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 import { InputText, ActionButton } from '../atoms'
-import { db, fieldValue } from '../../../firebase'
+import { db, fieldValue, realTimeDB } from '../../../firebase'
 import { deleteInvite } from '../../stores/slices/notificationsSlice'
 import Styles from '../../../styles/sass/card.module.scss'
 
@@ -33,9 +33,11 @@ const InviteCard: VFC<props> = (props) => {
       .doc(officeId)
       .collection('employees')
       .add({
+        uid: userId,
         is_office: false,
         employee_name: employeeName,
         employee_picture: '',
+        edit_permission: false,
         employee_x_coordinate: 20,
         employee_y_coordinate: 20
       })
@@ -59,6 +61,12 @@ const InviteCard: VFC<props> = (props) => {
           .update({
             invited_office: fieldValue.arrayRemove(officeId)
           })
+      })
+      .then(async () => {
+        await realTimeDB.ref(`status/${employeeId}`).set({
+          officeId: officeId,
+          status: false
+        })
       })
       .catch((e) => {
         console.log('参加エラー')

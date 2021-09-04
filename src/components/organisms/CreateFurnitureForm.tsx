@@ -16,7 +16,6 @@ import {
 import { InputText } from '../atoms'
 import Select from 'react-select'
 import Styles from '../../../styles/sass/createFurnitureForm.module.scss'
-import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 
 const CreateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()

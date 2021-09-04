@@ -7,7 +7,6 @@ import {
   getOwnEmployeeData
 } from '../stores/slices/employeesStatusSlice'
 import Peer, { SfuRoom } from 'skyway-js'
-import { sendData } from 'next/dist/next-server/server/api-utils'
 
 type EmployeeStatus = {
   employeeId: string
@@ -52,7 +51,12 @@ type IsMute = { isMute: boolean }
 
 type UpdateStatus = {
   type: 'update'
-  data: IsMute | IsDisplay
+  data: {
+    isDisplay?: boolean
+    isMute?: boolean
+    employeeId?: string
+    employeeName?: string
+  }
 }
 
 type StatusData = AddStatus | UpdateStatus
@@ -61,12 +65,16 @@ let localVideo: MediaStream = null
 let room: SfuRoom
 
 const judgeJoinRoom = (rooms: Rooms, employeeId: string) => {
+  console.log('room!!!!!!!!!!!!!!!!', rooms)
   let sfuRoomId = ''
-  if (rooms.length > 0) {
+  if (rooms.length > 0 && rooms) {
     rooms.forEach((room) => {
-      room.joinEmployees.forEach((empId) => {
-        if (employeeId === empId) sfuRoomId = room.roomId
-      })
+      console.log('foreachRooms!!(room)', room)
+      if (room.joinEmployees) {
+        room.joinEmployees.forEach((empId) => {
+          if (employeeId === empId) sfuRoomId = room.roomId
+        })
+      }
     })
   }
 
@@ -88,12 +96,15 @@ const judgeJoinFurniture = (
 
 const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   const [peer, setPeer] = useState<Peer | null>(null)
+
   useEffect(() => {
     const skywayKey: string | undefined = process.env.NEXT_PUBLIC_SKYWAY_API_KEY
+    if (peer) peer.disconnect()
     const p = new Peer({
       key: typeof skywayKey === 'string' ? skywayKey : '',
-      debug: 3
+      debug: 0
     })
+
     setPeer(p)
     p.once('open', (peerId) => {
       setMyId(peerId)
@@ -101,9 +112,14 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }, [])
   const selector = useSelector((state) => state)
   const rooms = getRooms(selector)
+
   const furnitureList = getFurniture(selector)
   const employeeId = getEmployeeId(selector)
   const ownEmployeeData = getOwnEmployeeData(selector)
+  const ownName = ownEmployeeData
+    ? ownEmployeeData.employeeName
+    : '再読み込み中'
+  console.log('ownEmployeeData', ownEmployeeData)
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const [myId, setMyId] = useState('')
   const [remoteUsersInfo, setRemoteUsersInfo] = useState<RemoteUser[]>([])
@@ -136,6 +152,22 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
     }
   }, [sfuRoomId])
 
+  useEffect(() => {
+    console.log('ownName', ownName)
+    if (room) {
+      const sendData: UpdateStatus = {
+        type: 'update',
+        data: {
+          employeeId: employeeId,
+          employeeName: ownName,
+          isDisplay: true,
+          isMute: true
+        }
+      }
+      room.send(sendData)
+    }
+  }, [ownName])
+
   const setRoomEvent = () => {
     //room.removeAllListeners()
     room.on('open', () => {
@@ -157,11 +189,12 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
           { id: id, video: video }
         ])
       }
+
       const sendData: AddStatus = {
         type: 'add',
         data: {
           employeeId: employeeId,
-          employeeName: ownEmployeeData.employeeName,
+          employeeName: ownName ? ownName : '再読み込み中',
           isDisplay: true,
           isMute: true
         }
@@ -238,6 +271,7 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
     }
 
     if (localVideoRef.current) localVideoRef.current.srcObject = sendVideo
+    console.log('room name must be defined', sfuRoomId)
     room = peer.joinRoom(sfuRoomId, { mode: 'sfu', stream: sendVideo })
     setRoomEvent()
   }
@@ -351,7 +385,7 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   const testSend = () => {
     room.send({
       employeeId: employeeId,
-      employeeName: ownEmployeeData.employeeName,
+      employeeName: '',
       isDisplay: true,
       isMute: true
     })

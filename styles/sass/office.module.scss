@@ -2,16 +2,12 @@
 @import './variables.scss';
 .root {
   border: blue 1px solid;
-  .inviteTest {
-    height: 10vh;
-    display: flex;
-    border: green 1px solid;
-  }
   .showEmployeesArea {
     position: relative;
     width: 2400px;
     height: 1200px;
     border: red 1px solid;
     background-color: bisque;
+    margin-bottom: 40px;
   }
 }

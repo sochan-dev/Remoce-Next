@@ -2,6 +2,7 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
+import 'firebase/database'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -22,6 +23,6 @@ export const auth = firebase.auth()
 export const db = firebase.firestore()
 export const storage = firebase.storage()
 export const serverTimeStamp = firebase.firestore.FieldValue.serverTimestamp
-
+export const realTimeDB = firebase.database()
 export type firebaseTimeStamp = firebase.firestore.Timestamp
 export const fieldValue = firebase.firestore.FieldValue

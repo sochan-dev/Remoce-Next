@@ -13,6 +13,9 @@ export interface DialogsStatus {
   createFurniture: boolean
   updateFurniture: boolean
   updateEmployee: boolean
+  officeMenu: boolean
+  deportEmployee: boolean
+  accessRightMessage: boolean
 }
 //signUp関数が受け取るuserの入力情報
 
@@ -22,20 +25,11 @@ export interface DialogsStatus {
 const initialState: DialogsStatus = {
   createFurniture: false,
   updateFurniture: false,
-  updateEmployee: false
+  updateEmployee: false,
+  officeMenu: false,
+  deportEmployee: false,
+  accessRightMessage: false
 }
-
-/*////////////////////////////////////////////////
-  createAsyncThunk
-/*/ ///////////////////////////////////////////////
-
-//サインアップ
-export const f = createAsyncThunk<boolean>(
-  'dialogsStatus/fetchEmployees',
-  async () => {
-    return false
-  }
-)
 
 /*////////////////////////////////////////////////
   createSlice
@@ -67,23 +61,40 @@ export const dialogsStatusSlice = createSlice({
     ) => {
       const payload = action.payload
       state.updateEmployee = payload ? payload.isOpen : !state.updateEmployee
+    },
+    turnOfficeMenu: (state, action?: PayloadAction<{ isOpen: boolean }>) => {
+      const payload = action.payload
+      state.officeMenu = payload ? payload.isOpen : !state.officeMenu
+    },
+    turnDeportEmployee: (
+      state,
+      action?: PayloadAction<{ isOpen: boolean }>
+    ) => {
+      const payload = action.payload
+      state.deportEmployee = payload ? payload.isOpen : !state.deportEmployee
+    },
+    turnAccessRightMessage: (
+      state,
+      action?: PayloadAction<{ isOpen: boolean }>
+    ) => {
+      const payload = action.payload
+      state.accessRightMessage = payload
+        ? payload.isOpen
+        : !state.accessRightMessage
     }
-  },
-
-  //AsyncThunkを扱うreducer
-  extraReducers: (builder) => {
-    //signUp関数
-    builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////
   Actions
 /*/ ///////////////////////////////////////////////
-export const { turnCreateFurniture, turnUpdateFurniture, turnUpdateEmployee } =
-  dialogsStatusSlice.actions
+export const {
+  turnCreateFurniture,
+  turnUpdateFurniture,
+  turnUpdateEmployee,
+  turnOfficeMenu,
+  turnDeportEmployee,
+  turnAccessRightMessage
+} = dialogsStatusSlice.actions
 
 /*////////////////////////////////////////////////
   Selector
@@ -103,6 +114,18 @@ export const getIsCreateFurniture = createSelector(
 export const getIsUpdateEmployee = createSelector(
   dialogsStatusSelector,
   (state) => state.updateEmployee
+)
+export const getIsOfficeMenu = createSelector(
+  dialogsStatusSelector,
+  (state) => state.officeMenu
+)
+export const getIsDeportEmployee = createSelector(
+  dialogsStatusSelector,
+  (state) => state.deportEmployee
+)
+export const getIsAccessRightMessage = createSelector(
+  dialogsStatusSelector,
+  (state) => state.accessRightMessage
 )
 
 //エクスポート

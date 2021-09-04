@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
-    "start": "next start"
+    "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
     "@jswf/react": "^1.0.33",
@@ -14,8 +14,10 @@
     "axios": "^0.21.1",
     "blueimp-load-image": "^5.14.0",
     "classnames": "^2.3.1",
+    "express": "^4.17.1",
     "firebase": "^8.8.1",
     "firebase-admin": "^9.11.0",
+    "http-proxy-middleware": "^2.0.1",
     "next": "10.2.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",

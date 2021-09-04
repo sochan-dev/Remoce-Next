@@ -5,15 +5,13 @@ import {
   OfficeFooter,
   ShowEmployeesArea,
   ShowRoomsArea,
-  ShowFurnitureArea,
-  TestInvite,
-  CreateFurnitureForm
+  ShowFurnitureArea
 } from '../organisms'
 import Styles from '../../../styles/sass/office.module.scss'
 
 const OfficeTemplate: VFC = () => {
-  const selector = useSelector((state) => state)
   const rootRef = useRef(null)
+  const selector = useSelector((state) => state)
 
   return (
     <div className={Styles.root} ref={rootRef}>
@@ -24,9 +22,6 @@ const OfficeTemplate: VFC = () => {
       </div>
       <OfficeFooter />
       <CallScreen />
-      <div className={Styles.inviteTest}>
-        <TestInvite />
-      </div>
     </div>
   )
 }

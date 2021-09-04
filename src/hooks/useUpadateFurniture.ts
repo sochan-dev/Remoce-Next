@@ -81,6 +81,7 @@ const useUpdateFurniture = () => {
   const selector = useSelector((state) => state)
   const dispatch = useDispatch()
   const {
+    updateInfo,
     furnitureName,
     furnitureDetail,
     furnitureSize,
@@ -159,6 +160,7 @@ const useUpdateFurniture = () => {
   ]
 
   const formControls = {
+    furnitureId: updateInfo ? updateInfo.furnitureId : false,
     furnitureName: furnitureName,
     furnitureDetail: furnitureDetail,
     furnitureSize: furnitureSizeRadioList,

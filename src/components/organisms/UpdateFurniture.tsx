@@ -50,7 +50,7 @@ type PutRequest = {
 
 const virtualSize = OBJECTSIZE / 4
 const URL =
-  'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/furniture'
+  'http://localhost:5000/remoce-7a22f/asia-northeast1/remoce/furniture'
 
 const UpdateFurniture: VFC<props> = (props) => {
   const { exe, setExe } = props

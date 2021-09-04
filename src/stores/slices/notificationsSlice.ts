@@ -17,6 +17,16 @@ export interface Notifications {
   }[]
 }
 
+type InvitedOfficeList = {
+  officeId: string
+  officeName: string
+  officePicture?: string | false
+}[]
+
+type User = {
+  invited_office: string[]
+}
+
 /*////////////////////////////////////////////////
   stateの初期値
 /*/ ///////////////////////////////////////////////
@@ -28,33 +38,38 @@ const initialState: Notifications = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-export const asyncFetchInvites = createAsyncThunk<
-  Notifications['invites'],
-  string
->('notifications/asyncFetchInvites', async (userId) => {
-  const invitedOfficeList: Notifications['invites'] = []
-  db.collection('users')
-    .doc(userId)
-    .get()
-    .then(async (snapshot) => {
-      if (Object.keys(snapshot.data()).length !== 0) {
-        for await (let officeId of snapshot.data().invited_office) {
-          await db
-            .collection('offices')
-            .doc(officeId)
-            .get()
-            .then((officeData) => {
-              invitedOfficeList.push({
-                officeId: officeId,
-                officeName: officeData.data().office_name
+export const asyncFetchInvites = createAsyncThunk<InvitedOfficeList, string>(
+  'notifications/asyncFetchInvites',
+  async (userId) => {
+    let invitedOfficeList: InvitedOfficeList = []
+    await db
+      .collection('users')
+      .doc(userId)
+      .get()
+      .then(async (snapshot) => {
+        const { invited_office } = snapshot.data() as User
+        if (invited_office.length !== 0) {
+          for await (let officeId of invited_office) {
+            await db
+              .collection('offices')
+              .doc(officeId)
+              .get()
+              .then((officeData) => {
+                const data = officeData.data() as { office_name: string }
+                console.log('officeData', data)
+                const d: InvitedOfficeList[0] = {
+                  officeId: officeId,
+                  officeName: data.office_name
+                }
+                invitedOfficeList = [...invitedOfficeList, d]
               })
-            })
+          }
         }
-      }
-    })
+      })
 
-  return invitedOfficeList
-})
+    return invitedOfficeList
+  }
+)
 
 /*////////////////////////////////////////////////
   createSlice
@@ -78,6 +93,7 @@ export const notificationsSlices = createSlice({
     builder
       .addCase(asyncFetchInvites.pending, (state, action) => {})
       .addCase(asyncFetchInvites.fulfilled, (state, action) => {
+        console.log('payload', action.payload)
         state.invites = action.payload
       })
       .addCase(asyncFetchInvites.rejected, (state, action) => {})

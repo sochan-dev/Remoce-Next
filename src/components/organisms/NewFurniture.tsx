@@ -1,6 +1,5 @@
 import React, { VFC, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { db } from '../../../firebase'
 import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import axios from 'axios'
@@ -42,7 +41,7 @@ const NewFurniture: VFC = () => {
   const [message, setMessage] = useState('')
   const draggableRef = useRef(null)
   const URL =
-    'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/furniture'
+    'http://localhost:5000/remoce-7a22f/asia-northeast1/remoce/furniture'
   const furnitureList = getFurniture(selector)
   const newFurnitureSize = getNewFurnitureSize(selector)
   const newFurnitureStyle = {

@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux'
 import { db, storage } from '../../../firebase'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { getEmployees } from '../../stores/slices/employeesStatusSlice'
-import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import { ICONSIZE, SENSORSIZE, OBJECTSIZE, ROOMSIZE } from './utils/iconSize'
 import Styles from '../../../styles/sass/employeeIcon.module.scss'
 import { getRooms } from '../../stores/slices/roomsStatusSlice'
@@ -90,7 +89,7 @@ const dragAreaStyle = {
 
 const MyIcon: VFC<props> = (props) => {
   const selector = useSelector((state) => state)
-  const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/'
+  const URL = 'http://localhost:5000/remoce-7a22f/asia-northeast1/remoce/'
   const employees = getEmployees(selector)
   const rooms = getRooms(selector)
   const furnitureList = getFurniture(selector)
@@ -126,8 +125,8 @@ const MyIcon: VFC<props> = (props) => {
       .collection('employees')
       .doc(ownData.employeeId)
       .update({
-        employee_x_coordinate: xCoordinate,
-        employee_y_coordinate: yCoordinate
+        employee_x_coordinate: Math.round(xCoordinate),
+        employee_y_coordinate: Math.round(yCoordinate)
       })
       .then(() => {
         isSuccess = true
@@ -236,7 +235,6 @@ const MyIcon: VFC<props> = (props) => {
       const crotchNum = ownCenterX - roomCenterX
       const hookNum = ownCenterY - roomCenterY
       const bowstringNum = crotchNum * crotchNum + hookNum * hookNum
-      console.log('crotch', crotchNum, 'hook', hookNum)
       const radiusSum = ICONSIZE / 2 + ROOMSIZE / 2
 
       if (bowstringNum <= radiusSum * radiusSum) {
@@ -266,7 +264,6 @@ const MyIcon: VFC<props> = (props) => {
         const crotchNum = sensorCenterX - employeeCenterX
         const hookNum = sensorCenterY - employeeCenterY
         const bowstringNum = crotchNum * crotchNum + hookNum * hookNum
-        console.log('crotch', crotchNum, 'hook', hookNum)
         const radiusSum = SENSORSIZE //二つの円の半径の合計
         if (bowstringNum <= radiusSum * radiusSum) {
           const wayX =
@@ -283,7 +280,7 @@ const MyIcon: VFC<props> = (props) => {
           const halfwayPointY = Math.round(
             (sensorCenterY + employeeCenterY) / 2
           )
-          console.log('wayX', wayX, 'wayY', wayY)
+
           const overlapEmployee: OverlapEmployee = {
             employeeId: employee.employeeId,
             halfwayPointX:
@@ -336,6 +333,7 @@ const MyIcon: VFC<props> = (props) => {
       const furnitureReqJSON = JSON.stringify(furnitureReq)
       let furnitureParams = new URLSearchParams()
       furnitureParams.append('data', furnitureReqJSON)
+      console.log('通過しているfurniture', furnitureReqJSON)
       axios.put(`${URL}furniture`, furnitureParams)
     } else {
       //furnitureと重なっていない

@@ -17,11 +17,13 @@ type props = {
   setIsOpen: ActionCreatorWithOptionalPayload<{ isOpen: boolean }, string>
   maxWidth: false | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   children: ReactNode
+  keep?: true
 }
 
 const VersatilityDialog: VFC<props> = (props) => {
   const { isOpen, setIsOpen, maxWidth, children } = props
   const dispatch = useDispatch()
+  const closeValue = props.keep ? true : false
 
   const handleSetIsOpen = (isOpen: boolean) => {
     dispatch(setIsOpen({ isOpen: isOpen }))
@@ -32,7 +34,7 @@ const VersatilityDialog: VFC<props> = (props) => {
       <Dialog
         open={isOpen}
         keepMounted
-        onClose={() => handleSetIsOpen(false)}
+        onClose={() => handleSetIsOpen(closeValue)}
         maxWidth={maxWidth}
       >
         <DialogContent>{isOpen && children}</DialogContent>

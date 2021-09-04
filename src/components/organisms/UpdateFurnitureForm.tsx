@@ -1,16 +1,21 @@
 import React, { useEffect, VFC } from 'react'
-import { useDispatch } from 'react-redux'
-import { InputText } from '../atoms'
+import { useDispatch, useSelector } from 'react-redux'
+import { InputText, ActionButton } from '../atoms'
 import { RadioButtons } from '../molecules'
 import { VirtualArea } from '../organisms'
 import { useUpdateFurniture } from '../../hooks'
 import Select from 'react-select'
 import { clearNewFurniture } from '../../stores/slices/newFurnitureSlice'
+import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
+import { db } from '../../../firebase'
+import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 
 const UpdateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()
+  const selector = useSelector((state) => state)
   const [formControls, changeFunctions] = useUpdateFurniture()
   const {
+    furnitureId,
     furnitureName,
     furnitureDetail,
     furnitureSize,
@@ -27,6 +32,18 @@ const UpdateFurnitureForm: VFC = () => {
     setAuthorities
   } = changeFunctions
 
+  const deleteFurniture = async () => {
+    const officeId = getOfficeId(selector)
+    if (typeof furnitureId === 'boolean') return
+    await db
+      .collection('offices')
+      .doc(officeId)
+      .collection('furniture')
+      .doc(furnitureId)
+      .delete()
+    dispatch(turnUpdateFurniture({ isOpen: false }))
+  }
+
   useEffect(() => {
     return () => {
       {
@@ -38,6 +55,11 @@ const UpdateFurnitureForm: VFC = () => {
   return (
     <>
       <div>
+        <ActionButton
+          w={20}
+          label={'このオブジェクトを削除する'}
+          onClick={deleteFurniture}
+        />
         <InputText
           label={'オブジェクト名を入力してください'}
           value={furnitureName}

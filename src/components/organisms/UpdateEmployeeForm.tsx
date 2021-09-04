@@ -1,19 +1,55 @@
-import React, { useRef, VFC, Dispatch, SetStateAction } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useRef, VFC } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { turnUpdateEmployee } from '../../stores/slices/dialogsStatusSlice'
 import { InputText, ActionButton } from '../atoms'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 import { useUpdateEmployeeData } from '../../hooks'
+import axios, { AxiosRequestConfig } from 'axios'
 import Styles from '../../../styles/sass/updateEmployeeForm.module.scss'
+import { getOfficeId } from '../../stores/slices/officeStatusSlice'
+import { getEmployeeId } from '../../stores/slices/employeesStatusSlice'
+import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
+import { useRouter } from 'next/router'
+import { db } from '../../../firebase'
+
+type Request = {
+  officeId: string
+  employeeId: string
+}
+
+const URL = 'http://localhost:5001/remoce-7a22f/asia-northeast1/remoce/'
 
 const UpdateEmployeeForm: VFC = () => {
+  const router = useRouter()
   const dispatch = useDispatch()
+  const selector = useSelector((state) => state)
   const [ownData, updateEmployee, setStates] = useUpdateEmployeeData()
   const profileImgRef = useRef<HTMLInputElement>(null)
 
   const afterFunction = () => dispatch(turnUpdateEmployee({ isOpen: false }))
   const handleUpdateEmployee = async () => await updateEmployee(afterFunction)
   const handleClick = () => profileImgRef.current.click()
+
+  const deleteEmployee = async () => {
+    const officeId = getOfficeId(selector)
+    const employeeId = getEmployeeId(selector)
+    const employeeReq: Request = {
+      officeId: officeId,
+      employeeId: employeeId
+    }
+    const employeeReqJSON = JSON.stringify(employeeReq)
+    let employeeParams = new URLSearchParams()
+    employeeParams.append('data', employeeReqJSON)
+    axios
+      .request({
+        method: 'delete',
+        url: `${URL}employee`,
+        data: employeeParams
+      })
+      .then(() => {
+        router.push('/')
+      })
+  }
 
   return (
     <>
@@ -34,6 +70,7 @@ const UpdateEmployeeForm: VFC = () => {
         />
         <div className={Blanks.blank_32} />
         <ActionButton label={'更新する'} onClick={handleUpdateEmployee} />
+        <ActionButton label={'退職する'} onClick={deleteEmployee} />
       </div>
       {/*//////////////////////////////////////////////*/}
       <input

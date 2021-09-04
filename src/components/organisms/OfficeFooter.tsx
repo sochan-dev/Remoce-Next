@@ -1,22 +1,38 @@
 import React, { useState, VFC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useRouter } from 'next/router'
 import { ActionButton } from '../atoms'
 import {
   UpdateEmployeeForm,
   VersatilityDialog,
-  CreateFurnitureForm
+  CreateFurnitureForm,
+  OfficeMenu
 } from '../organisms'
 import {
   getAllDialogStatus,
   turnCreateFurniture,
   turnUpdateFurniture,
-  turnUpdateEmployee
+  turnUpdateEmployee,
+  turnOfficeMenu
 } from '../../stores/slices/dialogsStatusSlice'
-import { getEditPermission } from '../../stores/slices/employeesStatusSlice'
+import {
+  getEditPermission,
+  getEmployeeId
+} from '../../stores/slices/employeesStatusSlice'
 import Styles from '../../../styles/sass/officeFooter.module.scss'
 import UpdateFurnitureForm from './UpdateFurnitureForm'
+import { getOfficeId } from '../../stores/slices/officeStatusSlice'
+import { customAxios } from '../../components/organisms/utils/customAxios'
 
+type PutRequest = {
+  isExit: boolean
+  officeId: string
+  employeeId: string
+}
+
+const URL = 'https://asia-northeast1-remoce-7a22f.cloudfunctions.net/remoce/'
 const OfficeFooter: VFC = () => {
+  const router = useRouter()
   const dispatch = useDispatch()
   const [message, setMessage] = useState<string | false>(false)
   const selector = useSelector((state) => state)
@@ -35,6 +51,39 @@ const OfficeFooter: VFC = () => {
     dispatch(turnCreateFurniture())
   }
 
+  const handleOfficeMenuDialog = () => {
+    dispatch(turnOfficeMenu())
+  }
+
+  const handleLeave = async () => {
+    const officeId = getOfficeId(selector)
+    const employeeId = getEmployeeId(selector)
+    const employeeReq: PutRequest = {
+      isExit: true,
+      officeId: officeId,
+      employeeId: employeeId
+    }
+    const employeeReqJSON = JSON.stringify(employeeReq)
+    let employeeParams = new URLSearchParams()
+    employeeParams.append('data', employeeReqJSON)
+    customAxios.defaults.withCredentials = true
+    await customAxios
+      .put(`${URL}employee`, employeeParams, {
+        withCredentials: true
+      })
+      /*await fetch(`${URL}employee`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: employeeReqJSON,
+      mode: 'cors'
+    })*/ .then(() => {
+        router.push(`/`)
+      })
+  }
+
   return (
     <>
       <div className={Styles.root}>
@@ -42,7 +91,7 @@ const OfficeFooter: VFC = () => {
           {message && <p className={Styles.message}>{message}</p>}
           <ActionButton
             label={'オブジェクトを作成'}
-            w={10}
+            w={20}
             onClick={handleCreateFurnitureDialog}
           />
         </div>
@@ -52,6 +101,12 @@ const OfficeFooter: VFC = () => {
           w={10}
           onClick={handleUpdateEmployeeDialog}
         />
+        <ActionButton
+          w={10}
+          label={'メニュー'}
+          onClick={handleOfficeMenuDialog}
+        />
+        <ActionButton w={10} label={'退社'} onClick={handleLeave} />
       </div>
 
       {/*--------ダイアログ-------- */}
@@ -77,6 +132,14 @@ const OfficeFooter: VFC = () => {
         maxWidth={'md'}
       >
         <UpdateFurnitureForm />
+      </VersatilityDialog>
+
+      <VersatilityDialog
+        isOpen={dialogsStatus.officeMenu}
+        setIsOpen={turnOfficeMenu}
+        maxWidth={'md'}
+      >
+        <OfficeMenu />
       </VersatilityDialog>
     </>
   )

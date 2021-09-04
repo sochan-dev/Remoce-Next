@@ -69,6 +69,7 @@ export const asyncFetchEmployees = createAsyncThunk<
     .collection('offices')
     .doc(officeId)
     .collection('employees')
+    .where('is_office', '==', true)
     .get()
 
   const employeesData: EmployeesStatus['employees'] = []
@@ -98,6 +99,9 @@ export const employeesStatusSlice = createSlice({
     fetchEmployeesStatus: (state, action: PayloadAction<EmployeesStatus>) => {
       state.yourId = action.payload.yourId
       state.employees = action.payload.employees
+    },
+    fetchEmployeeId: (state, action: PayloadAction<string>) => {
+      state.yourId = action.payload
     },
     fetchEmployees: (
       state,
@@ -142,6 +146,7 @@ export const employeesStatusSlice = createSlice({
 /*/ ///////////////////////////////////////////////
 export const {
   fetchEmployeesStatus,
+  fetchEmployeeId,
   fetchEmployees,
   updateEmployee,
   updateOwnEmployee,
