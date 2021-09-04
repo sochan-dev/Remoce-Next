@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { store } from '../stores'
-import { CheckMediaDeviceRight } from '../components/containments'
+import {
+  Authentication,
+  CheckMediaDeviceRight
+} from '../components/containments'
 import { ThemeProvider as StyledComponentsThemeProvider } from 'styled-components'
 import {
   ThemeProvider as MaterialUIThemeProvider,
@@ -27,9 +30,11 @@ const MyApp = ({ Component, pageProps }): JSX.Element => {
         <StyledComponentsThemeProvider theme={theme}>
           <CssBaseline />
           <Provider store={store}>
-            <CheckMediaDeviceRight>
-              <Component {...pageProps} />
-            </CheckMediaDeviceRight>
+            <Authentication>
+              <CheckMediaDeviceRight>
+                <Component {...pageProps} />
+              </CheckMediaDeviceRight>
+            </Authentication>
           </Provider>
         </StyledComponentsThemeProvider>
       </MaterialUIThemeProvider>
