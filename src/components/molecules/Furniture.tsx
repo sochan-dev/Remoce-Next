@@ -1,4 +1,4 @@
-import React, { useState, VFC } from 'react'
+import React, { VFC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { OBJECTSIZE } from '../organisms/utils/iconSize'
 import { setUpdateFurniture } from '../../stores/slices/newFurnitureSlice'
@@ -27,7 +27,6 @@ const Furniture: VFC<props> = (props) => {
   const { virtual } = props
   const dispatch = useDispatch()
   const selector = useSelector((state) => state)
-  const [isHover, setIsHover] = useState(false)
   const furnitureData = props.furnitureData
   const furnitureSizeStyle = furnitureData.furnitureSize * OBJECTSIZE
   const magnification = props.virtual ? 4 : 1
@@ -68,16 +67,14 @@ const Furniture: VFC<props> = (props) => {
       className={classNames(Styles.exist, Styles[furnitureData.furnitureColor])}
       style={furnitureStyle}
       onDoubleClick={() => onDoubleClick()}
-      onMouseOver={() => setIsHover(true)}
-      onMouseOut={() => setIsHover(false)}
     >
-      {isHover && (
-        <div className={Styles.hover} onDoubleClick={() => onDoubleClick()}>
-          <p>名前：{furnitureData.furnitureName}</p>
-          <p>詳細：{furnitureData.furnitureDetail}</p>
-          <p>閉鎖：{isCloseMsg}</p>
-        </div>
-      )}
+      <div
+        className={virtual ? Styles.virtualHover : Styles.hover}
+        onDoubleClick={() => onDoubleClick()}
+      >
+        <p>閉鎖：{isCloseMsg}</p>
+        <p>{furnitureData.furnitureDetail}</p>
+      </div>
     </div>
   )
 }

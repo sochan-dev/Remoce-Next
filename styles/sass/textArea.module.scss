@@ -1,0 +1,45 @@
+@charset "UTF-8";
+@import './variables.scss';
+@import './componentWidth.scss';
+
+%labelStyle {
+  position: absolute;
+  top: 0;
+  font-size: 1rem;
+  margin: 0.5rem 1rem;
+  color: lighten$color-accent;
+  -webkit-transition: top 0.2s ease-in-out, font-size 0.2s ease-in-out;
+  transition: top 0.2s ease-in-out, font-size 0.2s ease-in-out;
+}
+
+.root {
+  position: relative;
+  margin: 0 auto;
+  textarea {
+    resize: none;
+    width: 100%;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    border: solid 2px $color-accent;
+    &:focus {
+      outline: none;
+      border: solid 2px $font-focus;
+      box-shadow: 0 0 8px 0 dodgerBlue;
+    }
+    &:hover {
+      border: solid 2px $font-focus;
+    }
+  }
+  &__label {
+    @extend %labelStyle;
+    &_active {
+      @extend %labelStyle;
+      font-size: 0.5rem;
+      background-color: white;
+      box-shadow: 0 0 2px 0 gray;
+      top: -1rem;
+      padding: 0 0.5rem;
+      border-radius: 50px;
+    }
+  }
+}

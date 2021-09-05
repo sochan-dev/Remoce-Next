@@ -88,7 +88,8 @@ const judgeJoinFurniture = (
   let sfuRoomId = ''
   for (let furniture of furnitureList) {
     furniture.joinEmployees.forEach((joinEmployee) => {
-      if (joinEmployee === employeeId) sfuRoomId = furniture.roomId
+      if (joinEmployee === employeeId && furniture.joinEmployees.length >= 2)
+        sfuRoomId = furniture.roomId
     })
   }
   return sfuRoomId
@@ -119,7 +120,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   const ownName = ownEmployeeData
     ? ownEmployeeData.employeeName
     : '再読み込み中'
-  console.log('ownEmployeeData', ownEmployeeData)
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const [myId, setMyId] = useState('')
   const [remoteUsersInfo, setRemoteUsersInfo] = useState<RemoteUser[]>([])
@@ -138,12 +138,10 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
 
   useEffect(() => {
     if (sfuRoomId !== '') {
-      console.log('通過２', sfuRoomId)
       handleJoin(sfuRoomId)
     } else {
       handleLeave()
       if (localVideo) {
-        console.log('通過sfu２')
         localVideo.getTracks().forEach((track) => track.stop())
         localVideoRef.current.pause()
         localVideoRef.current.srcObject = null
@@ -153,7 +151,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }, [sfuRoomId])
 
   useEffect(() => {
-    console.log('ownName', ownName)
     if (room) {
       const sendData: UpdateStatus = {
         type: 'update',

@@ -1,6 +1,6 @@
 import React, { useEffect, VFC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { InputText, ActionButton } from '../atoms'
+import { InputText, ActionButton, TextArea } from '../atoms'
 import { RadioButtons } from '../molecules'
 import { VirtualArea } from '../organisms'
 import { useUpdateFurniture } from '../../hooks'
@@ -65,7 +65,7 @@ const UpdateFurnitureForm: VFC = () => {
           value={furnitureName}
           onChange={setFurnitureName}
         />
-        <InputText
+        <TextArea
           label={'オブジェクトの詳細を入力してください'}
           value={furnitureDetail}
           onChange={setFurnitureDetail}

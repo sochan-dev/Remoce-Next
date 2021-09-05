@@ -86,6 +86,7 @@ const UpdateFurniture: VFC<props> = (props) => {
   }
 
   const updateFurnitureStyle = {
+    border: '3px red solid',
     width: updateFurnitureSize * virtualSize,
     height: updateFurnitureSize * virtualSize
   }

@@ -34,6 +34,13 @@
     overflow: hidden;
     object-fit: cover;
   }
+  .cursor {
+    z-index: 16;
+    cursor: grab;
+    &:active {
+      cursor: grabbing;
+    }
+  }
 }
 
 .mine {

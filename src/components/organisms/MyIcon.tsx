@@ -431,17 +431,17 @@ const MyIcon: VFC<props> = (props) => {
       >
         <div
           onMouseOver={() => setIsHover(true)}
-          className={classNames('dragArea', Styles.icon)}
+          className={classNames('dragArea', Styles.icon, Styles.cursor)}
           style={imgStyle}
         >
           <div className="dragArea" style={dragAreaStyle}></div>
         </div>
-        {isHover && (
+        {/*isHover && (
           <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
             <p>ID：{ownData.employeeId}</p>
             <p>{ownData.employeeName}</p>
           </div>
-        )}
+        )*/}
         {message && (
           <div className={Styles.hover}>
             <p>{message}</p>

@@ -180,7 +180,7 @@ const useUpdateFurniture = () => {
       dispatch(setNewFurnitureName(e.target.value))
     },
 
-    setFurnitureDetail: (e: ChangeEvent<HTMLInputElement>) => {
+    setFurnitureDetail: (e: ChangeEvent<HTMLTextAreaElement>) => {
       dispatch(setNewFurnitureDetail(e.target.value))
     },
 

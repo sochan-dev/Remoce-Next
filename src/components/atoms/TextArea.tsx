@@ -1,19 +1,15 @@
-import React, { useState, ChangeEvent, forwardRef, Ref } from 'react'
-import Styles from '../../../styles/sass/inputText.module.scss'
+import React, { useState, ChangeEvent, VFC } from 'react'
+import Styles from '../../../styles/sass/textArea.module.scss'
 import classNames from 'classnames'
 
 type props = {
-  type?: 'text' | 'number' | 'password' | 'email'
   w?: 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
   value: string
   label: string
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
 }
 
-const InputText = forwardRef(function (
-  props: props,
-  ref: Ref<HTMLInputElement>
-) {
+const TextArea: VFC<props> = (props) => {
   const [isActive, setIsActive] = useState(false)
   const handleOnFocus = () => setIsActive(!isActive)
 
@@ -29,21 +25,18 @@ const InputText = forwardRef(function (
       >
         {props.label}
       </label>
-      <input
-        type={props.type}
+      <textarea
         id={props.label}
         value={props.value}
         onChange={props.onChange ? (e) => props.onChange(e) : undefined}
         onFocus={() => handleOnFocus()}
         onBlur={() => handleOnFocus()}
-        ref={ref}
       />
     </div>
   )
-})
+}
 
-InputText.defaultProps = {
-  type: 'text',
+TextArea.defaultProps = {
   w: 100
 }
-export default InputText
+export default TextArea

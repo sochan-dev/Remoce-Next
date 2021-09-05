@@ -13,7 +13,7 @@ import {
   setNewFurnitureName,
   setNewFurnitureDetail
 } from '../../stores/slices/newFurnitureSlice'
-import { InputText } from '../atoms'
+import { InputText, TextArea } from '../atoms'
 import Select from 'react-select'
 import Styles from '../../../styles/sass/createFurnitureForm.module.scss'
 
@@ -30,10 +30,9 @@ const CreateFurnitureForm: VFC = () => {
   const inputFurnitureName = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setNewFurnitureName(e.target.value))
   }
-  const inputFurnitureDetail = (e: ChangeEvent<HTMLInputElement>) => {
+  const inputFurnitureDetail = (e: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(setNewFurnitureDetail(e.target.value))
   }
-
   return (
     <div className={Styles.root}>
       <InputText
@@ -41,10 +40,11 @@ const CreateFurnitureForm: VFC = () => {
         value={furnitureName}
         onChange={inputFurnitureName}
       />
-      <InputText
+      <TextArea
         label={'オブジェクトの詳細を入力してください'}
         value={furnitureDetail}
         onChange={inputFurnitureDetail}
+        w={100}
       />
       <RadioButtons
         onChange={changeFurnitureSize}

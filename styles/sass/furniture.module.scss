@@ -11,6 +11,11 @@
   position: absolute;
   z-index: 8;
   border-width: 2px;
+  box-shadow: 0 10px 25px 0 rgba(red, 0.5);
+  cursor: grab;
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .update {
@@ -18,22 +23,62 @@
   position: absolute;
   z-index: 8;
   border-width: 2px;
+  box-shadow: 0 0 30px 0 rgba(red, 0.5);
+  cursor: grab;
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .exist {
   @extend %furnitureRoot;
   position: absolute;
   z-index: 6;
+  pointer-events: auto;
+  &:hover {
+    .hover {
+      display: block;
+    }
+  }
+  &:hover {
+    .virtualHover {
+      display: block;
+    }
+  }
   .hover {
+    pointer-events: auto;
+    display: none;
     position: absolute;
     width: 15rem;
+    height: 10rem;
+    overflow-y: scroll;
     padding: 1rem;
     background-color: antiquewhite;
     opacity: 0.7;
     text-align: middle;
     p {
+      white-space: pre-wrap;
       font-size: 12px;
       padding-top: 8px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  }
+  .virtualHover {
+    pointer-events: auto;
+    display: none;
+    position: absolute;
+    width: 5rem;
+    height: 3rem;
+    overflow-y: scroll;
+    padding: 3px;
+    background-color: antiquewhite;
+    opacity: 0.7;
+    text-align: middle;
+    p {
+      white-space: pre-wrap;
+      font-size: 5px;
+      padding-top: 4px;
       margin: 0 auto;
       text-align: center;
     }
