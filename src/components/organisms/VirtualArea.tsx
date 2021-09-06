@@ -5,6 +5,7 @@ import { NewFurniture, UpdateFurniture } from '../organisms'
 import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import { getUpdateInfo } from '../../stores/slices/newFurnitureSlice'
 import Styles from '../../../styles/sass/virtualArea.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
 import { ActionButton } from '../atoms'
 
 type props = {
@@ -34,6 +35,7 @@ const VirtualArea: VFC<props> = (props) => {
             )}
             <UpdateFurniture exe={exe} setExe={setExe} />
           </div>
+          <div className={Blanks.blank_16} />
           <ActionButton label={'更新する'} onClick={() => setExe(true)} />
         </>
       ) : (

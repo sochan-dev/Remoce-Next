@@ -35,6 +35,15 @@
   position: absolute;
   z-index: 6;
   pointer-events: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .name {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    opacity: 0.5;
+  }
   &:hover {
     .hover {
       display: block;
@@ -49,6 +58,8 @@
     pointer-events: auto;
     display: none;
     position: absolute;
+    top: 0;
+    left: 0;
     width: 15rem;
     height: 10rem;
     overflow-y: scroll;

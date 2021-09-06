@@ -38,18 +38,12 @@ const VersatilityDialog: VFC<props> = (props) => {
         maxWidth={maxWidth}
       >
         <DialogContent>{isOpen && children}</DialogContent>
-        <DialogActions>
+        <DialogActions style={{ justifyContent: 'flex-start' }}>
           <Button
-            onClick={() => dispatch(setIsOpen({ isOpen: isOpen }))}
+            onClick={() => dispatch(setIsOpen({ isOpen: false }))}
             color="primary"
           >
-            No
-          </Button>
-          <Button
-            onClick={() => dispatch(setIsOpen({ isOpen: isOpen }))}
-            color="primary"
-          >
-            Yes
+            閉じる
           </Button>
         </DialogActions>
       </Dialog>

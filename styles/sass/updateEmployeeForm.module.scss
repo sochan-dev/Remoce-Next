@@ -11,4 +11,8 @@
   input[file] {
     display: none;
   }
+  .retire {
+    display: flex;
+    flex-direction: row-reverse;
+  }
 }

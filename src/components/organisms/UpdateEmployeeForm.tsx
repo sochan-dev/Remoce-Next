@@ -2,15 +2,16 @@ import React, { useRef, VFC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { turnUpdateEmployee } from '../../stores/slices/dialogsStatusSlice'
 import { InputText, ActionButton } from '../atoms'
-import Blanks from '../../../styles/sass/blanks.module.scss'
 import { useUpdateEmployeeData } from '../../hooks'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import Styles from '../../../styles/sass/updateEmployeeForm.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import { getEmployeeId } from '../../stores/slices/employeesStatusSlice'
-import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import { useRouter } from 'next/router'
-import { db } from '../../../firebase'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
+import WorkOffOutlinedIcon from '@material-ui/icons/WorkOffOutlined'
 
 type Request = {
   officeId: string
@@ -55,22 +56,30 @@ const UpdateEmployeeForm: VFC = () => {
     <>
       <div className={Styles.root}>
         <h1>あなたの社員情報</h1>
-        <p>{ownData.employeeId}</p>
+
         <img
           src={ownData.profileImg}
           alt="no images"
           className={Styles.previewArea}
           onClick={() => handleClick()}
         />
+        <div className={Blanks.blank_8} />
         <InputText
           label={'名前'}
           type={'text'}
           value={ownData.employeeName}
           onChange={setStates.inputEmployeeName}
         />
-        <div className={Blanks.blank_32} />
+        <div className={Blanks.blank_16} />
         <ActionButton label={'更新する'} onClick={handleUpdateEmployee} />
-        <ActionButton label={'退職する'} onClick={deleteEmployee} />
+        <div className={Blanks.blank_32} />
+        <div className={Styles.retire}>
+          <Tooltip title={'退職する'}>
+            <IconButton onClick={deleteEmployee}>
+              <WorkOffOutlinedIcon color={'secondary'} />
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
       {/*//////////////////////////////////////////////*/}
       <input

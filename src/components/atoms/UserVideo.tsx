@@ -9,13 +9,14 @@ type EmployeeStatus = {
 }
 
 type props = {
+  attention?: true
   video: MediaStream
   userId: string
   employeeStatus?: EmployeeStatus
 }
 
 const UserVideo: VFC<props> = (props) => {
-  const { video, userId, employeeStatus } = props
+  const { attention, video, userId, employeeStatus } = props
   const remoteRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -33,11 +34,7 @@ const UserVideo: VFC<props> = (props) => {
       }
     }*/
   }, [video, userId])
-  const style = {
-    p: {
-      fontSize: '7px'
-    }
-  }
+
   return (
     <div className={Styles.root}>
       <div className={Styles.test}>
@@ -49,7 +46,12 @@ const UserVideo: VFC<props> = (props) => {
           </>
         )}
       </div>
-      <video width="320px" ref={remoteRef} autoPlay playsInline></video>
+      <video
+        className={!attention ? Styles.video : Styles.attentionVideo}
+        ref={remoteRef}
+        autoPlay
+        playsInline
+      ></video>
     </div>
   )
 }

@@ -1,0 +1,25 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  display: flex;
+  padding: 15px;
+  height: 60vh;
+  justify-content: space-between;
+
+  .form {
+    margin-right: 30px;
+    padding: 15px;
+    overflow-y: scroll;
+  }
+  .virtualArea {
+    margin: 0 auto;
+    background-color: azure;
+    width: 600px;
+    height: 300px;
+    border: 1px black solid;
+  }
+}
+.delete {
+  display: flex;
+  flex-direction: row-reverse;
+}

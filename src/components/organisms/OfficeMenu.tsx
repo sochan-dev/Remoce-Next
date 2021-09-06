@@ -8,8 +8,12 @@ import {
   getIsDeportEmployee,
   turnDeportEmployee
 } from '../../stores/slices/dialogsStatusSlice'
-import ShowEmployeesArea from './ShowEmployeesArea'
 import ShowDeportTargetsArea from '../molecules/ShowDeportTargets'
+import Styles from '../../../styles/sass/officeMenu.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
+import PersonAddDisabledOutlinedIcon from '@material-ui/icons/PersonAddDisabledOutlined'
 
 type Employee_to_office = {
   employee_id: string
@@ -43,29 +47,20 @@ const OfficeMenu: VFC = () => {
 
     await db.runTransaction(async (transaction) => {
       const snapshot = await employee_to_officeRef.get()
-      console.log('snaoshots', snapshot.exists)
       if (snapshot.exists) {
         const snapshots = await employee_to_officeCollectionRef.get()
         if (!snapshots.empty) {
           snapshots.forEach((snapshot) => {
             const userInfo = snapshot.data() as Employee_to_office
-            if (officeId === userInfo.office_id) {
-              console.log('通過１')
-              isInvite = false //すでに入社してる
-            }
+            if (officeId === userInfo.office_id) isInvite = false //すでに入社してる
           })
         }
-      } else {
-        //userIdのユーザーが存在しない
-        console.log('通過２')
-        isInvite = false
-      }
+      } else isInvite = false //userIdのユーザーが存在しない
+
       if (isInvite) {
         transaction.update(employee_to_officeRef, {
           invited_office: fieldValue.arrayUnion(officeId)
         })
-      } else {
-        console.log('invite　false通過')
       }
       return
     })
@@ -74,19 +69,26 @@ const OfficeMenu: VFC = () => {
 
   return (
     <>
-      <div>
+      <div className={Styles.root}>
         <InputText
           label={'招待するuserId'}
-          w={70}
+          w={100}
           value={userId}
           onChange={inputUserId}
         />
-        <ActionButton w={20} label={'招待'} onClick={inviteUser} />
-        <ActionButton
-          w={10}
-          label={'追放'}
-          onClick={handleDeportEmployeeDialog}
-        />
+        <div>
+          <ActionButton w={100} label={'招待'} onClick={inviteUser} />
+        </div>
+      </div>
+      <div className={Styles.deport}>
+        <Tooltip title={'追放'}>
+          <IconButton onClick={handleDeportEmployeeDialog}>
+            <PersonAddDisabledOutlinedIcon
+              color={'secondary'}
+              className={Styles.icon}
+            />
+          </IconButton>
+        </Tooltip>
       </div>
       <VersatilityDialog
         isOpen={isOpen}

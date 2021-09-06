@@ -23,6 +23,12 @@ import Styles from '../../../styles/sass/officeFooter.module.scss'
 import UpdateFurnitureForm from './UpdateFurnitureForm'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import { customAxios } from '../../components/organisms/utils/customAxios'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
+import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined'
+import PersonOutlinedIcon from '@material-ui/icons/PersonOutlined'
+import GroupAddOutlinedIcon from '@material-ui/icons/GroupAddOutlined'
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 
 type PutRequest = {
   isExit: boolean
@@ -87,26 +93,34 @@ const OfficeFooter: VFC = () => {
   return (
     <>
       <div className={Styles.root}>
-        <div>
-          {message && <p className={Styles.message}>{message}</p>}
-          <ActionButton
-            label={'オブジェクトを作成'}
-            w={20}
-            onClick={handleCreateFurnitureDialog}
-          />
+        <div className={Styles.icon}>
+          <Tooltip title={message ? message : 'オブジェクトを作成'}>
+            <IconButton onClick={handleCreateFurnitureDialog}>
+              <BuildOutlinedIcon />
+            </IconButton>
+          </Tooltip>
         </div>
-
-        <ActionButton
-          label={'社員情報'}
-          w={10}
-          onClick={handleUpdateEmployeeDialog}
-        />
-        <ActionButton
-          w={10}
-          label={'メニュー'}
-          onClick={handleOfficeMenuDialog}
-        />
-        <ActionButton w={10} label={'退社'} onClick={handleLeave} />
+        <div className={Styles.icon}>
+          <Tooltip title={message ? message : '社員情報'}>
+            <IconButton onClick={handleUpdateEmployeeDialog}>
+              <PersonOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+        <div className={Styles.icon}>
+          <Tooltip title={message ? message : '招待'}>
+            <IconButton onClick={handleOfficeMenuDialog}>
+              <GroupAddOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+        <div className={Styles.icon}>
+          <Tooltip title={message ? message : '退社'}>
+            <IconButton onClick={handleLeave}>
+              <ExitToAppIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
 
       {/*--------ダイアログ-------- */}
@@ -121,7 +135,7 @@ const OfficeFooter: VFC = () => {
       <VersatilityDialog
         isOpen={dialogsStatus.createFurniture}
         setIsOpen={turnCreateFurniture}
-        maxWidth={'md'}
+        maxWidth={'xl'}
       >
         <CreateFurnitureForm />
       </VersatilityDialog>
@@ -129,7 +143,7 @@ const OfficeFooter: VFC = () => {
       <VersatilityDialog
         isOpen={dialogsStatus.updateFurniture}
         setIsOpen={turnUpdateFurniture}
-        maxWidth={'md'}
+        maxWidth={'xl'}
       >
         <UpdateFurnitureForm />
       </VersatilityDialog>
@@ -137,7 +151,7 @@ const OfficeFooter: VFC = () => {
       <VersatilityDialog
         isOpen={dialogsStatus.officeMenu}
         setIsOpen={turnOfficeMenu}
-        maxWidth={'md'}
+        maxWidth={'xl'}
       >
         <OfficeMenu />
       </VersatilityDialog>

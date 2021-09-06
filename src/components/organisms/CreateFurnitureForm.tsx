@@ -15,7 +15,8 @@ import {
 } from '../../stores/slices/newFurnitureSlice'
 import { InputText, TextArea } from '../atoms'
 import Select from 'react-select'
-import Styles from '../../../styles/sass/createFurnitureForm.module.scss'
+import Styles from '../../../styles/sass/furnitureForm.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
 
 const CreateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()
@@ -35,43 +36,53 @@ const CreateFurnitureForm: VFC = () => {
   }
   return (
     <div className={Styles.root}>
-      <InputText
-        label={'オブジェクト名を入力してください'}
-        value={furnitureName}
-        onChange={inputFurnitureName}
-      />
-      <TextArea
-        label={'オブジェクトの詳細を入力してください'}
-        value={furnitureDetail}
-        onChange={inputFurnitureDetail}
-        w={100}
-      />
-      <RadioButtons
-        onChange={changeFurnitureSize}
-        name={'furnitureSize'}
-        radioList={furnitureSizeRadioList}
-      />
-      <RadioButtons
-        onChange={changeIsClose}
-        name={'isClose'}
-        radioList={isCloseRadioList}
-      />
-      <Select
-        options={colors}
-        onChange={selectColor}
-        id="colors"
-        instanceId="colors"
-        value={selectedColor}
-      />
-      <Select
-        isMulti
-        options={authorityData.employees}
-        onChange={selectAuthority}
-        id="authoritie"
-        instanceId="authoritie"
-        value={authorityData.selectedAuthorities}
-      />
-      <VirtualArea />
+      <div className={Styles.form}>
+        <InputText
+          label={'オブジェクト名を入力してください'}
+          value={furnitureName}
+          onChange={inputFurnitureName}
+        />
+        <div className={Blanks.blank_16} />
+        <TextArea
+          label={'オブジェクトの詳細を入力してください'}
+          value={furnitureDetail}
+          onChange={inputFurnitureDetail}
+          w={100}
+        />
+        <div>
+          <RadioButtons
+            onChange={changeFurnitureSize}
+            name={'furnitureSize'}
+            radioList={furnitureSizeRadioList}
+          />
+        </div>
+        <div>
+          <RadioButtons
+            onChange={changeIsClose}
+            name={'isClose'}
+            radioList={isCloseRadioList}
+          />
+        </div>
+        <Select
+          options={colors}
+          onChange={selectColor}
+          id="colors"
+          instanceId="colors"
+          value={selectedColor}
+        />
+        <div className={Blanks.blank_16} />
+        <Select
+          isMulti
+          options={authorityData.employees}
+          onChange={selectAuthority}
+          id="authoritie"
+          instanceId="authoritie"
+          value={authorityData.selectedAuthorities}
+        />
+      </div>
+      <div>
+        <VirtualArea />
+      </div>
     </div>
   )
 }

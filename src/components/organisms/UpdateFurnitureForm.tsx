@@ -9,6 +9,11 @@ import { clearNewFurniture } from '../../stores/slices/newFurnitureSlice'
 import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
 import { db } from '../../../firebase'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
+import Styles from '../../../styles/sass/furnitureForm.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined'
 
 const UpdateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()
@@ -54,48 +59,62 @@ const UpdateFurnitureForm: VFC = () => {
 
   return (
     <>
-      <div>
-        <ActionButton
-          w={20}
-          label={'このオブジェクトを削除する'}
-          onClick={deleteFurniture}
-        />
-        <InputText
-          label={'オブジェクト名を入力してください'}
-          value={furnitureName}
-          onChange={setFurnitureName}
-        />
-        <TextArea
-          label={'オブジェクトの詳細を入力してください'}
-          value={furnitureDetail}
-          onChange={setFurnitureDetail}
-        />
-        <RadioButtons
-          onChange={setFurnitureSize}
-          name={'furnitureSize'}
-          radioList={furnitureSize}
-        />
-        <RadioButtons
-          onChange={setIsClose}
-          name={'isClose'}
-          radioList={isClose}
-        />
-        <Select
-          options={furnitureColor.colors}
-          onChange={setFurnitureColor}
-          id="colors"
-          instanceId="colors"
-          value={furnitureColor.selectedColor}
-        />
-        <Select
-          isMulti
-          options={authorities.employees}
-          onChange={setAuthorities}
-          id="authorities"
-          instanceId="authorities"
-          value={authorities.selectedAuthorities}
-        />
-        <VirtualArea update />
+      <div className={Styles.root}>
+        <div className={Styles.form}>
+          <InputText
+            label={'オブジェクト名'}
+            value={furnitureName}
+            onChange={setFurnitureName}
+          />
+          <div className={Blanks.blank_16} />
+          <TextArea
+            label={'オブジェクト詳細'}
+            value={furnitureDetail}
+            onChange={setFurnitureDetail}
+          />
+          <div>
+            <RadioButtons
+              onChange={setFurnitureSize}
+              name={'furnitureSize'}
+              radioList={furnitureSize}
+            />
+          </div>
+          <div>
+            <RadioButtons
+              onChange={setIsClose}
+              name={'isClose'}
+              radioList={isClose}
+            />
+          </div>
+          <Select
+            options={furnitureColor.colors}
+            onChange={setFurnitureColor}
+            id="colors"
+            instanceId="colors"
+            value={furnitureColor.selectedColor}
+          />
+          <div className={Blanks.blank_16} />
+          <Select
+            isMulti
+            options={authorities.employees}
+            onChange={setAuthorities}
+            id="authorities"
+            instanceId="authorities"
+            value={authorities.selectedAuthorities}
+          />
+        </div>
+        <div>
+          <VirtualArea update />
+        </div>
+      </div>
+      <div className={Styles.delete}>
+        <div>
+          <Tooltip title={'このオブジェクトを削除する'}>
+            <IconButton onClick={deleteFurniture}>
+              <DeleteOutlineOutlinedIcon color={'secondary'} />
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
     </>
   )

@@ -45,7 +45,7 @@ const NewFurniture: VFC = () => {
   const furnitureList = getFurniture(selector)
   const newFurnitureSize = getNewFurnitureSize(selector)
   const newFurnitureStyle = {
-    borderWidth: '3px',
+    border: '3px red solid',
     width: newFurnitureSize * virtualSize,
     height: newFurnitureSize * virtualSize
   }

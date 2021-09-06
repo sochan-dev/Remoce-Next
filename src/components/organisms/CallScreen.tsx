@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, VFC } from 'react'
 import { ActionButton } from '../atoms'
-import { VideoArea } from '../molecules'
+import { VideoArea, FewScreenArea, ScreenArea } from '../molecules'
 import useSFU from '../../hooks/useSFU'
 import { CallScreenHeader, CallScreenFooter } from '../organisms'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
@@ -12,6 +12,7 @@ const CallScreen: VFC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const draggableRef = useRef(null)
   const [videosInfo, handles, testSend] = useSFU(setIsDisplay)
+  const [attentionPeerId, setAttentionPeerId] = useState('')
   const { id, video } = videosInfo.localInfo
 
   useEffect(() => {
@@ -50,6 +51,14 @@ const CallScreen: VFC = () => {
     : {
         visibility: 'visible' as 'visible'
       }
+
+  const testStyle = {
+    visibility: 'hidden' as 'hidden',
+    height: '0px',
+    lineHeight: '0px',
+    overflow: 'hidden',
+    margin: '0px'
+  }
   return (
     <>
       {isDisplay && (
@@ -64,7 +73,23 @@ const CallScreen: VFC = () => {
             style={isMinimize ? rootStyle.minimize : rootStyle.maximize}
           >
             <CallScreenHeader updateIsMinimize={updateIsMinimize} />
-            <div className={Styles.inlineBlock} style={videosStyle}>
+
+            {videosInfo.remotesInfo.length > 5 ? (
+              <ScreenArea
+                attentionPeerId={attentionPeerId}
+                localInfo={videosInfo.localInfo}
+                remotesInfo={videosInfo.remotesInfo}
+                isMinimize={isMinimize}
+              />
+            ) : (
+              <FewScreenArea
+                localVideo={video}
+                remotesInfo={videosInfo.remotesInfo}
+                isMinimize={isMinimize}
+              />
+            )}
+
+            {/*<div className={Styles.inlineBlock} style={videosStyle}>
               <video
                 width="320px"
                 ref={video}
@@ -79,16 +104,17 @@ const CallScreen: VFC = () => {
                   <VideoArea remotesInfo={videosInfo.remotesInfo} />
                 )}
               </div>
-            </div>
-            {!isMinimize && (
-              <>
-                <CallScreenFooter handles={handles} />{' '}
-                <ActionButton label={'test'} onClick={testSend} />
-              </>
-            )}
+                </div>*/}
+
+            {!isMinimize && <CallScreenFooter handles={handles} />}
           </div>
         </Draggable>
       )}
+      {/*
+        <div style={testStyle}>
+          <video ref={video} autoPlay playsInline muted></video>
+        </div>
+      */}
     </>
   )
 }

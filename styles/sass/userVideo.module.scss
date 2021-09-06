@@ -1,6 +1,12 @@
 @charset "UTF-8";
 @import './variables.scss';
 .root {
+  .video {
+    height: 20vh;
+  }
+  .attentionVideo {
+    height: 66vh;
+  }
   .test {
     position: absolute;
     p {

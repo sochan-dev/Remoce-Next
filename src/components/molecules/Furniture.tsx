@@ -68,11 +68,14 @@ const Furniture: VFC<props> = (props) => {
       style={furnitureStyle}
       onDoubleClick={() => onDoubleClick()}
     >
+      {!virtual && (
+        <div className={Styles.name}>{furnitureData.furnitureName}</div>
+      )}
       <div
         className={virtual ? Styles.virtualHover : Styles.hover}
         onDoubleClick={() => onDoubleClick()}
       >
-        <p>閉鎖：{isCloseMsg}</p>
+        {/*<p>閉鎖：{isCloseMsg}</p>*/}
         <p>{furnitureData.furnitureDetail}</p>
       </div>
     </div>
