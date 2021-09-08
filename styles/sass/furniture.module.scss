@@ -57,6 +57,7 @@
   .hover {
     pointer-events: auto;
     display: none;
+    z-index: 7;
     position: absolute;
     top: 0;
     left: 0;

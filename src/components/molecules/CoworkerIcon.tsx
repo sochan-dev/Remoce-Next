@@ -111,7 +111,6 @@ const CoworkerIcon: VFC<props> = (props) => {
       </div>
       {isHover && (
         <div className={Styles.hover} onMouseOut={() => setIsHover(false)}>
-          <p>ID：{ownData.employeeId}</p>
           <p>{ownData.employeeName}</p>
         </div>
       )}

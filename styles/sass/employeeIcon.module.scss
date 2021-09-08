@@ -10,18 +10,21 @@
   align-items: center;
   border-radius: 50%;
   .hover {
+    z-index: 18;
     position: absolute;
-    width: 15rem;
-    padding: 1rem;
+    padding: 5px;
     background-color: $color-accent;
     opacity: 0.5;
     text-align: middle;
     margin: 0 auto;
     p {
       font-size: 12px;
+      font-weight: bold;
       padding-top: 8px;
       margin: 0 auto;
       text-align: center;
+      color: pink;
+      opacity: 1;
     }
   }
   .icon {
@@ -58,4 +61,8 @@
 }
 .coworkerSensor {
   background-color: rgba($color: gray, $alpha: 0.5);
+}
+
+.message {
+  z-index: 18;
 }

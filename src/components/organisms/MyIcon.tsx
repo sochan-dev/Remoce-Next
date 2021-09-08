@@ -444,7 +444,7 @@ const MyIcon: VFC<props> = (props) => {
         )*/}
         {message && (
           <div className={Styles.hover}>
-            <p>{message}</p>
+            <p className={Styles.message}>{message}</p>
           </div>
         )}
       </div>

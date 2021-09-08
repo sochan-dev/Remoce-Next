@@ -108,7 +108,7 @@ const CallScreen: VFC = () => {
                 />
               </div>
             ) : (
-              //全員表示（少人数）
+              //全員表示 （大人数・注目｝
               <>
                 {videosInfo.remotesInfo.length > 5 || attentionPeerId !== '' ? (
                   <ScreenArea
@@ -117,7 +117,7 @@ const CallScreen: VFC = () => {
                     isMinimize={isMinimize}
                   />
                 ) : (
-                  //全員表示 （大人数・注目｝
+                  //全員表示（少人数）
                   <FewScreenArea
                     localInfo={videosInfo.localInfo}
                     remotesInfo={videosInfo.remotesInfo}

@@ -1,6 +1,7 @@
 import React, { MutableRefObject, VFC } from 'react'
 import { UserVideo, LocalVideo } from '../molecules'
 import Styles from '../../../styles/sass/screenArea.module.scss'
+import VideocamOutlined from '@material-ui/icons/VideocamOutlined'
 
 type EmployeeStatus = {
   employeeId: string
@@ -36,17 +37,20 @@ const FewScreenArea: VFC<props> = (props) => {
     : {
         visibility: 'visible' as 'visible'
       }
-  const videoSize = 100 / remotesInfo.length
+  const videoSize = Math.round(100 / (remotesInfo.length + 1))
+  console.log('videoSize', videoSize, 'length', remotesInfo.length)
+  console.log('remotesInfo', remotesInfo)
   return (
     <>
       {remotesInfo.length < 3 ? (
         <div className={Styles.root}>
+          {console.log('通話！！！UC')}
           <div className={Styles.fewRow}>
             <div style={localStyle}>
               <LocalVideo
                 video={localInfo.video}
                 userId={localInfo.id}
-                size={{ width: `${videoSize}%` }}
+                size={{ width: `${videoSize}vw` }}
               />
             </div>
             {!isMinimize &&
@@ -55,7 +59,7 @@ const FewScreenArea: VFC<props> = (props) => {
                   video={user.video}
                   userId={user.id}
                   employeeStatus={user.employeeStatus}
-                  size={{ width: `${videoSize}%` }}
+                  size={{ width: `${videoSize}vw` }}
                   key={i}
                 />
               ))}

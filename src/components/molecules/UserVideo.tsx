@@ -43,19 +43,12 @@ const UserVideo: VFC<props> = (props) => {
   const selector = useSelector((state) => state)
   const { attentionPeerId, fullScreenPeerId } = getScreenStatus(selector)
   const remoteRef = useRef<HTMLVideoElement>(null)
-  const [isVideo, setIsVideo] = useState(false)
   const isAttention = attentionPeerId === userId
   const isFullScreen = fullScreenPeerId === userId
 
   useEffect(() => {
     if (remoteRef.current) remoteRef.current.srcObject = video
   }, [video, userId])
-
-  useEffect(() => {
-    if (employeeStatus) {
-      if (employeeStatus.isDisplay) setIsVideo(true)
-    }
-  }, [employeeStatus])
 
   let isFooter = false
   console.log('employeeStatus', employeeStatus)
