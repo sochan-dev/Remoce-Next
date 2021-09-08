@@ -1,5 +1,5 @@
 import React, { MutableRefObject, VFC } from 'react'
-import { UserVideo } from '../atoms'
+import { UserVideo, LocalVideo } from '../molecules'
 import Styles from '../../../styles/sass/screenArea.module.scss'
 
 type EmployeeStatus = {
@@ -11,7 +11,11 @@ type EmployeeStatus = {
 
 type props = {
   isMinimize: boolean
-  localVideo: MutableRefObject<HTMLVideoElement>
+  localInfo: {
+    id: string
+    video: MediaStream
+    videoRef: MutableRefObject<HTMLVideoElement>
+  }
   remotesInfo: {
     id: string
     video: MediaStream
@@ -20,8 +24,7 @@ type props = {
 }
 
 const FewScreenArea: VFC<props> = (props) => {
-  const { isMinimize, localVideo, remotesInfo } = props
-  console.log('FewScreenArea内', remotesInfo)
+  const { isMinimize, localInfo, remotesInfo } = props
   const localStyle = isMinimize
     ? {
         visibility: 'hidden' as 'hidden',
@@ -33,20 +36,18 @@ const FewScreenArea: VFC<props> = (props) => {
     : {
         visibility: 'visible' as 'visible'
       }
-
+  const videoSize = 100 / remotesInfo.length
   return (
     <>
       {remotesInfo.length < 3 ? (
         <div className={Styles.root}>
-          <div className={Styles.row}>
+          <div className={Styles.fewRow}>
             <div style={localStyle}>
-              <video
-                width="320px"
-                ref={localVideo}
-                autoPlay
-                playsInline
-                muted
-              ></video>
+              <LocalVideo
+                video={localInfo.video}
+                userId={localInfo.id}
+                size={{ width: `${videoSize}%` }}
+              />
             </div>
             {!isMinimize &&
               remotesInfo.map((user, i) => (
@@ -54,6 +55,7 @@ const FewScreenArea: VFC<props> = (props) => {
                   video={user.video}
                   userId={user.id}
                   employeeStatus={user.employeeStatus}
+                  size={{ width: `${videoSize}%` }}
                   key={i}
                 />
               ))}
@@ -61,20 +63,19 @@ const FewScreenArea: VFC<props> = (props) => {
         </div>
       ) : (
         <div className={Styles.root}>
-          <div className={Styles.row}>
+          <div className={Styles.fewRow}>
             <div style={localStyle}>
-              <video
-                width="320px"
-                ref={localVideo}
-                autoPlay
-                playsInline
-                muted
-              ></video>
+              <LocalVideo
+                video={localInfo.video}
+                userId={localInfo.id}
+                size={{ maxWidth: '50%', maxHeight: '43vh' }}
+              />
             </div>
             {!isMinimize &&
               remotesInfo.map((user, i) => {
                 i < 3 && (
                   <UserVideo
+                    size={{ maxWidth: '50%', maxHeight: '43vh' }}
                     video={user.video}
                     userId={user.id}
                     employeeStatus={user.employeeStatus}
@@ -84,10 +85,11 @@ const FewScreenArea: VFC<props> = (props) => {
               })}
           </div>
           {!isMinimize && (
-            <div className={Styles.row}>
+            <div className={Styles.fewRow}>
               {remotesInfo.map((user, i) => {
                 i > 3 && (
                   <UserVideo
+                    size={{ maxWidth: '50vw', maxHeight: '43vh' }}
                     video={user.video}
                     userId={user.id}
                     employeeStatus={user.employeeStatus}

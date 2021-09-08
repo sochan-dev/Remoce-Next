@@ -113,7 +113,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }, [])
   const selector = useSelector((state) => state)
   const rooms = getRooms(selector)
-
   const furnitureList = getFurniture(selector)
   const employeeId = getEmployeeId(selector)
   const ownEmployeeData = getOwnEmployeeData(selector)
@@ -123,6 +122,7 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const [myId, setMyId] = useState('')
   const [remoteUsersInfo, setRemoteUsersInfo] = useState<RemoteUser[]>([])
+  const [localMediaStream, setLocalMediaStream] = useState<MediaStream>(null)
   let sfuRoomId = ''
   const joinRoomId = judgeJoinRoom(rooms, employeeId)
   const joinFurnitureId = judgeJoinFurniture(furnitureList, employeeId)
@@ -317,9 +317,9 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
         ])
       : undefined
 
-    localVideo.getTracks().forEach((track) => track.stop())
-    if (localVideoRef.current) localVideoRef.current.srcObject = null
-
+    //localVideo.getTracks().forEach((track) => track.stop())
+    //if (localVideoRef.current) localVideoRef.current.srcObject = null
+    console.log('{{combineMediaStream}}', combineMediaStream)
     if (localVideoRef.current && combineMediaStream) {
       localVideoRef.current.srcObject = combineMediaStream
       localVideo = combineMediaStream
@@ -369,7 +369,7 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   const videosInfo = {
-    localInfo: { id: myId, video: localVideoRef },
+    localInfo: { id: myId, video: localVideo, videoRef: localVideoRef },
     remotesInfo: remoteUsersInfo
   }
   const handles = {

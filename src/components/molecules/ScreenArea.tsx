@@ -1,5 +1,7 @@
 import React, { VFC, MutableRefObject } from 'react'
-import { UserVideo } from '../atoms'
+import { useSelector } from 'react-redux'
+import { getScreenStatus } from '../../stores/slices/screenStatus'
+import { UserVideo, LocalVideo } from '../molecules'
 import Styles from '../../../styles/sass/screenArea.module.scss'
 
 type EmployeeStatus = {
@@ -10,11 +12,11 @@ type EmployeeStatus = {
 }
 
 type props = {
-  attentionPeerId: string
   isMinimize: boolean
   localInfo: {
     id: string
-    video: MutableRefObject<HTMLVideoElement>
+    video: MediaStream
+    videoRef: MutableRefObject<HTMLVideoElement>
   }
   remotesInfo: {
     id: string
@@ -24,8 +26,19 @@ type props = {
 }
 
 const ScreenArea: VFC<props> = (props) => {
-  const { attentionPeerId, isMinimize, localInfo, remotesInfo } = props
-  console.log('ScreenArea', attentionPeerId, isMinimize, localInfo, remotesInfo)
+  const { isMinimize, localInfo, remotesInfo } = props
+  const selector = useSelector((state) => state)
+  const { attentionPeerId } = getScreenStatus(selector)
+  const attentionUser =
+    attentionPeerId !== localInfo.id || attentionPeerId !== ''
+      ? remotesInfo.filter((user) => user.id === attentionPeerId)[0]
+      : false
+  console.log(
+    'attentionPeerId',
+    attentionPeerId,
+    'attentionUser???',
+    attentionUser
+  )
   const localStyle = isMinimize
     ? {
         visibility: 'hidden' as 'hidden',
@@ -37,10 +50,6 @@ const ScreenArea: VFC<props> = (props) => {
     : {
         visibility: 'visible' as 'visible'
       }
-  const attentionUser =
-    attentionPeerId !== localInfo.id || attentionPeerId === ''
-      ? remotesInfo.filter((user) => user.id === attentionPeerId)[0]
-      : false
 
   return (
     <>
@@ -53,6 +62,7 @@ const ScreenArea: VFC<props> = (props) => {
                   video={user.video}
                   userId={user.id}
                   employeeStatus={user.employeeStatus}
+                  size={{ height: '20vh' }}
                   key={i}
                 />
               ))}
@@ -60,13 +70,11 @@ const ScreenArea: VFC<props> = (props) => {
           )}
           <div className={Styles.attentionRow}>
             <div style={localStyle}>
-              <video
-                style={{ height: '66vh' }}
-                ref={localInfo.video}
-                autoPlay
-                playsInline
-                muted
-              ></video>
+              <LocalVideo
+                video={localInfo.video}
+                userId={localInfo.id}
+                size={{ height: '66vh' }}
+              />
             </div>
           </div>
         </div>
@@ -74,13 +82,11 @@ const ScreenArea: VFC<props> = (props) => {
         <div className={Styles.root}>
           <div className={Styles.row}>
             <div style={localStyle}>
-              <video
-                style={{ height: '20vh' }}
-                ref={localInfo.video}
-                autoPlay
-                playsInline
-                muted
-              ></video>
+              <LocalVideo
+                video={localInfo.video}
+                userId={localInfo.id}
+                size={{ height: '20vh' }}
+              />
             </div>
             {!isMinimize &&
               remotesInfo.map((user, i) => {
@@ -90,18 +96,19 @@ const ScreenArea: VFC<props> = (props) => {
                     userId={user.id}
                     employeeStatus={user.employeeStatus}
                     key={i}
-                    attention
+                    size={{ height: '20vh' }}
                   />
                 )
               })}
           </div>
           {!isMinimize && (
-            <div className={Styles.row}>
+            <div className={Styles.attentionRow}>
               {attentionUser && (
                 <UserVideo
                   video={attentionUser.video}
                   userId={attentionUser.id}
                   employeeStatus={attentionUser.employeeStatus}
+                  size={{ height: '66vh' }}
                 />
               )}
             </div>

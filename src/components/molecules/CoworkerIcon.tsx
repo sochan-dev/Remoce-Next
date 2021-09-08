@@ -54,7 +54,7 @@ type EmployeeData = {
 
 const CoworkerIcon: VFC<props> = (props) => {
   const dispatch = useDispatch()
-  const { id, officeId, ownData, isDrag, setIsDrag } = props
+  const { id, officeId, ownData, isDrag } = props
   const [isHover, setIsHover] = useState(false)
   const [iconURL, setIconURL] = useState(userIcon)
   const initialCoordinate = {

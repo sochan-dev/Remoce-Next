@@ -2,18 +2,22 @@
 @import './variables.scss';
 .root {
   display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 17;
   position: fixed;
-  //width: 800px;
   height: 100%;
   width: 100%;
   top: 0;
   right: 0;
-  .videoArea {
-    display: flex;
+
+  .oneScreen {
+    width: 20vw;
+    margin-top: 4vh;
+    margin-bottom: 6vh;
   }
-  .inlineBlock {
-    margin-top: 60px;
-    margin-bottom: 50px;
+  .fullScreen {
+    margin-top: 4vh;
+    margin-bottom: 6vh;
   }
 }

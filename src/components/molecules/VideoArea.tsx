@@ -1,5 +1,5 @@
 import React, { VFC, MutableRefObject } from 'react'
-import { UserVideo } from '../atoms'
+import { UserVideo } from '../molecules'
 
 type EmployeeStatus = {
   employeeId: string
@@ -26,6 +26,7 @@ const VideoArea: VFC<props> = (props) => {
           userId={user.id}
           employeeStatus={user.employeeStatus}
           key={i}
+          size={{}}
         />
       ))}
     </>

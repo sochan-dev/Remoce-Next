@@ -1,17 +1,35 @@
 @charset "UTF-8";
 @import './variables.scss';
 .root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .header {
+    position: absolute;
+    display: flex;
+    justify-content: flex-end;
+    top: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1;
+  }
+  .footer {
+    position: absolute;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 5%;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    .icon {
+      margin-left: 5%;
+    }
+  }
   .video {
     height: 20vh;
   }
   .attentionVideo {
     height: 66vh;
-  }
-  .test {
-    position: absolute;
-    p {
-      font-size: 7px;
-      color: blue;
-    }
   }
 }

@@ -1,24 +1,31 @@
-import React, { useState, useEffect, useRef, VFC } from 'react'
-import { ActionButton } from '../atoms'
-import { VideoArea, FewScreenArea, ScreenArea } from '../molecules'
+import React, { useState, useEffect, useRef, VFC, ReactNode } from 'react'
+import { useSelector } from 'react-redux'
+import { getScreenStatus } from '../../stores/slices/screenStatus'
+import { FewScreenArea, ScreenArea } from '../molecules'
 import useSFU from '../../hooks/useSFU'
 import { CallScreenHeader, CallScreenFooter } from '../organisms'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import Styles from '../../../styles/sass/callScreen.module.scss'
+import { UserVideo, LocalVideo } from '../molecules'
 
 const CallScreen: VFC = () => {
+  const selector = useSelector((state) => state)
+  const { attentionPeerId, fullScreenPeerId } = getScreenStatus(selector)
   const [isDisplay, setIsDisplay] = useState(false)
   const [isMinimize, setIsMinimize] = useState(false)
+  const [isOneScreen, setIsOneScreen] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const draggableRef = useRef(null)
-  const [videosInfo, handles, testSend] = useSFU(setIsDisplay)
-  const [attentionPeerId, setAttentionPeerId] = useState('')
-  const { id, video } = videosInfo.localInfo
+  const [videosInfo, handles] = useSFU(setIsDisplay)
+  const newRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const newPosition = isMinimize ? null : { x: 0, y: 0 }
-    setPosition(newPosition)
-  }, [isMinimize])
+    if (newRef.current) newRef.current.srcObject = videosInfo.localInfo.video
+  })
+
+  useEffect(() => {
+    if (!isMinimize && !isOneScreen) setPosition({ x: 0, y: 0 })
+  }, [isMinimize, isOneScreen])
 
   const updateIsMinimize = (isMinimize: boolean) => {
     setIsMinimize(isMinimize)
@@ -28,37 +35,54 @@ const CallScreen: VFC = () => {
     setPosition({ x: data.lastX, y: data.lastY })
   }
 
-  const rootStyle = {
-    minimize: {
-      width: '10%',
+  let fullScreenUser: false | ReactNode = false
+
+  if (fullScreenPeerId === videosInfo.localInfo.id) {
+    console.log('fullScreen通過')
+    const { video, id } = videosInfo.localInfo
+    fullScreenUser = (
+      <div className={Styles.fullScreen}>
+        <LocalVideo video={video} userId={id} size={{ height: '86vh' }} />
+      </div>
+    )
+  } else if (fullScreenPeerId !== '') {
+    const user = videosInfo.remotesInfo.filter(
+      (remoteUser) => remoteUser.id === fullScreenPeerId
+    )[0]
+    fullScreenUser = (
+      <div className={Styles.fullScreen}>
+        <UserVideo
+          video={user.video}
+          userId={user.id}
+          employeeStatus={user.employeeStatus}
+          size={{ height: '86vh' }}
+        />
+      </div>
+    )
+  }
+
+  let rootStyle: any = {
+    width: '100%',
+    left: '0px',
+    top: '0px'
+  }
+
+  if (isMinimize) {
+    rootStyle = {
+      width: '13%',
+      height: '0px',
       right: '0px',
       top: '0px'
-    },
-    maximize: {
-      width: '100%',
-      left: '0px',
+    }
+  } else if (isOneScreen) {
+    rootStyle = {
+      width: '20vw',
+      height: 'auto',
+      right: '0px',
       top: '0px'
     }
   }
-  const videosStyle = isMinimize
-    ? {
-        visibility: 'hidden' as 'hidden',
-        height: '0px',
-        lineHeight: '0px',
-        overflow: 'hidden',
-        margin: '0px'
-      }
-    : {
-        visibility: 'visible' as 'visible'
-      }
 
-  const testStyle = {
-    visibility: 'hidden' as 'hidden',
-    height: '0px',
-    lineHeight: '0px',
-    overflow: 'hidden',
-    margin: '0px'
-  }
   return (
     <>
       {isDisplay && (
@@ -67,54 +91,55 @@ const CallScreen: VFC = () => {
           position={position}
           onDrag={handleDrag}
         >
-          <div
-            ref={draggableRef}
-            className={Styles.root}
-            style={isMinimize ? rootStyle.minimize : rootStyle.maximize}
-          >
-            <CallScreenHeader updateIsMinimize={updateIsMinimize} />
+          <div ref={draggableRef} className={Styles.root} style={rootStyle}>
+            <CallScreenHeader
+              setIsMinimize={updateIsMinimize}
+              setIsOneScreen={setIsOneScreen}
+            />
 
-            {videosInfo.remotesInfo.length > 5 ? (
-              <ScreenArea
-                attentionPeerId={attentionPeerId}
-                localInfo={videosInfo.localInfo}
-                remotesInfo={videosInfo.remotesInfo}
-                isMinimize={isMinimize}
-              />
-            ) : (
-              <FewScreenArea
-                localVideo={video}
-                remotesInfo={videosInfo.remotesInfo}
-                isMinimize={isMinimize}
-              />
-            )}
-
-            {/*<div className={Styles.inlineBlock} style={videosStyle}>
-              <video
-                width="320px"
-                ref={video}
-                autoPlay
-                playsInline
-                muted
-              ></video>
-            </div>
-            <div className={Styles.inlineBlock} style={videosStyle}>
-              <div className={Styles.videoArea}>
-                {!isMinimize && (
-                  <VideoArea remotesInfo={videosInfo.remotesInfo} />
-                )}
+            {fullScreenUser ? ( //一つの画面で全画面に表示
+              { ...fullScreenUser }
+            ) : isOneScreen ? ( //一つの画面のみ表示
+              <div className={Styles.oneScreen}>
+                <LocalVideo
+                  video={videosInfo.localInfo.video}
+                  userId={videosInfo.localInfo.id}
+                  size={{ width: '100%' }}
+                />
               </div>
-                </div>*/}
-
+            ) : (
+              //全員表示（少人数）
+              <>
+                {videosInfo.remotesInfo.length > 5 || attentionPeerId !== '' ? (
+                  <ScreenArea
+                    localInfo={videosInfo.localInfo}
+                    remotesInfo={videosInfo.remotesInfo}
+                    isMinimize={isMinimize}
+                  />
+                ) : (
+                  //全員表示 （大人数・注目｝
+                  <FewScreenArea
+                    localInfo={videosInfo.localInfo}
+                    remotesInfo={videosInfo.remotesInfo}
+                    isMinimize={isMinimize}
+                  />
+                )}
+              </>
+            )}
+            <video
+              ref={videosInfo.localInfo.videoRef}
+              style={{
+                visibility: 'hidden' as 'hidden',
+                height: '0px',
+                lineHeight: '0px',
+                overflow: 'hidden',
+                margin: '0px'
+              }}
+            ></video>
             {!isMinimize && <CallScreenFooter handles={handles} />}
           </div>
         </Draggable>
       )}
-      {/*
-        <div style={testStyle}>
-          <video ref={video} autoPlay playsInline muted></video>
-        </div>
-      */}
     </>
   )
 }

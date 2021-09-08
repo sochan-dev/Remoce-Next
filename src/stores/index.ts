@@ -9,6 +9,7 @@ import roomsReducer from './slices/roomsStatusSlice'
 import newFurnitureReducer from './slices/newFurnitureSlice'
 import furnitureStatusReducer from './slices/furnitureStatusSlice'
 import dialogsStatusReducer from './slices/dialogsStatusSlice'
+import screenStatusReducer from './slices/screenStatus'
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +22,8 @@ export const store = configureStore({
     roomsStatus: roomsReducer,
     newFurnitureStatus: newFurnitureReducer,
     furnitureStatus: furnitureStatusReducer,
-    dialogsStatus: dialogsStatusReducer
+    dialogsStatus: dialogsStatusReducer,
+    screenStatus: screenStatusReducer
   }
 })
 
