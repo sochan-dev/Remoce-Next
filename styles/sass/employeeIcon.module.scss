@@ -13,8 +13,8 @@
     position: absolute;
     width: 15rem;
     padding: 1rem;
-    background-color: antiquewhite;
-    opacity: 0.7;
+    background-color: $color-accent;
+    opacity: 0.5;
     text-align: middle;
     margin: 0 auto;
     p {
@@ -28,7 +28,7 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    border: 1px gray solid;
+    border: 1px $color-accent solid;
     justify-content: center;
     align-items: center;
     overflow: hidden;

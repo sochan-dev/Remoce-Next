@@ -96,28 +96,28 @@ const OfficeFooter: VFC = () => {
         <div className={Styles.icon}>
           <Tooltip title={message ? message : 'オブジェクトを作成'}>
             <IconButton onClick={handleCreateFurnitureDialog}>
-              <BuildOutlinedIcon />
+              <BuildOutlinedIcon color={'primary'} />
             </IconButton>
           </Tooltip>
         </div>
         <div className={Styles.icon}>
           <Tooltip title={message ? message : '社員情報'}>
             <IconButton onClick={handleUpdateEmployeeDialog}>
-              <PersonOutlinedIcon />
+              <PersonOutlinedIcon color={'primary'} />
             </IconButton>
           </Tooltip>
         </div>
         <div className={Styles.icon}>
           <Tooltip title={message ? message : '招待'}>
             <IconButton onClick={handleOfficeMenuDialog}>
-              <GroupAddOutlinedIcon />
+              <GroupAddOutlinedIcon color={'primary'} />
             </IconButton>
           </Tooltip>
         </div>
         <div className={Styles.icon}>
           <Tooltip title={message ? message : '退社'}>
             <IconButton onClick={handleLeave}>
-              <ExitToAppIcon />
+              <ExitToAppIcon color={'primary'} />
             </IconButton>
           </Tooltip>
         </div>

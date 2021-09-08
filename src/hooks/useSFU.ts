@@ -89,7 +89,7 @@ const judgeJoinFurniture = (
   for (let furniture of furnitureList) {
     furniture.joinEmployees.forEach((joinEmployee) => {
       if (joinEmployee === employeeId && furniture.joinEmployees.length >= 2)
-        sfuRoomId = furniture.roomId
+        sfuRoomId = furniture.isClose ? 'muteArea' : furniture.roomId
     })
   }
   return sfuRoomId
@@ -133,11 +133,13 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }
 
   useEffect(() => {
-    sfuRoomId !== '' ? setDisplay(true) : setDisplay(false)
+    sfuRoomId !== '' && sfuRoomId !== 'muteArea'
+      ? setDisplay(true)
+      : setDisplay(false)
   }, [sfuRoomId])
 
   useEffect(() => {
-    if (sfuRoomId !== '') {
+    if (sfuRoomId !== '' && sfuRoomId !== 'muteArea') {
       handleJoin(sfuRoomId)
     } else {
       handleLeave()

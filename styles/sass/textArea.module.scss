@@ -16,6 +16,7 @@
   position: relative;
   margin: 0 auto;
   textarea {
+    background-color: $color-base;
     resize: none;
     width: 100%;
     border-radius: 10px;
@@ -24,7 +25,7 @@
     &:focus {
       outline: none;
       border: solid 2px $font-focus;
-      box-shadow: 0 0 8px 0 dodgerBlue;
+      box-shadow: 0 0 8px 0 $color-focus;
     }
     &:hover {
       border: solid 2px $font-focus;
@@ -35,7 +36,7 @@
     &_active {
       @extend %labelStyle;
       font-size: 0.5rem;
-      background-color: white;
+      background-color: $color-base;
       box-shadow: 0 0 2px 0 gray;
       top: -1rem;
       padding: 0 0.5rem;

@@ -3,10 +3,10 @@
 @import './componentWidth.scss';
 
 .root {
-  border: solid 2px darken($color-accent, 15%);
+  border: solid 2px $color-accent;
   margin: 0 auto;
   &:hover {
-    border: solid 2px $color-focus;
+    border: solid 2px $font-focus;
     font-weight: bold;
   }
 }

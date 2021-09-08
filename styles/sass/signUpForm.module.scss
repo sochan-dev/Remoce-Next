@@ -2,7 +2,7 @@
 @import './variables.scss';
 
 .root {
-  background-color: rgba(white, 0.5);
+  background-color: $color-base;
   border-radius: 30px;
   padding: 3rem;
   box-shadow: 0 0 9px gray;

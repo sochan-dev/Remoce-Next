@@ -45,17 +45,25 @@ const CallScreenFooter: VFC<props> = (props) => {
   return (
     <div className={Styles.root}>
       <IconButton onClick={() => onClickVideo()}>
-        {turnVideo ? <VideocamOutlinedIcon /> : <VideocamOffOutlinedIcon />}
+        {turnVideo ? (
+          <VideocamOutlinedIcon color={'secondary'} />
+        ) : (
+          <VideocamOffOutlinedIcon color={'secondary'} />
+        )}
       </IconButton>
 
       <IconButton onClick={() => onClickVoice()}>
-        {turnVoice ? <VolumeUpOutlinedIcon /> : <VolumeOffOutlinedIcon />}
+        {turnVoice ? (
+          <VolumeUpOutlinedIcon color={'secondary'} />
+        ) : (
+          <VolumeOffOutlinedIcon color={'secondary'} />
+        )}
       </IconButton>
       <IconButton onClick={() => onClickShare()}>
         {turnShare ? (
-          <ScreenShareOutlinedIcon />
+          <ScreenShareOutlinedIcon color={'secondary'} />
         ) : (
-          <StopScreenShareOutlinedIcon />
+          <StopScreenShareOutlinedIcon color={'secondary'} />
         )}
       </IconButton>
     </div>

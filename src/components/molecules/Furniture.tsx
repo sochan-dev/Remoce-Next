@@ -60,7 +60,7 @@ const Furniture: VFC<props> = (props) => {
     dispatch(setUpdateFurniture(updateFurniture))
     dispatch(turnUpdateFurniture({ isOpen: true }))
   }
-  const isCloseMsg = furnitureData.isClose ? 'はい' : 'いいえ'
+  const isCloseMsg = furnitureData.isClose ? '不可' : false
 
   return (
     <div
@@ -75,7 +75,9 @@ const Furniture: VFC<props> = (props) => {
         className={virtual ? Styles.virtualHover : Styles.hover}
         onDoubleClick={() => onDoubleClick()}
       >
-        {/*<p>閉鎖：{isCloseMsg}</p>*/}
+        {isCloseMsg && (
+          <p className={Styles.isCloseMsg}>ここは通話出来ません。</p>
+        )}
         <p>{furnitureData.furnitureDetail}</p>
       </div>
     </div>

@@ -5,6 +5,7 @@
   padding: 15px;
   height: 60vh;
   justify-content: space-between;
+  background-color: $color-base;
 
   .form {
     margin-right: 30px;
@@ -13,10 +14,10 @@
   }
   .virtualArea {
     margin: 0 auto;
-    background-color: azure;
+    background-color: $color-sub;
     width: 600px;
     height: 300px;
-    border: 1px black solid;
+    border: 1px $color-accent solid;
   }
 }
 .delete {

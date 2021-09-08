@@ -38,7 +38,7 @@ const LocalVideo: VFC<props> = (props) => {
 
   const isAttention = attentionPeerId === userId
   const isFullScreen = fullScreenPeerId === userId
-  const headerColor = 'primary'
+  const headerColor = 'error'
   return (
     <div className={Styles.root}>
       <div className={Styles.header}>

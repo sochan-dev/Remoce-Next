@@ -1,0 +1,22 @@
+@charset "UTF-8";
+@import './variables.scss';
+.root {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2rem;
+  border: darken($color-base, 30) solid 2px;
+  .addCard {
+    width: 220px;
+    height: 220px;
+    border: $color-accent solid 2px;
+    border-radius: 16px;
+    text-align: center;
+    margin: 1rem;
+    padding: 1rem;
+    color: $color-sub;
+    &:hover {
+      border: $color-focus solid 3px;
+    }
+  }
+}

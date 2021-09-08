@@ -67,8 +67,8 @@ const UserVideo: VFC<props> = (props) => {
     isFooter = true
   }
 
-  const headerColor = 'primary'
-  const footerColor = 'secondary'
+  const headerColor = 'error'
+  const footerColor = 'error'
 
   return (
     <div className={Styles.root}>

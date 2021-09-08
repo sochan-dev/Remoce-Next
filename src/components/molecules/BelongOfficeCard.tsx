@@ -1,6 +1,7 @@
 import React, { VFC } from 'react'
 import { useRouter } from 'next/router'
 import Styles from '../../../styles/sass/card.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
 
 type props = {
   employeeId: string
@@ -20,8 +21,11 @@ const BelongOfficeCard: VFC<props> = (props) => {
 
   return (
     <div className={Styles.workPlace} onClick={handleOnClick}>
-      <p>{`office_id:${officeId},　office_name${officeName}`}</p>
-      <p>{`employee_id${employeeId},　employee_name${employeeName}`}</p>
+      <p className={Styles.label}>オフィス名</p>
+      <p>{officeName}</p>
+      <div className={Blanks.blank_16} />
+      <p className={Styles.label}>あなたの社員名</p>
+      <p>{employeeName}</p>
     </div>
   )
 }

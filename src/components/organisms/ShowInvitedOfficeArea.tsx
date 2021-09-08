@@ -10,16 +10,24 @@ const ShowInvitedOfficeArea: VFC = () => {
   const invites = getInvites(selector)
   const userId = getAuthStatus(selector).userId
 
+  const isExist = invites.length !== 0
+
   return (
     <div className={Styles.root}>
-      {invites.map((data, i) => (
-        <InviteCard
-          userId={userId}
-          officeId={data.officeId}
-          officeName={data.officeName}
-          key={i}
-        />
-      ))}
+      {isExist ? (
+        <>
+          {invites.map((data, i) => (
+            <InviteCard
+              userId={userId}
+              officeId={data.officeId}
+              officeName={data.officeName}
+              key={i}
+            />
+          ))}
+        </>
+      ) : (
+        <p>現在オフィスからの招待はありません。</p>
+      )}
     </div>
   )
 }

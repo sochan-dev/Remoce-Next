@@ -1,27 +1,36 @@
 @charset "UTF-8";
 @import './variables.scss';
 %card {
+  background-color: $color-sub;
   border-radius: 16px;
+  text-align: center;
   margin: 1rem;
-  padding: 3px;
+  padding: 1rem;
+  cursor: pointer;
   &:hover {
-    background-color: bisque;
-    border: aqua solid 3px;
+    border: $color-focus solid 3px;
+    .officeName {
+      font-weight: bold;
+    }
   }
 }
 .workPlace {
+  padding-top: 50px;
   width: 220px;
   height: 220px;
-  border: red solid 2px;
+  border: $color-accent solid 2px;
   @extend %card;
+  p {
+    margin-top: 0;
+  }
+  .label {
+    font-size: 0.7rem;
+    color: lighten(black, 10);
+  }
 }
 
 .invite {
-  width: 150px;
-  height: 150px;
-  border: orange solid 2px;
+  width: 220px;
+  border: $color-accent solid 2px;
   @extend %card;
-  p {
-    font-size: 0.5rem;
-  }
 }

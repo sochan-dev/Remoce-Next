@@ -148,13 +148,13 @@ const useUpdateFurniture = () => {
     {
       id: 1,
       value: 'open',
-      label: '公開',
+      label: '通話可能',
       isChecked: isClose ? false : true
     },
     {
       id: 2,
       value: 'close',
-      label: '非公開',
+      label: '通話不可',
       isChecked: isClose ? true : false
     }
   ]

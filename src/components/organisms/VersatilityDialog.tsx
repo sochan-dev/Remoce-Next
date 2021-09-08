@@ -11,6 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import Button from '@material-ui/core/Button'
 import { ActionCreatorWithOptionalPayload } from '@reduxjs/toolkit'
+import Styles from '../../../styles/sass/versatility.module.scss'
 
 type props = {
   isOpen: boolean
@@ -37,8 +38,13 @@ const VersatilityDialog: VFC<props> = (props) => {
         onClose={() => handleSetIsOpen(closeValue)}
         maxWidth={maxWidth}
       >
-        <DialogContent>{isOpen && children}</DialogContent>
-        <DialogActions style={{ justifyContent: 'flex-start' }}>
+        <DialogContent className={Styles.root}>
+          {isOpen && children}
+        </DialogContent>
+        <DialogActions
+          className={Styles.root}
+          style={{ justifyContent: 'flex-start' }}
+        >
           <Button
             onClick={() => dispatch(setIsOpen({ isOpen: false }))}
             color="primary"

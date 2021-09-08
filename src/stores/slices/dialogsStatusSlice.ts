@@ -16,6 +16,8 @@ export interface DialogsStatus {
   officeMenu: boolean
   deportEmployee: boolean
   accessRightMessage: boolean
+  invitedOffices: boolean
+  createOffice: boolean
 }
 //signUp関数が受け取るuserの入力情報
 
@@ -28,7 +30,9 @@ const initialState: DialogsStatus = {
   updateEmployee: false,
   officeMenu: false,
   deportEmployee: false,
-  accessRightMessage: false
+  accessRightMessage: false,
+  invitedOffices: false,
+  createOffice: false
 }
 
 /*////////////////////////////////////////////////
@@ -81,6 +85,17 @@ export const dialogsStatusSlice = createSlice({
       state.accessRightMessage = payload
         ? payload.isOpen
         : !state.accessRightMessage
+    },
+    turnInvitedOffices: (
+      state,
+      action?: PayloadAction<{ isOpen: boolean }>
+    ) => {
+      const payload = action.payload
+      state.invitedOffices = payload ? payload.isOpen : !state.invitedOffices
+    },
+    turnCreateOffice: (state, action?: PayloadAction<{ isOpen: boolean }>) => {
+      const payload = action.payload
+      state.createOffice = payload ? payload.isOpen : !state.createOffice
     }
   }
 })
@@ -93,7 +108,9 @@ export const {
   turnUpdateEmployee,
   turnOfficeMenu,
   turnDeportEmployee,
-  turnAccessRightMessage
+  turnAccessRightMessage,
+  turnInvitedOffices,
+  turnCreateOffice
 } = dialogsStatusSlice.actions
 
 /*////////////////////////////////////////////////
@@ -127,6 +144,13 @@ export const getIsAccessRightMessage = createSelector(
   dialogsStatusSelector,
   (state) => state.accessRightMessage
 )
-
+export const getIsInvitedOffices = createSelector(
+  dialogsStatusSelector,
+  (state) => state.invitedOffices
+)
+export const getIsCreateOffice = createSelector(
+  dialogsStatusSelector,
+  (state) => state.createOffice
+)
 //エクスポート
 export default dialogsStatusSlice.reducer

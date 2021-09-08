@@ -19,6 +19,7 @@
   input[type='number'],
   input[type='password'] {
     width: 100%;
+    background-color: $color-base;
     border-radius: 10px;
     padding: 0.5rem 1rem;
     border: solid 2px $color-accent;
@@ -36,7 +37,7 @@
     &_active {
       @extend %labelStyle;
       font-size: 0.5rem;
-      background-color: white;
+      background-color: $color-base;
       box-shadow: 0 0 2px 0 gray;
       top: -1rem;
       padding: 0 0.5rem;

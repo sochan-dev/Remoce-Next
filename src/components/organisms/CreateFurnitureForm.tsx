@@ -56,6 +56,7 @@ const CreateFurnitureForm: VFC = () => {
             radioList={furnitureSizeRadioList}
           />
         </div>
+
         <div>
           <RadioButtons
             onChange={changeIsClose}
@@ -63,6 +64,7 @@ const CreateFurnitureForm: VFC = () => {
             radioList={isCloseRadioList}
           />
         </div>
+
         <Select
           options={colors}
           onChange={selectColor}

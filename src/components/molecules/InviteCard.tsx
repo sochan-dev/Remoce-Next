@@ -5,6 +5,7 @@ import { InputText, ActionButton } from '../atoms'
 import { db, fieldValue, realTimeDB } from '../../../firebase'
 import { deleteInvite } from '../../stores/slices/notificationsSlice'
 import Styles from '../../../styles/sass/card.module.scss'
+import Blanks from '../../../styles/sass/blanks.module.scss'
 
 type props = {
   userId: string
@@ -77,13 +78,15 @@ const InviteCard: VFC<props> = (props) => {
 
   return (
     <div className={Styles.invite}>
-      <p>{`office_id:${officeId},office_name:${officeName}`}</p>
+      <p className={Styles.officeName}>{officeName}</p>
+      <div className={Blanks.blank_32} />
       <InputText
         type={'text'}
         label={'あなたの社員名'}
         value={employeeName}
         onChange={inputEmployeeName}
       />
+      <div className={Blanks.blank_16} />
       <ActionButton onClick={handleOnClick} label={'参加'} />
     </div>
   )

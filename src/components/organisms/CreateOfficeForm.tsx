@@ -5,6 +5,7 @@ import { getAuthStatus } from '../../stores/slices/authStatusSlice'
 import { InputText, ActionButton } from '../atoms'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 import { db, realTimeDB } from '../../../firebase'
+import Styles from '../../../styles/sass/createOffice.module.scss'
 
 const CreateOfficeHome: VFC = () => {
   const router = useRouter()
@@ -79,8 +80,9 @@ const CreateOfficeHome: VFC = () => {
   }
 
   return (
-    <>
+    <div className={Styles.root}>
       <h1>オフィスの作成</h1>
+      <div className={Blanks.blank_32} />
       <InputText
         label={'リモートオフィスの名前'}
         type={'text'}
@@ -96,7 +98,7 @@ const CreateOfficeHome: VFC = () => {
       />
       <div className={Blanks.blank_16} />
       <ActionButton label={'登録'} onClick={createOffice} />
-    </>
+    </div>
   )
 }
 

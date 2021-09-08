@@ -31,13 +31,13 @@ const CallScreenHeader: VFC<props> = (props) => {
   return (
     <div className={Styles.root}>
       <IconButton onClick={() => updateMinimize()}>
-        <MinimizeIcon />
+        <MinimizeIcon color={'secondary'} />
       </IconButton>
       <IconButton onClick={() => releaseMinimize()}>
-        <ZoomOutMapIcon />
+        <ZoomOutMapIcon color={'secondary'} />
       </IconButton>
       <IconButton onClick={() => updateOneScreen()}>
-        <Crop54Icon />
+        <Crop54Icon color={'secondary'} />
       </IconButton>
     </div>
   )

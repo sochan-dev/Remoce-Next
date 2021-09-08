@@ -4,8 +4,8 @@
   position: relative;
   padding: 0;
   margin: 0 auto;
-  background-color: azure;
+  background-color: $color-sub;
   width: 600px;
   height: 300px;
-  outline: 1px black solid;
+  outline: 1px $color-accent solid;
 }
