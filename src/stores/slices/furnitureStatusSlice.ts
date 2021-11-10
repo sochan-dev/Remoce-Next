@@ -1,7 +1,6 @@
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { RootState } from '..'
+import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -36,7 +35,6 @@ type Furniture_data = {
   y_coordinate: number
   join_employees: string[]
 }
-//signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
   stateの初期値
@@ -49,7 +47,6 @@ const initialState: FurnitureStatus = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-//オブジェクト情報の取得
 export const asyncFetchFurniture = createAsyncThunk<
   FurnitureStatus['furniture'],
   string
@@ -97,7 +94,6 @@ export const furnitureStatusSlice = createSlice({
   },
   //AsyncThunkを扱うreducer
   extraReducers: (builder) => {
-    //signUp関数
     builder
       .addCase(asyncFetchFurniture.pending, (state, action) => {})
       .addCase(asyncFetchFurniture.fulfilled, (state, action) => {
@@ -114,7 +110,7 @@ export const { fetchFurniture } = furnitureStatusSlice.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const furnitureStatusSelector = (state): FurnitureStatus =>
+export const furnitureStatusSelector = (state: RootState): FurnitureStatus =>
   state.furnitureStatus
 
 export const getFurniture = createSelector(

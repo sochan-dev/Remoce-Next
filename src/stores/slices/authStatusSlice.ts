@@ -1,8 +1,7 @@
-import Router, { useRouter } from 'next/router'
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import Router from 'next/router'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { RootState } from '..'
+import { auth, db } from '../../../firebase'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -149,7 +148,8 @@ export const authStatusSlice = createSlice({
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const authStatusSelector = (state): authStatus => state.authStatus
+export const authStatusSelector = (state: RootState): authStatus =>
+  state.authStatus
 
 export const getAuthStatus = createSelector(
   authStatusSelector,

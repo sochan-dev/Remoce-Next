@@ -1,8 +1,6 @@
-import Router, { useRouter } from 'next/router'
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
+import { RootState } from '..'
+import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -117,7 +115,8 @@ export const { fetchOffice, fetchOfficeSize, setScrollValue } =
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const officeSelector = (state): OfficeStatus => state.officeStatus
+export const officeSelector = (state: RootState): OfficeStatus =>
+  state.officeStatus
 
 export const getOffice = createSelector(officeSelector, (state) => state)
 export const getOfficeId = createSelector(

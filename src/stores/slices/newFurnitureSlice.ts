@@ -1,7 +1,5 @@
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
+import { RootState } from '..'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -133,7 +131,7 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const newFurnitureSelector = (state): NewFurniture =>
+export const newFurnitureSelector = (state: RootState): NewFurniture =>
   state.newFurnitureStatus
 
 export const getFurnitureName = createSelector(

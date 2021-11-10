@@ -1,9 +1,5 @@
-import Router from 'next/router'
-import { createAsyncThunk } from '@reduxjs/toolkit'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import axios, { AxiosResponse } from 'axios'
-import { auth } from '../../../firebase'
+import { RootState } from '..'
 import { signUp } from './authStatusSlice'
 
 /*////////////////////////////////////////////////

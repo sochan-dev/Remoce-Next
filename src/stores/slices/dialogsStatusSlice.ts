@@ -1,8 +1,5 @@
-import Router, { useRouter } from 'next/router'
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { RootState } from '..'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -116,7 +113,7 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const dialogsStatusSelector = (state): DialogsStatus =>
+export const dialogsStatusSelector = (state: RootState): DialogsStatus =>
   state.dialogsStatus
 
 export const getAllDialogStatus = createSelector(

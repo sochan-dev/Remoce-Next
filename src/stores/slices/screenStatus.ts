@@ -1,8 +1,5 @@
-import Router, { useRouter } from 'next/router'
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { RootState } from '..'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -68,7 +65,8 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const screenStatusSelector = (state): ScreenStatus => state.screenStatus
+export const screenStatusSelector = (state: RootState): ScreenStatus =>
+  state.screenStatus
 
 export const getScreenStatus = createSelector(
   screenStatusSelector,

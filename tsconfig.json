@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
+    "alwaysStrict": true,
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext"], //詳しく調べる
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
+    //"strictNullChecks": true,nullとundefined厳格チェック
+    "noImplicitAny": false,
+    //"noUnusedLocals":true,//使っていない変数をチェック
+    //"noUnusedParameters":true,変数名先頭に_を付けると回避可
+    //noImplicitReturns:true,//returnで値を返す場合とreturnしない場合が混在したとき、エラー。暗黙のreturnをチェック
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,

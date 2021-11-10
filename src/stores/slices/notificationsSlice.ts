@@ -1,8 +1,6 @@
-import Router, { useRouter } from 'next/router'
-import { createAsyncThunk, unwrapResult } from '@reduxjs/toolkit'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppDispatch, AppThunk, RootState } from '..'
-import { auth, db, serverTimeStamp, firebaseTimeStamp } from '../../../firebase'
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
+import { RootState } from '..'
+import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
 
 /*////////////////////////////////////////////////
@@ -107,7 +105,7 @@ export const { fetchInvites, deleteInvite } = notificationsSlices.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const invitesSelector = (state): Notifications[`invites`] =>
+export const invitesSelector = (state: RootState): Notifications[`invites`] =>
   state.notifications.invites
 
 export const getInvites = createSelector(invitesSelector, (state) => state)
