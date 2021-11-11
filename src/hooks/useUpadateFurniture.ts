@@ -11,44 +11,19 @@ import {
   setNewFurnitureColor
 } from '../stores//slices/newFurnitureSlice'
 import { db } from '../../firebase'
-
-type Employee_data = {
-  employee_name: string
-  employee_picture: string
-  employee_x_coordinate: number
-  employee_y_coordinate: number
+import { Employee_data } from '../types/employee'
+import { Color, RadioValue } from '../types/form'
+interface isCloseRadioValue {
+  id: number
+  value: 'open' | 'close'
+  label: '通話不可' | '通話可能'
+  isChecked: boolean
 }
 
 type Employees = {
   label: string
   value: string
 }[]
-
-type Color =
-  | {
-      label: '白色'
-      value: 'white'
-    }
-  | {
-      label: '黒色'
-      value: 'black'
-    }
-  | {
-      label: '赤色'
-      value: 'red'
-    }
-  | {
-      label: '青色'
-      value: 'blue'
-    }
-  | {
-      label: '黄色'
-      value: 'yellow'
-    }
-  | {
-      label: '緑色'
-      value: 'green'
-    }
 
 const colors: Color[] = [
   {
@@ -123,7 +98,7 @@ const useUpdateFurniture = () => {
     }
   })
 
-  const furnitureSizeRadioList = [
+  const furnitureSizeRadioList: RadioValue[] = [
     {
       id: 1,
       value: 1,
@@ -144,7 +119,7 @@ const useUpdateFurniture = () => {
     }
   ]
 
-  const isCloseRadioList = [
+  const isCloseRadioList: isCloseRadioValue[] = [
     {
       id: 1,
       value: 'open',

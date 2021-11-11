@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { getScreenStatus } from '../../stores/slices/screenStatus'
 import { UserVideo, LocalVideo } from '../molecules'
 import Styles from '../../../styles/sass/screenArea.module.scss'
+import { LocalInfo, RemoteUser } from '../../types/sfu'
 
 type EmployeeStatus = {
   employeeId: string
@@ -13,25 +14,17 @@ type EmployeeStatus = {
 
 type props = {
   isMinimize: boolean
-  localInfo: {
-    id: string
-    video: MediaStream
-    videoRef: MutableRefObject<HTMLVideoElement>
-  }
-  remotesInfo: {
-    id: string
-    video: MediaStream
-    employeeStatus?: EmployeeStatus
-  }[]
+  localInfo: LocalInfo
+  remoteUsers: RemoteUser[]
 }
 
 const ScreenArea: VFC<props> = (props) => {
-  const { isMinimize, localInfo, remotesInfo } = props
+  const { isMinimize, localInfo, remoteUsers } = props
   const selector = useSelector((state) => state)
   const { attentionPeerId } = getScreenStatus(selector)
   const attentionUser =
     attentionPeerId !== localInfo.id || attentionPeerId !== ''
-      ? remotesInfo.filter((user) => user.id === attentionPeerId)[0]
+      ? remoteUsers.filter((user) => user.id === attentionPeerId)[0]
       : false
   console.log(
     'attentionPeerId',
@@ -57,7 +50,7 @@ const ScreenArea: VFC<props> = (props) => {
         <div className={Styles.root}>
           {!isMinimize && (
             <div className={Styles.row}>
-              {remotesInfo.map((user, i) => (
+              {remoteUsers.map((user, i) => (
                 <UserVideo
                   video={user.video}
                   userId={user.id}
@@ -89,7 +82,7 @@ const ScreenArea: VFC<props> = (props) => {
               />
             </div>
             {!isMinimize &&
-              remotesInfo.map((user, i) => {
+              remoteUsers.map((user, i) => {
                 user.id !== attentionPeerId && (
                   <UserVideo
                     video={user.video}

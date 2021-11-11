@@ -8,13 +8,7 @@ import { getOfficeId } from '../stores/slices/officeStatusSlice'
 import { db, storage, auth } from '../../firebase'
 import loadImage from 'blueimp-load-image'
 import userIcon from '../../public/image/initial-user-icon.png'
-
-type EmployeeData = {
-  employee_name: string
-  employee_picture: string
-  employee_x_coordinate: number
-  employee_y_coordinate: number
-}
+import { Employee_data } from '../types/employee'
 
 const useUpdateEmployeeData = () => {
   const selector = useSelector((state) => state)
@@ -53,7 +47,7 @@ const useUpdateEmployeeData = () => {
       .get()
       .then(async (snapshot) => {
         const { employee_name, employee_picture } =
-          snapshot.data() as EmployeeData
+          snapshot.data() as Employee_data
         setEmployeeName(employee_name)
         if (employee_picture !== '') {
           const imgRef = storage.ref().child(employee_picture)
@@ -117,7 +111,7 @@ const useUpdateEmployeeData = () => {
       .doc(employeeId)
       .get()
       .then((snapshot) => {
-        const employee_data = snapshot.data() as EmployeeData
+        const employee_data = snapshot.data() as Employee_data
         const employeeData = {
           employeeName: employee_data.employee_name,
           xCoordinate: employee_data.employee_x_coordinate,

@@ -2,30 +2,19 @@ import React, { MutableRefObject, VFC } from 'react'
 import { UserVideo, LocalVideo } from '../molecules'
 import Styles from '../../../styles/sass/screenArea.module.scss'
 import VideocamOutlined from '@material-ui/icons/VideocamOutlined'
-
-type EmployeeStatus = {
-  employeeId: string
-  employeeName: string
-  isDisplay: boolean
-  isMute: boolean
-}
+import { LocalInfo, RemoteUser } from '../../types/sfu'
 
 type props = {
   isMinimize: boolean
-  localInfo: {
-    id: string
-    video: MediaStream
-    videoRef: MutableRefObject<HTMLVideoElement>
-  }
-  remotesInfo: {
-    id: string
-    video: MediaStream
-    employeeStatus?: EmployeeStatus
-  }[]
+  localInfo: LocalInfo
+  remoteUsers: RemoteUser[]
 }
 
 const FewScreenArea: VFC<props> = (props) => {
-  const { isMinimize, localInfo, remotesInfo } = props
+  const { isMinimize, localInfo, remoteUsers } = props
+  console.log('isMinimaize->', isMinimize)
+  console.log('localInfo', localInfo)
+
   const localStyle = isMinimize
     ? {
         visibility: 'hidden' as 'hidden',
@@ -37,12 +26,13 @@ const FewScreenArea: VFC<props> = (props) => {
     : {
         visibility: 'visible' as 'visible'
       }
-  const videoSize = Math.round(100 / (remotesInfo.length + 1))
-  console.log('videoSize', videoSize, 'length', remotesInfo.length)
-  console.log('remotesInfo', remotesInfo)
+  const videoSize = Math.round(100 / (remoteUsers.length + 1))
+
   return (
     <>
-      {remotesInfo.length < 3 ? (
+      {!remoteUsers ? (
+        <></>
+      ) : remoteUsers.length < 3 ? (
         <div className={Styles.root}>
           {console.log('通話！！！UC')}
           <div className={Styles.fewRow}>
@@ -54,7 +44,7 @@ const FewScreenArea: VFC<props> = (props) => {
               />
             </div>
             {!isMinimize &&
-              remotesInfo.map((user, i) => (
+              remoteUsers.map((user, i) => (
                 <UserVideo
                   video={user.video}
                   userId={user.id}
@@ -76,7 +66,7 @@ const FewScreenArea: VFC<props> = (props) => {
               />
             </div>
             {!isMinimize &&
-              remotesInfo.map((user, i) => {
+              remoteUsers.map((user, i) => {
                 i < 3 && (
                   <UserVideo
                     size={{ maxWidth: '50%', maxHeight: '43vh' }}
@@ -90,7 +80,7 @@ const FewScreenArea: VFC<props> = (props) => {
           </div>
           {!isMinimize && (
             <div className={Styles.fewRow}>
-              {remotesInfo.map((user, i) => {
+              {remoteUsers.map((user, i) => {
                 i > 3 && (
                   <UserVideo
                     size={{ maxWidth: '50vw', maxHeight: '43vh' }}

@@ -5,15 +5,8 @@ import {
   getNewFurnitureAuthorities
 } from '../stores/slices/newFurnitureSlice'
 import { getOfficeId } from '../stores/slices/officeStatusSlice'
-import Select from 'react-select'
 import { db } from '../../firebase'
-
-type Employee_data = {
-  employee_name: string
-  employee_picture: string
-  employee_x_coordinate: number
-  employee_y_coordinate: number
-}
+import { Employee_data } from '../types/employee'
 
 type Employees = {
   label: string

@@ -2,25 +2,12 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from '..'
 import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
+import { NotificationData } from '../../types/notification'
 
 /*////////////////////////////////////////////////
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
-export interface Notifications {
-  invites: {
-    officeId: string
-    officeName: string
-    officePicture?: string | false
-  }[]
-}
-
-type InvitedOfficeList = {
-  officeId: string
-  officeName: string
-  officePicture?: string | false
-}[]
-
 type User = {
   invited_office: string[]
 }
@@ -28,7 +15,7 @@ type User = {
 /*////////////////////////////////////////////////
   stateの初期値
 /*/ ///////////////////////////////////////////////
-const initialState: Notifications = {
+const initialState: NotificationData = {
   invites: []
 }
 
@@ -36,38 +23,38 @@ const initialState: Notifications = {
   createAsyncThunk
 /*/ ///////////////////////////////////////////////
 
-export const asyncFetchInvites = createAsyncThunk<InvitedOfficeList, string>(
-  'notifications/asyncFetchInvites',
-  async (userId) => {
-    let invitedOfficeList: InvitedOfficeList = []
-    await db
-      .collection('users')
-      .doc(userId)
-      .get()
-      .then(async (snapshot) => {
-        const { invited_office } = snapshot.data() as User
-        if (invited_office.length !== 0) {
-          for await (let officeId of invited_office) {
-            await db
-              .collection('offices')
-              .doc(officeId)
-              .get()
-              .then((officeData) => {
-                const data = officeData.data() as { office_name: string }
-                console.log('officeData', data)
-                const d: InvitedOfficeList[0] = {
-                  officeId: officeId,
-                  officeName: data.office_name
-                }
-                invitedOfficeList = [...invitedOfficeList, d]
-              })
-          }
+export const asyncFetchInvites = createAsyncThunk<
+  NotificationData['invites'],
+  string
+>('notifications/asyncFetchInvites', async (userId) => {
+  let invitedOfficeList: NotificationData['invites'] = []
+  await db
+    .collection('users')
+    .doc(userId)
+    .get()
+    .then(async (snapshot) => {
+      const { invited_office } = snapshot.data() as User
+      if (invited_office.length !== 0) {
+        for await (let officeId of invited_office) {
+          await db
+            .collection('offices')
+            .doc(officeId)
+            .get()
+            .then((officeData) => {
+              const data = officeData.data() as { office_name: string }
+              console.log('officeData', data)
+              const d: NotificationData['invites'][0] = {
+                officeId: officeId,
+                officeName: data.office_name
+              }
+              invitedOfficeList = [...invitedOfficeList, d]
+            })
         }
-      })
+      }
+    })
 
-    return invitedOfficeList
-  }
-)
+  return invitedOfficeList
+})
 
 /*////////////////////////////////////////////////
   createSlice
@@ -77,7 +64,10 @@ export const notificationsSlices = createSlice({
   initialState,
   //reducer
   reducers: {
-    fetchInvites: (state, action: PayloadAction<Notifications['invites']>) => {
+    fetchInvites: (
+      state,
+      action: PayloadAction<NotificationData['invites']>
+    ) => {
       state.invites = action.payload
     },
     deleteInvite: (state, action: PayloadAction<string>) => {
@@ -105,8 +95,9 @@ export const { fetchInvites, deleteInvite } = notificationsSlices.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const invitesSelector = (state: RootState): Notifications[`invites`] =>
-  state.notifications.invites
+export const invitesSelector = (
+  state: any /**RootStateが変 */
+): NotificationData[`invites`] => state.notifications.invites
 
 export const getInvites = createSelector(invitesSelector, (state) => state)
 //エクスポート

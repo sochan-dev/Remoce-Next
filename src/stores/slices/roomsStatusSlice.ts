@@ -2,30 +2,18 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from '..'
 import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
+import { RoomData, Room_data } from '../../types/room'
 
 /*////////////////////////////////////////////////
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
 export interface RoomsStatus {
-  rooms: {
-    roomId: string
-    roomX: number
-    roomY: number
-    joinEmployees: string[]
-  }[]
-}
-
-type Room_data = {
-  room_id: string
-  x_coordinate: number
-  y_coordinate: number
-  join_employees: string[]
+  rooms: RoomData[]
 }
 type Rooms_data = {
   rooms: Room_data[]
 }
-//signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
   stateの初期値
@@ -54,8 +42,8 @@ export const asyncFetchRooms = createAsyncThunk<RoomsStatus['rooms'], string>(
     rooms_data.rooms.forEach((room_data) => {
       roomsData.push({
         roomId: room_data.room_id,
-        roomX: room_data.x_coordinate,
-        roomY: room_data.y_coordinate,
+        xCoordinate: room_data.x_coordinate,
+        yCoordinate: room_data.y_coordinate,
         joinEmployees: room_data.join_employees
       })
     })
@@ -94,8 +82,9 @@ export const { fetchRooms } = roomsStatusSlice.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const roomsStatusSelector = (state: RootState): RoomsStatus =>
-  state.roomsStatus
+export const roomsStatusSelector = (
+  state: any /**RootStateが変 */
+): RoomsStatus => state.roomsStatus
 
 export const getRooms = createSelector(
   roomsStatusSelector,

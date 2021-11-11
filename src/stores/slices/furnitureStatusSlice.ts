@@ -2,38 +2,14 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '..'
 import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
+import { FurnitureData, Furniture_data } from '../../types/furniture'
 
 /*////////////////////////////////////////////////
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
 export interface FurnitureStatus {
-  furniture: {
-    furnitureId: string
-    roomId: string
-    furnitureName: string
-    furnitureDetail: string
-    furnitureSize: number
-    furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
-    isClose: boolean
-    authorities: string[]
-    xCoordinate: number
-    yCoordinate: number
-    joinEmployees: string[]
-  }[]
-}
-
-type Furniture_data = {
-  roomId: string
-  furniture_name: string
-  furniture_detail: string
-  furniture_size: number
-  furniture_color: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
-  is_close: boolean
-  authorities: string[]
-  x_coordinate: number
-  y_coordinate: number
-  join_employees: string[]
+  furniture: FurnitureData[]
 }
 
 /*////////////////////////////////////////////////
@@ -62,7 +38,7 @@ export const asyncFetchFurniture = createAsyncThunk<
     const furniture_data = snapshot.data() as Furniture_data
     furnitureData.push({
       furnitureId: snapshot.id,
-      roomId: furniture_data.roomId,
+      roomId: furniture_data.room_id,
       furnitureName: furniture_data.furniture_name,
       furnitureDetail: furniture_data.furniture_detail,
       furnitureSize: furniture_data.furniture_size,
@@ -110,8 +86,9 @@ export const { fetchFurniture } = furnitureStatusSlice.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const furnitureStatusSelector = (state: RootState): FurnitureStatus =>
-  state.furnitureStatus
+export const furnitureStatusSelector = (
+  state: any /**RootStateが変 */
+): FurnitureStatus => state.furnitureStatus
 
 export const getFurniture = createSelector(
   furnitureStatusSelector,

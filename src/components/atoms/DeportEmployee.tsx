@@ -3,11 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import { turnDeportEmployee } from '../../stores/slices/dialogsStatusSlice'
+import { EmployeeData } from '../../types/employee'
 
-type props = {
-  employeeId: string
-  employeeName: string
-}
+type props = Pick<EmployeeData, 'employeeId' | 'employeeName'>
 
 type Request = {
   officeId: string

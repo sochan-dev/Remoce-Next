@@ -113,8 +113,9 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const dialogsStatusSelector = (state: RootState): DialogsStatus =>
-  state.dialogsStatus
+export const dialogsStatusSelector = (
+  state: any /**RootStateが変 */
+): DialogsStatus => state.dialogsStatus
 
 export const getAllDialogStatus = createSelector(
   dialogsStatusSelector,

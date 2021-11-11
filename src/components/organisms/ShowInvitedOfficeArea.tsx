@@ -17,12 +17,7 @@ const ShowInvitedOfficeArea: VFC = () => {
       {isExist ? (
         <>
           {invites.map((data, i) => (
-            <InviteCard
-              userId={userId}
-              officeId={data.officeId}
-              officeName={data.officeName}
-              key={i}
-            />
+            <InviteCard invite={data} userId={userId} key={i} />
           ))}
         </>
       ) : (

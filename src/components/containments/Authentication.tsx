@@ -1,15 +1,10 @@
 import React, { VFC, ReactNode, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { auth, db } from '../../../firebase'
+import { WorkPlace_data } from '../../types/workPlace'
 
 type props = {
   children: ReactNode
-}
-
-type Employee_to_office = {
-  employee_id: string
-  employee_name: string
-  office_id: string
 }
 
 const Authentication: VFC<props> = (props) => {
@@ -21,6 +16,7 @@ const Authentication: VFC<props> = (props) => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         const uid = user.uid
+        console.log('uid->', uid)
         if (pathArray[1] === 'office') {
           const officeId = router.query.office_id as string
           const employeeId = router.query.employee_id as string
@@ -39,7 +35,7 @@ const Authentication: VFC<props> = (props) => {
             .get()
             .then((snapshot) => {
               if (snapshot.exists) {
-                const info = snapshot.data() as Employee_to_office
+                const info = snapshot.data() as WorkPlace_data
                 if (info.office_id !== officeId) {
                   router.push('/')
                 }

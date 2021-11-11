@@ -1,19 +1,9 @@
 import React, { VFC, MutableRefObject } from 'react'
 import { UserVideo } from '../molecules'
-
-type EmployeeStatus = {
-  employeeId: string
-  employeeName: string
-  isDisplay: boolean
-  isMute: boolean
-}
+import { RemoteUser } from '../../types/sfu'
 
 type props = {
-  remotesInfo: {
-    id: string
-    video: MediaStream
-    employeeStatus?: EmployeeStatus
-  }[]
+  remotesInfo: RemoteUser[]
 }
 
 const VideoArea: VFC<props> = (props) => {

@@ -4,6 +4,7 @@ import {
   setNewFurnitureSize,
   getNewFurnitureSize
 } from '../stores/slices/newFurnitureSlice'
+import { RadioValue } from '../types/form'
 
 const useFurnitureRadioControl = () => {
   const dispatch = useDispatch()
@@ -15,7 +16,7 @@ const useFurnitureRadioControl = () => {
     dispatch(setNewFurnitureSize(checkedType))
   }
 
-  const furnitureSizeRadioList = [
+  const furnitureSizeRadioList: RadioValue[] = [
     {
       id: 1,
       value: 1,

@@ -3,15 +3,15 @@ import Styles from '../../../styles/sass/room.module.scss'
 
 type props = {
   roomId: string
-  roomX: number
-  roomY: number
+  xCoordinate: number
+  yCoordinate: number
 }
 
 const Room: VFC<props> = (props) => {
-  const { roomId, roomX, roomY } = props
+  const { roomId, xCoordinate, yCoordinate } = props
   const initialCoordinate = {
-    left: roomX,
-    top: roomY
+    left: xCoordinate,
+    top: yCoordinate
   }
   return (
     <div className={Styles.root} style={initialCoordinate}>

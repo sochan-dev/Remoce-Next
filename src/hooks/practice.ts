@@ -48,4 +48,11 @@ let c5: Record<keyof Cat, boolean> = {
   age: true // 必須になる
 }
 
+interface Sample {
+  title: string
+  price: number
+}
+
+type SamplePick = Pick<Sample, 'title'>
+
 export {}

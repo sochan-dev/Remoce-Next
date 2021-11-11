@@ -6,21 +6,11 @@ import { getEditPermission } from '../../stores/slices/employeesStatusSlice'
 import Styles from '../../../styles/sass/furniture.module.scss'
 import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
 import classNames from 'classnames'
+import { FurnitureData } from '../../types/furniture'
 
 type props = {
   virtual?: true
-  furnitureData: {
-    roomId: string
-    furnitureId: string
-    furnitureName: string
-    furnitureDetail: string
-    furnitureSize: number
-    furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
-    isClose: boolean
-    authorities: string[]
-    xCoordinate: number
-    yCoordinate: number
-  }
+  furnitureData: FurnitureData
 }
 
 const Furniture: VFC<props> = (props) => {

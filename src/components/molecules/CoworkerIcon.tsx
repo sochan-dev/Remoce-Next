@@ -12,44 +12,14 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import Styles from '../../../styles/sass/employeeIcon.module.scss'
 import userIcon from '../../../public/image/initial-user-icon.png'
 import classNames from 'classnames'
-
-type OwnData = {
-  employeeId: string
-  employeeName: string
-  employeePicture: string
-  xCoordinate: number
-  yCoordinate: number
-}
-type OfficeSize = {
-  officeWidth: number
-  officeHeight: number
-}
+import { EmployeeData, Employee_data } from '../../types/employee'
 
 type props = {
   id: number
   officeId: string
   isDrag: boolean
   setIsDrag: Dispatch<SetStateAction<boolean>>
-  ownData: OwnData
-  officeSize: OfficeSize
-}
-
-type Employee_data = {
-  employee_id: string
-  employee_name: string
-  employee_picture: string
-  edit_permission: boolean
-  employee_x_coordinate: number
-  employee_y_coordinate: number
-}
-
-type EmployeeData = {
-  employeeId: string
-  employeeName: string
-  editPermission: boolean
-  employeePicture: string
-  xCoordinate: number
-  yCoordinate: number
+  ownData: Omit<EmployeeData, 'editPermission'>
 }
 
 const CoworkerIcon: VFC<props> = (props) => {

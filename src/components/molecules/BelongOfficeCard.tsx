@@ -2,14 +2,9 @@ import React, { VFC } from 'react'
 import { useRouter } from 'next/router'
 import Styles from '../../../styles/sass/card.module.scss'
 import Blanks from '../../../styles/sass/blanks.module.scss'
+import { WorkPlaceData } from '../../types/workPlace'
 
-type props = {
-  employeeId: string
-  employeeName: string
-  officeId: string
-  officeName: string
-  officePicture?: string
-}
+type props = WorkPlaceData
 
 const BelongOfficeCard: VFC<props> = (props) => {
   const router = useRouter()

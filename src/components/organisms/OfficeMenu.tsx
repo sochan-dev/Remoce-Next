@@ -14,12 +14,7 @@ import Blanks from '../../../styles/sass/blanks.module.scss'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import PersonAddDisabledOutlinedIcon from '@material-ui/icons/PersonAddDisabledOutlined'
-
-type Employee_to_office = {
-  employee_id: string
-  employee_name: string
-  office_id: string
-}
+import { WorkPlace_data } from '../../types/workPlace'
 
 const OfficeMenu: VFC = () => {
   const dispatch = useDispatch()
@@ -51,7 +46,7 @@ const OfficeMenu: VFC = () => {
         const snapshots = await employee_to_officeCollectionRef.get()
         if (!snapshots.empty) {
           snapshots.forEach((snapshot) => {
-            const userInfo = snapshot.data() as Employee_to_office
+            const userInfo = snapshot.data() as WorkPlace_data
             if (officeId === userInfo.office_id) isInvite = false //すでに入社してる
           })
         }

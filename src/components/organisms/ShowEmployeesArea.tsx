@@ -1,10 +1,7 @@
 import React, { VFC, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { getEmployeesStatus } from '../../stores/slices/employeesStatusSlice'
-import {
-  getOfficeId,
-  getOfficeSize
-} from '../../stores/slices/officeStatusSlice'
+import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import { CoworkerIcon } from '../molecules'
 import { MyIcon } from '../organisms'
 
@@ -13,7 +10,6 @@ const ShowEmployeesArea: VFC = () => {
   const { employees, yourId } = getEmployeesStatus(selector)
   const [isDrag, setIsDrag] = useState(false)
   const officeId = getOfficeId(selector)
-  const officeSize = getOfficeSize(selector)
 
   return (
     <>
@@ -24,7 +20,6 @@ const ShowEmployeesArea: VFC = () => {
             id={i}
             officeId={officeId}
             ownData={employee}
-            officeSize={officeSize}
             isDrag={isDrag}
             setIsDrag={setIsDrag}
           />
@@ -34,7 +29,6 @@ const ShowEmployeesArea: VFC = () => {
             id={i}
             officeId={officeId}
             ownData={employee}
-            officeSize={officeSize}
             isDrag={isDrag}
             setIsDrag={setIsDrag}
           />

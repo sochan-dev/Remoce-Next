@@ -6,18 +6,18 @@ import { db, fieldValue, realTimeDB } from '../../../firebase'
 import { deleteInvite } from '../../stores/slices/notificationsSlice'
 import Styles from '../../../styles/sass/card.module.scss'
 import Blanks from '../../../styles/sass/blanks.module.scss'
+import { NotificationData } from '../../types/notification'
 
 type props = {
   userId: string
-  officeId: string
-  officeName: string
-  officePicture?: string
+  invite: NotificationData['invites'][0]
 }
 
 const InviteCard: VFC<props> = (props) => {
   const router = useRouter()
   const dispatch = useDispatch()
-  const { userId, officeId, officeName } = props
+  const userId = props.userId
+  const { officeId, officeName } = props.invite
   const [employeeName, setEmployeeName] = useState('')
 
   const inputEmployeeName = (e: ChangeEvent<HTMLInputElement>) => {

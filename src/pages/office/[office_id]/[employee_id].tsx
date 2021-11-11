@@ -6,10 +6,8 @@ import { db, realTimeDB } from '../../../../firebase'
 import { sdb, sRealtimeDB } from '../../../../ServerSideApp'
 import { OfficeTemplate } from '../../../components/templates'
 import {
-  fetchEmployeesStatus,
   fetchEmployees,
   asyncFetchEmployees,
-  getEmployeeId,
   fetchEmployeeId
 } from '../../../stores/slices/employeesStatusSlice'
 import {
@@ -18,8 +16,6 @@ import {
 } from '../../../stores/slices/furnitureStatusSlice'
 import {
   asyncFetchOffice,
-  fetchOffice,
-  getOfficeId,
   setScrollValue
 } from '../../../stores/slices/officeStatusSlice'
 import {
@@ -27,63 +23,14 @@ import {
   fetchRooms
 } from '../../../stores/slices/roomsStatusSlice'
 import { customAxios } from '../../../components/organisms/utils/customAxios'
+import { EmployeeData, Employee_data } from '../../../types/employee'
+import { FurnitureData, Furniture_data } from '../../../types/furniture'
+import { Room_data } from '../../../types/room'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
 type OfficeData = {
   office_name: string
 }
-type Employee_data = {
-  employee_name: string
-  employee_picture: string
-  edit_permission: boolean
-  employee_x_coordinate: number
-  employee_y_coordinate: number
-}
-
-type EmployeeData = {
-  employeeId: string
-  employeeName: string
-  employeePicture: string
-  editPermission: boolean
-  xCoordinate: number
-  yCoordinate: number
-}
-
-type RoomsData = {
-  rooms: {
-    room_id: string
-    x_coordinate: number
-    y_coordinate: number
-    join_employees: string[]
-  }[]
-}
-
-type Furniture = {
-  room_id: string
-  furniture_name: string
-  furniture_detail: string
-  furniture_size: number
-  furniture_color: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
-  is_close: boolean
-  authorities: string[]
-  x_coordinate: number
-  y_coordinate: number
-  join_employees: []
-}
-
-type FurnitureList = {
-  furnitureId: string
-  roomId: string
-  furnitureName: string
-  furnitureDetail: string
-  furnitureSize: number
-  furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
-  isClose: boolean
-  authorities: string[]
-  xCoordinate: number
-  yCoordinate: number
-  joinEmployees: []
-}[]
 
 type PutRequest = {
   isExit: boolean
@@ -107,7 +54,7 @@ export const getStaticProps = async ({ params }) => {
   let officeData: OfficeData
   let employeeList: EmployeeData[] = []
   const roomList = []
-  const furnitureList: FurnitureList = []
+  const furnitureList: FurnitureData[] = []
 
   await sdb
     .collection('offices')
@@ -149,7 +96,7 @@ export const getStaticProps = async ({ params }) => {
     .doc('room')
     .get()
     .then((snapshots) => {
-      const data = snapshots.data() as RoomsData
+      const data = snapshots.data() as { rooms: Room_data[] }
       const roomData = data.rooms
 
       roomData.forEach((room) => {
@@ -161,6 +108,7 @@ export const getStaticProps = async ({ params }) => {
       })
     })
     .catch((e) => {
+      console.log(e)
       isSuccess = false
     })
 
@@ -171,7 +119,7 @@ export const getStaticProps = async ({ params }) => {
     .get()
     .then((snapshots) => {
       snapshots.forEach((snapshot) => {
-        const furniture = snapshot.data() as Furniture
+        const furniture = snapshot.data() as Furniture_data
         furnitureList.push({
           furnitureId: snapshot.id,
           roomId: furniture.room_id,
@@ -208,6 +156,7 @@ export const getStaticProps = async ({ params }) => {
     await statusRef.update({
       status: false
     })
+    console.log('c1')
     return {
       redirect: {
         permanent: false,
@@ -299,7 +248,9 @@ const Office: NextPage<props> = (props) => {
     //スクロールした座標を更新
     const scrollAction = () => {}
     window.addEventListener('scroll', () => {
-      dispatch(setScrollValue({ x: window.scrollX, y: window.scrollY }))
+      dispatch(
+        setScrollValue({ scrollX: window.scrollX, scrollY: window.scrollY })
+      )
     })
 
     return window.removeEventListener('scroll', scrollAction)
@@ -356,12 +307,12 @@ const Office: NextPage<props> = (props) => {
       .collection('room')
       .doc('room')
       .onSnapshot(async (snapshot) => {
-        const rooms = snapshot.data().rooms as RoomsData['rooms']
+        const rooms = snapshot.data().rooms as Room_data[]
         const roomList = rooms.map((room) => {
           return {
             roomId: room.room_id,
-            roomX: room.x_coordinate,
-            roomY: room.y_coordinate,
+            xCoordinate: room.x_coordinate,
+            yCoordinate: room.y_coordinate,
             joinEmployees: room.join_employees
           }
         })
@@ -376,9 +327,9 @@ const Office: NextPage<props> = (props) => {
       .doc(officeId)
       .collection('furniture')
       .onSnapshot(async (snapshots) => {
-        const furnitureList: FurnitureList = []
+        const furnitureList: FurnitureData[] = []
         snapshots.forEach((snapshot) => {
-          const furniture = snapshot.data() as Furniture
+          const furniture = snapshot.data() as Furniture_data
           furnitureList.push({
             furnitureId: snapshot.id,
             roomId: furniture.room_id,

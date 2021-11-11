@@ -13,25 +13,10 @@ import {
   asyncFetchInvites,
   fetchInvites
 } from '../../stores/slices/notificationsSlice'
+import { NotificationData } from '../../types/notification'
+import { WorkPlaceData, WorkPlace_data } from '../../types/workPlace'
 
 type props = InferGetStaticPropsType<typeof getStaticProps>
-type OfficeDataList = {
-  employeeId: string
-  employeeName: string
-  officeId: string
-  officeName: string
-  officePicture?: string | false
-}[]
-type employeeData = {
-  employee_id: string
-  employee_name: string
-  office_id: string
-}
-type InvitedOfficeList = {
-  officeId: string
-  officeName: string
-  officePicture?: string | false
-}[]
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
@@ -41,8 +26,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps = async ({ params }) => {
   const uid = params.user_id
-  const belongOfficeList: OfficeDataList = []
-  const invitedOfficeList: InvitedOfficeList = []
+  const belongOfficeList: WorkPlaceData[] = []
+  const invitedOfficeList: NotificationData['invites'] = []
   let errFlg = false
   await sdb
     .collection('users')
@@ -52,7 +37,7 @@ export const getStaticProps = async ({ params }) => {
     .then(async (snapshot) => {
       if (!snapshot.empty) {
         for await (let childSnapshot of snapshot.docs) {
-          const employee = childSnapshot.data() as employeeData
+          const employee = childSnapshot.data() as WorkPlace_data
           await sdb
             .collection('offices')
             .doc(employee.office_id)
