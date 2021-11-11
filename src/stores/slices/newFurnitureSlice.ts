@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from '..'
 import { createSelector } from 'reselect'
+import { NewFurniture } from '../../types/newFurniture'
 
 /*////////////////////////////////////////////////
   型宣言
@@ -13,15 +14,6 @@ type UpdateInfo = {
     x: number
     y: number
   }
-}
-export interface NewFurniture {
-  furnitureName: string
-  furnitureDetail: string
-  furnitureSize: number
-  furnitureColor: 'white' | 'black' | 'red' | 'blue' | 'yellow' | 'green'
-  isClose: boolean
-  authorities: string[]
-  updateInfo: UpdateInfo | false
 }
 
 /*////////////////////////////////////////////////
@@ -131,8 +123,9 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const newFurnitureSelector = (state: RootState): NewFurniture =>
-  state.newFurnitureStatus
+export const newFurnitureSelector = (
+  state: any /**RootStateが変 */
+): NewFurniture => state.newFurnitureStatus
 
 export const getFurnitureName = createSelector(
   newFurnitureSelector,

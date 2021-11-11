@@ -65,7 +65,8 @@ export const { onLoad, offLoad } = loadingStatusSlice.actions
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const getLoadingStatus = (state: RootState): loadingStatus =>
-  state.loadingStatus
+export const getLoadingStatus = (
+  state: any /**RootStateが変 */
+): loadingStatus => state.loadingStatus
 //エクスポート
 export default loadingStatusSlice.reducer

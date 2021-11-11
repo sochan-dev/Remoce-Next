@@ -1,3 +1,4 @@
+import { FurnitureData } from './../types/furniture'
 import { getFurniture } from './../stores/slices/furnitureStatusSlice'
 import { useState, useEffect, useRef, SetStateAction, Dispatch } from 'react'
 import { useSelector } from 'react-redux'
@@ -7,47 +8,16 @@ import {
   getOwnEmployeeData
 } from '../stores/slices/employeesStatusSlice'
 import Peer, { SfuRoom } from 'skyway-js'
-
-type EmployeeStatus = {
-  employeeId: string
-  employeeName: string
-  isDisplay: boolean
-  isMute: boolean
-}
-
-type RemoteUser = {
-  id: string
-  video: MediaStream
-  employeeStatus?: EmployeeStatus
-}
-
-type Rooms = {
-  roomId: string
-  roomX: number
-  roomY: number
-  joinEmployees: string[]
-}[]
-
-type FurnitureList = {
-  furnitureId: string
-  roomId: string
-  furnitureName: string
-  furnitureDetail: string
-  furnitureSize: number
-  isClose: boolean
-  authorities: string[]
-  xCoordinate: number
-  yCoordinate: number
-  joinEmployees: string[]
-}[]
+import { RoomData } from '../types/room'
+import { EmployeeStatus, RemoteUser } from './../types/sfu'
 
 type AddStatus = {
   type: 'add'
   data: EmployeeStatus
 }
 
-type IsDisplay = { isDisplay: boolean }
-type IsMute = { isMute: boolean }
+//type IsDisplay = { isDisplay: boolean }
+//type IsMute = { isMute: boolean }
 
 type UpdateStatus = {
   type: 'update'
@@ -64,12 +34,11 @@ type StatusData = AddStatus | UpdateStatus
 let localVideo: MediaStream = null
 let room: SfuRoom
 
-const judgeJoinRoom = (rooms: Rooms, employeeId: string) => {
-  console.log('room!!!!!!!!!!!!!!!!', rooms)
+const judgeJoinRoom = (rooms: RoomData[], employeeId: string) => {
   let sfuRoomId = ''
+
   if (rooms.length > 0 && rooms) {
     rooms.forEach((room) => {
-      console.log('foreachRooms!!(room)', room)
       if (room.joinEmployees) {
         room.joinEmployees.forEach((empId) => {
           if (employeeId === empId) sfuRoomId = room.roomId
@@ -82,7 +51,7 @@ const judgeJoinRoom = (rooms: Rooms, employeeId: string) => {
 }
 
 const judgeJoinFurniture = (
-  furnitureList: FurnitureList,
+  furnitureList: FurnitureData[],
   employeeId: string
 ) => {
   let sfuRoomId = ''
@@ -113,6 +82,7 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }, [])
   const selector = useSelector((state) => state)
   const rooms = getRooms(selector)
+  console.log('rooms!!!', rooms)
   const furnitureList = getFurniture(selector)
   const employeeId = getEmployeeId(selector)
   const ownEmployeeData = getOwnEmployeeData(selector)

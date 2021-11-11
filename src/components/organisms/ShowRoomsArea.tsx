@@ -13,8 +13,8 @@ const ShowRoomsArea: VFC = () => {
         <Room
           key={i}
           roomId={room.roomId}
-          roomX={room.roomX}
-          roomY={room.roomY}
+          xCoordinate={room.xCoordinate}
+          yCoordinate={room.yCoordinate}
         />
       ))}
     </>

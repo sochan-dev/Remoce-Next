@@ -2,48 +2,22 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '..'
 import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
+import { EmployeeData, Employee_data } from '../../types/employee'
 
 /*////////////////////////////////////////////////
   型宣言
 /*/ ///////////////////////////////////////////////
 //stateの初期値
-export interface EmployeesStatus {
+interface EmployeesStatus {
   yourId: string
-  employees: {
-    employeeId: string
-    employeeName: string
-    employeePicture: string
-    editPermission: boolean
-    xCoordinate: number
-    yCoordinate: number
-  }[]
+  employees: EmployeeData[]
 }
 
 type UpdateEmployee = {
   id: number
-  employeeData: {
-    employeeId: string
-    employeeName: string
-    employeePicture: string
-    editPermission: boolean
-    xCoordinate: number
-    yCoordinate: number
-  }
+  employeeData: EmployeeData
 }
 
-type Employee = {
-  employeeName: string
-  xCoordinate: number
-  yCoordinate: number
-}
-
-type Employee_data = {
-  employee_name: string
-  employee_picture: string
-  edit_permission: boolean
-  employee_x_coordinate: number
-  employee_y_coordinate: number
-}
 //signUp関数が受け取るuserの入力情報
 
 /*////////////////////////////////////////////////
@@ -111,7 +85,12 @@ export const employeesStatusSlice = createSlice({
     updateEmployee: (state, action: PayloadAction<UpdateEmployee>) => {
       state.employees[action.payload.id] = action.payload.employeeData
     },
-    updateOwnEmployee: (state, action: PayloadAction<Employee>) => {
+    updateOwnEmployee: (
+      state,
+      action: PayloadAction<
+        Pick<EmployeeData, 'employeeName' | 'xCoordinate' | 'yCoordinate'>
+      >
+    ) => {
       const newOwnEmployee = action.payload
 
       state.employees = state.employees.map((employee) => {
@@ -154,8 +133,9 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const EmployeesStatusSelector = (state: RootState): EmployeesStatus =>
-  state.employeesStatus
+export const EmployeesStatusSelector = (
+  state: any /**RootStateが変 */
+): EmployeesStatus => state.employeesStatus
 
 export const getEmployeesStatus = createSelector(
   EmployeesStatusSelector,

@@ -65,8 +65,9 @@ export const {
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const screenStatusSelector = (state: RootState): ScreenStatus =>
-  state.screenStatus
+export const screenStatusSelector = (
+  state: any /**RootStateが変 */
+): ScreenStatus => state.screenStatus
 
 export const getScreenStatus = createSelector(
   screenStatusSelector,

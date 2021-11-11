@@ -17,10 +17,7 @@ const ShowOfficeArea: VFC = () => {
   const workPlaces = getWorkPlace(selector)
   const isCreateOffice = getIsCreateOffice(selector)
 
-  const createOffice = () => {
-    console.log('click!!!!!!!!!!!!!')
-    dispatch(turnCreateOffice())
-  }
+  const createOffice = () => dispatch(turnCreateOffice())
 
   return (
     <>

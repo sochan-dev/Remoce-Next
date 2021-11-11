@@ -113,14 +113,14 @@ const CallScreen: VFC = () => {
                 {videosInfo.remotesInfo.length > 5 || attentionPeerId !== '' ? (
                   <ScreenArea
                     localInfo={videosInfo.localInfo}
-                    remotesInfo={videosInfo.remotesInfo}
+                    remoteUsers={videosInfo.remotesInfo}
                     isMinimize={isMinimize}
                   />
                 ) : (
                   //全員表示（少人数）
                   <FewScreenArea
                     localInfo={videosInfo.localInfo}
-                    remotesInfo={videosInfo.remotesInfo}
+                    remoteUsers={videosInfo.remotesInfo}
                     isMinimize={isMinimize}
                   />
                 )}

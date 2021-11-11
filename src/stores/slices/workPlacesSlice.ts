@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from '..'
 import { db } from '../../../firebase'
 import { createSelector } from 'reselect'
+import { WorkPlaceData, WorkPlace_data } from '../../types/workPlace'
 
 /*////////////////////////////////////////////////
   型宣言
@@ -11,19 +12,7 @@ import { createSelector } from 'reselect'
 export type store = { workplaces: WorkPlaces }
 
 export interface WorkPlaces {
-  officeDataList: {
-    employeeId: string
-    employeeName: string
-    officeId: string
-    officeName: string
-    officePicture?: string | false
-  }[]
-}
-
-type Employee_data = {
-  employee_id: string
-  employee_name: string
-  office_id: string
+  officeDataList: WorkPlaceData[]
 }
 
 /*////////////////////////////////////////////////
@@ -50,7 +39,7 @@ export const asyncFetchWorkPlaces = createAsyncThunk<
     .then(async (snapshot) => {
       if (!snapshot.empty) {
         for await (let childSnapshot of snapshot.docs) {
-          const employee = childSnapshot.data() as Employee_data
+          const employee = childSnapshot.data() as WorkPlace_data
           await db
             .collection('offices')
             .doc(employee.office_id)
@@ -106,7 +95,7 @@ export const { fetchWorkPlaces } = workPlaceSlices.actions
   Selector
 /*/ ///////////////////////////////////////////////
 export const WorkPlaceSelector = (
-  state: RootState
+  state: any /**RootStateが変 */
 ): WorkPlaces[`officeDataList`] => state.workPlaces.officeDataList
 
 export const getWorkPlace = createSelector(WorkPlaceSelector, (state) => state)

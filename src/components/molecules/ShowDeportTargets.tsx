@@ -3,21 +3,14 @@ import { useSelector } from 'react-redux'
 import { db } from '../../../firebase'
 import { getOfficeId } from '../../stores/slices/officeStatusSlice'
 import DeportEmployee from '../atoms/DeportEmployee'
-
-type Employee_data = {
-  employee_name: string
-}
-
-type EmployeeData = {
-  employeeId: string
-  employeeName: string
-}
+import { EmployeeData, Employee_data } from '../../types/employee'
 
 const ShowDeportTargetsArea: VFC = () => {
   const selector = useSelector((state) => state)
   const officeId = getOfficeId(selector)
-  const [targetEmployees, setTargetEmployees] = useState<EmployeeData[]>([])
-  console.log('targett', targetEmployees)
+  const [targetEmployees, setTargetEmployees] = useState<
+    Pick<EmployeeData, 'employeeId' | 'employeeName'>[]
+  >([])
 
   useEffect(() => {
     db.collection('offices')
@@ -25,7 +18,7 @@ const ShowDeportTargetsArea: VFC = () => {
       .collection('employees')
       .get()
       .then((snapshots) => {
-        let targetEmployeesList: EmployeeData[] = []
+        let targetEmployeesList: typeof targetEmployees = []
         snapshots.forEach((snapshot) => {
           const employee = snapshot.data() as Employee_data
           targetEmployeesList.push({

@@ -11,7 +11,6 @@ import Styles from '../../../styles/sass/office.module.scss'
 
 const OfficeTemplate: VFC = () => {
   const rootRef = useRef(null)
-  const selector = useSelector((state) => state)
 
   return (
     <div className={Styles.root} ref={rootRef}>

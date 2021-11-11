@@ -148,8 +148,9 @@ export const authStatusSlice = createSlice({
 /*////////////////////////////////////////////////
   Selector
 /*/ ///////////////////////////////////////////////
-export const authStatusSelector = (state: RootState): authStatus =>
-  state.authStatus
+export const authStatusSelector = (
+  state: any /**RootStateが変 */
+): authStatus => state.authStatus
 
 export const getAuthStatus = createSelector(
   authStatusSelector,

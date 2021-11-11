@@ -18,34 +18,14 @@ import { getFurniture } from '../../stores/slices/furnitureStatusSlice'
 import { judgeLargerTarget } from './utils/judgeOverlap'
 import userIcon from '../../../public/image/initial-user-icon.png'
 import classNames from 'classnames'
-
-type OwnData = {
-  employeeId: string
-  employeeName: string
-  employeePicture: string
-  xCoordinate: number
-  yCoordinate: number
-}
-
-type OfficeSize = {
-  officeWidth: number
-  officeHeight: number
-}
+import { EmployeeData } from '../../types/employee'
 
 type props = {
   id: number
   officeId: string
   isDrag: boolean
   setIsDrag: Dispatch<SetStateAction<boolean>>
-  ownData: OwnData
-  officeSize: OfficeSize
-}
-
-type EmployeeData = {
-  employee_name: string
-  employee_picture: string
-  employee_x_coordinate: number
-  employee_y_coordinate: number
+  ownData: Omit<EmployeeData, 'editPermission'>
 }
 
 type OverlapEmployee = {
@@ -227,8 +207,8 @@ const MyIcon: VFC<props> = (props) => {
     const ownCenterY = ownStartY + ICONSIZE / 2
 
     rooms.forEach((room) => {
-      const roomStartX = room.roomX
-      const roomStartY = room.roomY
+      const roomStartX = room.xCoordinate
+      const roomStartY = room.yCoordinate
       const roomCenterX = roomStartX + ROOMSIZE / 2
       const roomCenterY = roomStartY + ROOMSIZE / 2
 

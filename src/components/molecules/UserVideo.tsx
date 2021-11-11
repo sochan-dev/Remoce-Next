@@ -17,13 +17,7 @@ import {
   releaseAttention,
   releaseFullScreen
 } from '../../stores/slices/screenStatus'
-
-type EmployeeStatus = {
-  employeeId: string
-  employeeName: string
-  isDisplay: boolean
-  isMute: boolean
-}
+import { EmployeeStatus } from '../../types/sfu'
 
 type props = {
   video: MediaStream
