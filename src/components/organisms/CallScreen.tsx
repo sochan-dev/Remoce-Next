@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, VFC, ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 import { getScreenStatus } from '../../stores/slices/screenStatus'
 import { FewScreenArea, ScreenArea } from '../molecules'
-import useSFU from '../../hooks/useSFU'
+import useSFU from './hooks/useSFU'
 import { CallScreenHeader, CallScreenFooter } from '../organisms'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import Styles from '../../../styles/sass/callScreen.module.scss'
@@ -38,7 +38,6 @@ const CallScreen: VFC = () => {
   let fullScreenUser: false | ReactNode = false
 
   if (fullScreenPeerId === videosInfo.localInfo.id) {
-    console.log('fullScreen通過')
     const { video, id } = videosInfo.localInfo
     fullScreenUser = (
       <div className={Styles.fullScreen}>

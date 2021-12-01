@@ -1,52 +1,39 @@
-import React, { VFC, ChangeEvent } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { VFC } from 'react'
 import {
   useFurnitureRadioControl,
   useIsCloseRadioControl,
   useSelectAuthority,
-  useSelectColor
-} from '../../hooks'
+  useSelectColor,
+  useCreateFurnitureForm
+} from './hooks'
 import { RadioButtons } from '../molecules'
-import { VirtualArea } from '.'
-import {
-  getNewFurniture,
-  setNewFurnitureName,
-  setNewFurnitureDetail
-} from '../../stores/slices/newFurnitureSlice'
+import { VirtualArea } from './index'
 import { InputText, TextArea } from '../atoms'
 import Select from 'react-select'
 import Styles from '../../../styles/sass/furnitureForm.module.scss'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 
 const CreateFurnitureForm: VFC = () => {
-  const dispatch = useDispatch()
-  const selector = useSelector((state) => state)
+  const [furnitureValues, furnitureControls] = useCreateFurnitureForm()
   const [changeFurnitureSize, furnitureSizeRadioList] =
     useFurnitureRadioControl()
   const [changeIsClose, isCloseRadioList] = useIsCloseRadioControl()
   const [authorityData, selectAuthority] = useSelectAuthority()
   const [selectedColor, selectColor, colors] = useSelectColor()
-  const { furnitureName, furnitureDetail } = getNewFurniture(selector)
 
-  const inputFurnitureName = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(setNewFurnitureName(e.target.value))
-  }
-  const inputFurnitureDetail = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch(setNewFurnitureDetail(e.target.value))
-  }
   return (
     <div className={Styles.root}>
       <div className={Styles.form}>
         <InputText
           label={'オブジェクト名を入力してください'}
-          value={furnitureName}
-          onChange={inputFurnitureName}
+          value={furnitureValues.furnitureName}
+          onChange={furnitureControls.inputFurnitureName}
         />
         <div className={Blanks.blank_16} />
         <TextArea
           label={'オブジェクトの詳細を入力してください'}
-          value={furnitureDetail}
-          onChange={inputFurnitureDetail}
+          value={furnitureValues.furnitureDetail}
+          onChange={furnitureControls.inputFurnitureDetail}
           w={100}
         />
         <div>

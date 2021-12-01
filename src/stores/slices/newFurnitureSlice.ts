@@ -1,20 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState } from '..'
 import { createSelector } from 'reselect'
 import { NewFurniture } from '../../types/newFurniture'
-
-/*////////////////////////////////////////////////
-  型宣言
-/*/ ///////////////////////////////////////////////
-//stateの初期値
-
-type UpdateInfo = {
-  furnitureId: string
-  position: {
-    x: number
-    y: number
-  }
-}
 
 /*////////////////////////////////////////////////
   stateの初期値
@@ -28,14 +14,6 @@ const initialState: NewFurniture = {
   authorities: [],
   updateInfo: false
 }
-
-/*////////////////////////////////////////////////
-  createAsyncThunk
-/*/ ///////////////////////////////////////////////
-
-export const f = createAsyncThunk<boolean>('newFurnitureStatus/f', async () => {
-  return false
-})
 
 /*////////////////////////////////////////////////
   createSlice
@@ -64,7 +42,6 @@ export const newFurnitureSlice = createSlice({
       state.isClose = action.payload
     },
     setNewFurnitureAuthorities: (state, action: PayloadAction<string[]>) => {
-      console.log('set')
       state.authorities = action.payload
     },
     setUpdateFurniture: (state, action: PayloadAction<NewFurniture>) => {
@@ -93,21 +70,12 @@ export const newFurnitureSlice = createSlice({
       state.authorities = []
       state.updateInfo = false
     }
-  },
-  //AsyncThunkを扱うreducer
-  extraReducers: (builder) => {
-    //signUp関数
-    builder
-      .addCase(f.pending, (state, action) => {})
-      .addCase(f.fulfilled, (state, action) => {})
-      .addCase(f.rejected, (state, action) => {})
   }
 })
 /*////////////////////////////////////////////////
   Actions
 /*/ ///////////////////////////////////////////////
 export const {
-  //setCreateDisplay,
   setNewFurnitureName,
   setNewFurnitureDetail,
   setNewFurnitureSize,
@@ -116,7 +84,6 @@ export const {
   setNewFurnitureAuthorities,
   setUpdateFurniture,
   setUpdatePosition,
-  //clearIsCreate,
   clearNewFurniture
 } = newFurnitureSlice.actions
 

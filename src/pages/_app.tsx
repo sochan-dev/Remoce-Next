@@ -31,9 +31,7 @@ const MyApp = ({ Component, pageProps }): JSX.Element => {
           <CssBaseline />
           <Provider store={store}>
             <Authentication>
-              <CheckMediaDeviceRight>
-                <Component {...pageProps} />
-              </CheckMediaDeviceRight>
+              <Component {...pageProps} />
             </Authentication>
           </Provider>
         </StyledComponentsThemeProvider>

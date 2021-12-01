@@ -1,15 +1,15 @@
-import { FurnitureData } from './../types/furniture'
-import { getFurniture } from './../stores/slices/furnitureStatusSlice'
+import { FurnitureData } from '../../../types/furniture'
+import { getFurniture } from '../../../stores/slices/furnitureStatusSlice'
 import { useState, useEffect, useRef, SetStateAction, Dispatch } from 'react'
 import { useSelector } from 'react-redux'
-import { getRooms } from '../stores/slices/roomsStatusSlice'
+import { getRooms } from '../../../stores/slices/roomsStatusSlice'
 import {
   getEmployeeId,
   getOwnEmployeeData
-} from '../stores/slices/employeesStatusSlice'
+} from '../../../stores/slices/employeesStatusSlice'
 import Peer, { SfuRoom } from 'skyway-js'
-import { RoomData } from '../types/room'
-import { EmployeeStatus, RemoteUser } from './../types/sfu'
+import { RoomData } from '../../../types/room'
+import { EmployeeStatus, RemoteUser } from '../../../types/sfu'
 
 type AddStatus = {
   type: 'add'
@@ -82,7 +82,6 @@ const useSFU = (setDisplay: Dispatch<SetStateAction<boolean>>) => {
   }, [])
   const selector = useSelector((state) => state)
   const rooms = getRooms(selector)
-  console.log('rooms!!!', rooms)
   const furnitureList = getFurniture(selector)
   const employeeId = getEmployeeId(selector)
   const ownEmployeeData = getOwnEmployeeData(selector)

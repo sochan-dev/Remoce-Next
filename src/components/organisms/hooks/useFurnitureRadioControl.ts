@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   setNewFurnitureSize,
   getNewFurnitureSize
-} from '../stores/slices/newFurnitureSlice'
-import { RadioValue } from '../types/form'
+} from '../../../stores/slices/newFurnitureSlice'
+import { RadioValue } from '../../../types/form'
 
 const useFurnitureRadioControl = () => {
   const dispatch = useDispatch()

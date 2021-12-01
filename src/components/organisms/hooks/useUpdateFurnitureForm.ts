@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { getOfficeId } from '../stores/slices/officeStatusSlice'
+import { getOfficeId } from '../../../stores/slices/officeStatusSlice'
 import {
   getNewFurniture,
   setNewFurnitureName,
@@ -9,10 +9,10 @@ import {
   setNewFurnitureIsClose,
   setNewFurnitureAuthorities,
   setNewFurnitureColor
-} from '../stores//slices/newFurnitureSlice'
-import { db } from '../../firebase'
-import { Employee_data } from '../types/employee'
-import { Color, RadioValue } from '../types/form'
+} from '../../../stores/slices/newFurnitureSlice'
+import { db } from '../../../../firebase'
+import { Employee_data } from '../../../types/employee'
+import { Color, RadioValue } from '../../../types/form'
 interface isCloseRadioValue {
   id: number
   value: 'open' | 'close'
@@ -52,7 +52,7 @@ const colors: Color[] = [
   }
 ]
 
-const useUpdateFurniture = () => {
+const useUpdateFurnitureForm = () => {
   const selector = useSelector((state) => state)
   const dispatch = useDispatch()
   const {
@@ -193,57 +193,4 @@ const useUpdateFurniture = () => {
   return [formControls, changeFunctions] as const
 }
 
-export default useUpdateFurniture
-
-/*
-useEffect(() => {
-    db.collection('offices')
-      .doc(officeId)
-      .collection('employees')
-      .get()
-      .then(async (snapshots) => {
-        const employeeList: Employees = []
-        snapshots.forEach((snapshot) => {
-          const employeeId = snapshot.id
-          const employee = snapshot.data() as Employee_data
-          employeeList.push({
-            label: employee.employee_name,
-            value: employeeId
-          })
-        })
-        setEmployees(employeeList)
-        await db
-          .collection('offices')
-          .doc(officeId)
-          .collection('furniture')
-          .doc(furnitureId)
-          .get()
-          .then((snapshot) => {
-            const furniture = snapshot.data() as Furniture
-
-            dispatch(
-              setUpdateFurniture({
-                furnitureName: furniture.furniture_name,
-                furnitureDetail: furniture.furniture_detail,
-                furnitureSize: furniture.furniture_size,
-                isClose: furniture.is_close,
-                authorities: furniture.authorities,
-                updateInfo: {
-                  furnitureId: snapshot.id,
-                  xCoordinate: furniture.x_coordinate,
-                  yCoordinate: furniture.y_coordinate
-                }
-              })
-            )
-          })
-      })
-  }, [])
-
-*/
-
-/*
-/*const [furnitureName, setFurnitureName] = useState('')
-  const [furnitureDetail, setFurnitureDetail] = useState('')
-  const [furnitureSize, setFurnitureSize] = useState(2)
-  const [isClose, setIsClose] = useState(false)
-  const [authorities, setAuthorities] = useState<string[]>([]) //権限者のidを格納。*/
+export default useUpdateFurnitureForm

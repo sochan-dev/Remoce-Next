@@ -1,10 +1,10 @@
 import {
   getNewFurnitureColor,
   setNewFurnitureColor
-} from './../stores/slices/newFurnitureSlice'
+} from '../../../stores/slices/newFurnitureSlice'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Color } from '../types/form'
+import { Color } from '../../../types/form'
 
 const colors: Color[] = [
   {

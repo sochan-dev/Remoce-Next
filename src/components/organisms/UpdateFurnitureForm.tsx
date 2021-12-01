@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { InputText, ActionButton, TextArea } from '../atoms'
 import { RadioButtons } from '../molecules'
 import { VirtualArea } from '../organisms'
-import { useUpdateFurniture } from '../../hooks'
+import { useUpdateFurnitureForm } from './hooks'
 import Select from 'react-select'
 import { clearNewFurniture } from '../../stores/slices/newFurnitureSlice'
 import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
@@ -18,7 +18,7 @@ import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined'
 const UpdateFurnitureForm: VFC = () => {
   const dispatch = useDispatch()
   const selector = useSelector((state) => state)
-  const [formControls, changeFunctions] = useUpdateFurniture()
+  const [formControls, changeFunctions] = useUpdateFurnitureForm()
   const {
     furnitureId,
     furnitureName,

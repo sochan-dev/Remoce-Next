@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   setNewFurnitureIsClose,
   getNewFurnitureIsClose
-} from '../stores/slices/newFurnitureSlice'
+} from '../../../stores/slices/newFurnitureSlice'
 
 const useCloseRadioControl = () => {
   const dispatch = useDispatch()

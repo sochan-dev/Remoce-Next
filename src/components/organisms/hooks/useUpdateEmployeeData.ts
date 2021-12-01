@@ -1,14 +1,14 @@
-import React, { VFC, useState, useEffect, ChangeEvent } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   getEmployeeId,
   updateOwnEmployee
-} from '../stores/slices/employeesStatusSlice'
-import { getOfficeId } from '../stores/slices/officeStatusSlice'
-import { db, storage, auth } from '../../firebase'
+} from '../../../stores/slices/employeesStatusSlice'
+import { getOfficeId } from '../../../stores/slices/officeStatusSlice'
+import { db, storage, auth } from '../../../../firebase'
 import loadImage from 'blueimp-load-image'
-import userIcon from '../../public/image/initial-user-icon.png'
-import { Employee_data } from '../types/employee'
+import userIcon from '../../../../public/image/initial-user-icon.png'
+import { Employee_data } from '../../../types/employee'
 
 const useUpdateEmployeeData = () => {
   const selector = useSelector((state) => state)

@@ -12,13 +12,13 @@ type EmployeeStatus = {
   isMute: boolean
 }
 
-type props = {
+type Props = {
   isMinimize: boolean
   localInfo: LocalInfo
   remoteUsers: RemoteUser[]
 }
 
-const ScreenArea: VFC<props> = (props) => {
+const ScreenArea: VFC<Props> = (props) => {
   const { isMinimize, localInfo, remoteUsers } = props
   const selector = useSelector((state) => state)
   const { attentionPeerId } = getScreenStatus(selector)
@@ -26,12 +26,7 @@ const ScreenArea: VFC<props> = (props) => {
     attentionPeerId !== localInfo.id || attentionPeerId !== ''
       ? remoteUsers.filter((user) => user.id === attentionPeerId)[0]
       : false
-  console.log(
-    'attentionPeerId',
-    attentionPeerId,
-    'attentionUser???',
-    attentionUser
-  )
+
   const localStyle = isMinimize
     ? {
         visibility: 'hidden' as 'hidden',

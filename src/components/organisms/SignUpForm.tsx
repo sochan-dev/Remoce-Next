@@ -3,28 +3,10 @@ import { useDispatch } from 'react-redux'
 import { InputText, ActionButton } from '../atoms'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 
-import { signIn, signUp } from '../../stores/slices/authStatusSlice'
+import { useSignInUp } from './hooks'
 
 const SignUpForm: VFC = () => {
-  const dispatch = useDispatch()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-
-  const inputEmail = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
-  }
-
-  const inputPassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value)
-  }
-
-  const handleRegister = () => {
-    dispatch(signUp({ email: email, password: password }))
-  }
-
-  const handleSignIn = () => {
-    dispatch(signIn({ email: email, password: password }))
-  }
+  const [values, formControls, handles] = useSignInUp()
 
   return (
     <>
@@ -32,20 +14,20 @@ const SignUpForm: VFC = () => {
       <InputText
         label={'メールアドレス'}
         type={'text'}
-        value={email}
-        onChange={inputEmail}
+        value={values.email}
+        onChange={formControls.inputEmail}
       />
       <div className={Blanks.blank_32} />
       <InputText
         label={'password'}
         type={'text'}
-        value={password}
-        onChange={inputPassword}
+        value={values.password}
+        onChange={formControls.inputPassword}
       />
       <div className={Blanks.blank_32} />
-      <ActionButton label={'サインアップ'} onClick={handleRegister} />
+      <ActionButton label={'サインアップ'} onClick={handles.handleRegister} />
       <div className={Blanks.blank_16} />
-      <ActionButton label={'サインイン'} onClick={handleSignIn} />
+      <ActionButton label={'サインイン'} onClick={handles.handleSignIn} />
     </>
   )
 }

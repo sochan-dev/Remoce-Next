@@ -4,9 +4,9 @@ import Styles from '../../../styles/sass/card.module.scss'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 import { WorkPlaceData } from '../../types/workPlace'
 
-type props = WorkPlaceData
+type Props = WorkPlaceData
 
-const BelongOfficeCard: VFC<props> = (props) => {
+const BelongOfficeCard: VFC<Props> = (props) => {
   const router = useRouter()
   const { employeeId, employeeName, officeId, officeName } = props
 

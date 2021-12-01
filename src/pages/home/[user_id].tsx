@@ -1,22 +1,12 @@
 import { NextPage, InferGetStaticPropsType, GetStaticPaths } from 'next'
-import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 import { HomeTemplate } from '../../components/templates'
 import { sdb } from '../../../ServerSideApp'
-import { db } from '../../../firebase'
-import { authentication } from '../../stores/slices/authStatusSlice'
-import {
-  asyncFetchWorkPlaces,
-  fetchWorkPlaces
-} from '../../stores/slices/workPlacesSlice'
-import {
-  asyncFetchInvites,
-  fetchInvites
-} from '../../stores/slices/notificationsSlice'
 import { NotificationData } from '../../types/notification'
 import { WorkPlaceData, WorkPlace_data } from '../../types/workPlace'
+import { useHomePageInitialize } from '../hooks'
 
-type props = InferGetStaticPropsType<typeof getStaticProps>
+type Props = InferGetStaticPropsType<typeof getStaticProps>
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
@@ -104,24 +94,9 @@ export const getStaticProps = async ({ params }) => {
   }
 }
 
-const HomePage: NextPage<props> = (props) => {
-  const dispatch = useDispatch()
+const HomePage: NextPage<Props> = (props) => {
   const { belongOfficeList, invitedOfficeList, uid } = props
-
-  useEffect(() => {
-    dispatch(fetchWorkPlaces(belongOfficeList))
-    dispatch(fetchInvites(invitedOfficeList))
-  }, [])
-
-  useEffect(() => {
-    dispatch(authentication())
-  }, [])
-
-  useEffect(() => {
-    dispatch(asyncFetchWorkPlaces(uid))
-    dispatch(asyncFetchInvites(uid))
-  }, [])
-
+  useHomePageInitialize(belongOfficeList, invitedOfficeList, uid)
   return (
     <>
       <HomeTemplate />

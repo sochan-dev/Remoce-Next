@@ -2,14 +2,14 @@ import React, { VFC } from 'react'
 import { OBJECTSIZE } from '../organisms/utils/iconSize'
 import Styles from '../../../styles/sass/furniture.module.scss'
 import { FurnitureData } from '../../types/furniture'
-type props = {
+type Props = {
   furnitureData: Omit<
     FurnitureData,
     'furnitureId' | 'joinEmployees' | 'furnitureColor'
   >
 }
 
-const VirtualFurniture: VFC<props> = (props) => {
+const VirtualFurniture: VFC<Props> = (props) => {
   const {
     roomId,
     furnitureName,
