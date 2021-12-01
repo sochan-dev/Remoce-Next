@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent, forwardRef, Ref } from 'react'
 import Styles from '../../../styles/sass/inputText.module.scss'
 import classNames from 'classnames'
 
-type props = {
+type Props = {
   type?: 'text' | 'number' | 'password' | 'email'
   w?: 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
   value: string
@@ -11,7 +11,7 @@ type props = {
 }
 
 const InputText = forwardRef(function (
-  props: props,
+  props: Props,
   ref: Ref<HTMLInputElement>
 ) {
   const [isActive, setIsActive] = useState(false)

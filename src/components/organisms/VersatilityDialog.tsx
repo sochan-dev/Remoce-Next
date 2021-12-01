@@ -13,7 +13,7 @@ import Button from '@material-ui/core/Button'
 import { ActionCreatorWithOptionalPayload } from '@reduxjs/toolkit'
 import Styles from '../../../styles/sass/versatility.module.scss'
 
-type props = {
+type Props = {
   isOpen: boolean
   setIsOpen: ActionCreatorWithOptionalPayload<{ isOpen: boolean }, string>
   maxWidth: false | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
@@ -21,7 +21,7 @@ type props = {
   keep?: true
 }
 
-const VersatilityDialog: VFC<props> = (props) => {
+const VersatilityDialog: VFC<Props> = (props) => {
   const { isOpen, setIsOpen, maxWidth, children } = props
   const dispatch = useDispatch()
   const closeValue = props.keep ? true : false

@@ -1,13 +1,13 @@
 import React, { VFC } from 'react'
 import Styles from '../../../styles/sass/room.module.scss'
 
-type props = {
+type Props = {
   roomId: string
   xCoordinate: number
   yCoordinate: number
 }
 
-const Room: VFC<props> = (props) => {
+const Room: VFC<Props> = (props) => {
   const { roomId, xCoordinate, yCoordinate } = props
   const initialCoordinate = {
     left: xCoordinate,

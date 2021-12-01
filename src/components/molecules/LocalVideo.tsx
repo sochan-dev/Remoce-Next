@@ -14,7 +14,7 @@ import {
   releaseFullScreen
 } from '../../stores/slices/screenStatus'
 
-type props = {
+type Props = {
   video: MediaStream
   userId: string
   size: {
@@ -24,8 +24,9 @@ type props = {
     maxWidth?: string
   }
 }
+const headerColor = 'error'
 
-const LocalVideo: VFC<props> = (props) => {
+const LocalVideo: VFC<Props> = (props) => {
   const { video, userId, size } = props
   const dispatch = useDispatch()
   const selector = useSelector((state) => state)
@@ -38,7 +39,7 @@ const LocalVideo: VFC<props> = (props) => {
 
   const isAttention = attentionPeerId === userId
   const isFullScreen = fullScreenPeerId === userId
-  const headerColor = 'error'
+
   return (
     <div className={Styles.root}>
       <div className={Styles.header}>

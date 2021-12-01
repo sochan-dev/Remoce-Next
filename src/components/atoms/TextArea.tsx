@@ -2,14 +2,14 @@ import React, { useState, ChangeEvent, VFC } from 'react'
 import Styles from '../../../styles/sass/textArea.module.scss'
 import classNames from 'classnames'
 
-type props = {
+type Props = {
   w?: 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
   value: string
   label: string
   onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
 }
 
-const TextArea: VFC<props> = (props) => {
+const TextArea: VFC<Props> = (props) => {
   const [isActive, setIsActive] = useState(false)
   const handleOnFocus = () => setIsActive(!isActive)
 

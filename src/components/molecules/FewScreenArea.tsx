@@ -1,20 +1,16 @@
-import React, { MutableRefObject, VFC } from 'react'
+import React, { VFC } from 'react'
 import { UserVideo, LocalVideo } from '../molecules'
 import Styles from '../../../styles/sass/screenArea.module.scss'
-import VideocamOutlined from '@material-ui/icons/VideocamOutlined'
 import { LocalInfo, RemoteUser } from '../../types/sfu'
 
-type props = {
+type Props = {
   isMinimize: boolean
   localInfo: LocalInfo
   remoteUsers: RemoteUser[]
 }
 
-const FewScreenArea: VFC<props> = (props) => {
+const FewScreenArea: VFC<Props> = (props) => {
   const { isMinimize, localInfo, remoteUsers } = props
-  console.log('isMinimaize->', isMinimize)
-  console.log('localInfo', localInfo)
-
   const localStyle = isMinimize
     ? {
         visibility: 'hidden' as 'hidden',
@@ -34,7 +30,6 @@ const FewScreenArea: VFC<props> = (props) => {
         <></>
       ) : remoteUsers.length < 3 ? (
         <div className={Styles.root}>
-          {console.log('通話！！！UC')}
           <div className={Styles.fewRow}>
             <div style={localStyle}>
               <LocalVideo

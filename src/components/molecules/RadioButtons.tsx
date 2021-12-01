@@ -1,7 +1,7 @@
 import React, { VFC, ChangeEvent } from 'react'
 import Styles from '../../../styles/sass/radioButtons.module.scss'
 
-type props = {
+type Props = {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
   name: string
   radioList: {
@@ -12,7 +12,7 @@ type props = {
   }[]
 }
 
-const RadioButtons: VFC<props> = (props) => {
+const RadioButtons: VFC<Props> = (props) => {
   const { radioList, name, onChange } = props
   return (
     <>

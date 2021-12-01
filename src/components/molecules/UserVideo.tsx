@@ -19,7 +19,7 @@ import {
 } from '../../stores/slices/screenStatus'
 import { EmployeeStatus } from '../../types/sfu'
 
-type props = {
+type Props = {
   video: MediaStream
   userId: string
   employeeStatus?: EmployeeStatus
@@ -30,8 +30,10 @@ type props = {
     maxWidth?: string
   }
 }
+const headerColor = 'error'
+const footerColor = 'error'
 
-const UserVideo: VFC<props> = (props) => {
+const UserVideo: VFC<Props> = (props) => {
   const { video, userId, employeeStatus, size } = props
   const dispatch = useDispatch()
   const selector = useSelector((state) => state)
@@ -45,7 +47,6 @@ const UserVideo: VFC<props> = (props) => {
   }, [video, userId])
 
   let isFooter = false
-  console.log('employeeStatus', employeeStatus)
   if (
     employeeStatus &&
     'isDisplay' in employeeStatus &&
@@ -53,9 +54,6 @@ const UserVideo: VFC<props> = (props) => {
   ) {
     isFooter = true
   }
-
-  const headerColor = 'error'
-  const footerColor = 'error'
 
   return (
     <div className={Styles.root}>

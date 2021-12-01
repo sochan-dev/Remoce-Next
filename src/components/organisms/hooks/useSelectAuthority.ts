@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   setNewFurnitureAuthorities,
   getNewFurnitureAuthorities
-} from '../stores/slices/newFurnitureSlice'
-import { getOfficeId } from '../stores/slices/officeStatusSlice'
-import { db } from '../../firebase'
-import { Employee_data } from '../types/employee'
+} from '../../../stores/slices/newFurnitureSlice'
+import { getOfficeId } from '../../../stores/slices/officeStatusSlice'
+import { db } from '../../../../firebase'
+import { Employee_data } from '../../../types/employee'
 
 type Employees = {
   label: string

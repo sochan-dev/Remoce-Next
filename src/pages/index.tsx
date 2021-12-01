@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { auth } from '../../firebase'
 import { SignUpTemplate } from '../components/templates'
 
-type props = InferGetStaticPropsType<typeof getStaticProps>
+type Props = InferGetStaticPropsType<typeof getStaticProps>
 
 export const getStaticProps = async () => {
   return {
@@ -13,7 +13,7 @@ export const getStaticProps = async () => {
   }
 }
 
-const SignUp: NextPage<props> = () => {
+const SignUp: NextPage<Props> = () => {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       user && Router.push(`/home/${user.uid}`)

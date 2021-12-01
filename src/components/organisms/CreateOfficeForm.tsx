@@ -1,83 +1,11 @@
-import { useRouter } from 'next/router'
-import React, { VFC, useState, ChangeEvent } from 'react'
-import { useSelector } from 'react-redux'
-import { getAuthStatus } from '../../stores/slices/authStatusSlice'
+import React, { VFC } from 'react'
 import { InputText, ActionButton } from '../atoms'
 import Blanks from '../../../styles/sass/blanks.module.scss'
-import { db, realTimeDB } from '../../../firebase'
 import Styles from '../../../styles/sass/createOffice.module.scss'
+import { useCreateOfficeForm } from './hooks'
 
 const CreateOfficeHome: VFC = () => {
-  const router = useRouter()
-  const selector = useSelector((state) => state)
-  const { userId } = getAuthStatus(selector)
-  const [officeName, setOfficeName] = useState('')
-  const [employeeName, setEmployeeName] = useState('')
-
-  const inputOfficeName = (e: ChangeEvent<HTMLInputElement>) => {
-    setOfficeName(e.target.value)
-  }
-
-  const inputEmployeeName = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmployeeName(e.target.value)
-  }
-
-  const createOffice = async () => {
-    if (officeName == '' || employeeName == '') return
-
-    let officeId: string, employeeId: string
-    await db
-      .collection('offices')
-      .add({
-        office_name: officeName
-      })
-      .then(async (doc) => {
-        officeId = doc.id
-        await db
-          .collection('offices')
-          .doc(officeId)
-          .collection('employees')
-          .add({
-            uid: userId,
-            is_office: false,
-            employee_name: employeeName,
-            employee_picture: '',
-            employee_x_coordinate: 20,
-            employee_y_coordinate: 20,
-            edit_permission: true
-          })
-          .then(async (doc) => {
-            employeeId = doc.id
-            await db
-              .collection('users')
-              .doc(userId)
-              .collection('employee_to_office')
-              .doc(employeeId)
-              .set({
-                office_id: officeId,
-                employee_id: employeeId,
-                employee_name: employeeName
-              })
-          })
-          .then(async () => {
-            await db
-              .collection('offices')
-              .doc(officeId)
-              .collection('room')
-              .doc('room')
-              .set({
-                rooms: []
-              })
-          })
-          .then(async () => {
-            await realTimeDB.ref(`status/${employeeId}`).set({
-              status: false,
-              officeId: officeId
-            })
-          })
-      })
-    router.push(`/office/${officeId}/${employeeId}`)
-  }
+  const [formValues, formControls] = useCreateOfficeForm()
 
   return (
     <div className={Styles.root}>
@@ -86,18 +14,18 @@ const CreateOfficeHome: VFC = () => {
       <InputText
         label={'リモートオフィスの名前'}
         type={'text'}
-        value={officeName}
-        onChange={inputOfficeName}
+        value={formValues.officeName}
+        onChange={formControls.inputOfficeName}
       />
       <div className={Blanks.blank_16} />
       <InputText
         label={'あなたの名前'}
         type={'text'}
-        value={employeeName}
-        onChange={inputEmployeeName}
+        value={formValues.employeeName}
+        onChange={formControls.inputEmployeeName}
       />
       <div className={Blanks.blank_16} />
-      <ActionButton label={'登録'} onClick={createOffice} />
+      <ActionButton label={'登録'} onClick={formControls.createOffice} />
     </div>
   )
 }

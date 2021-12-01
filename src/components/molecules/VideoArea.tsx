@@ -1,12 +1,12 @@
-import React, { VFC, MutableRefObject } from 'react'
+import React, { VFC } from 'react'
 import { UserVideo } from '../molecules'
 import { RemoteUser } from '../../types/sfu'
 
-type props = {
+type Props = {
   remotesInfo: RemoteUser[]
 }
 
-const VideoArea: VFC<props> = (props) => {
+const VideoArea: VFC<Props> = (props) => {
   const { remotesInfo } = props
   return (
     <>

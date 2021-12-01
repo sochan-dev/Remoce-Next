@@ -1,5 +1,5 @@
 import React, { VFC } from 'react'
-import { SignUpForm, SignInForm } from '../organisms'
+import { SignUpForm } from '../organisms'
 import Styles from '../../../styles/sass/signForm.module.scss'
 const SignUpTemplate: VFC = () => {
   return (

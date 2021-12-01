@@ -8,11 +8,11 @@ import Styles from '../../../styles/sass/virtualArea.module.scss'
 import Blanks from '../../../styles/sass/blanks.module.scss'
 import { ActionButton } from '../atoms'
 
-type props = {
+type Props = {
   update?: true
 }
 
-const VirtualArea: VFC<props> = (props) => {
+const VirtualArea: VFC<Props> = (props) => {
   const selector = useSelector((state) => state)
   const furnitureList = getFurniture(selector)
   const [exe, setExe] = useState(false)

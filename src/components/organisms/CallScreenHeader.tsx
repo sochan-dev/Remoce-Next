@@ -5,12 +5,12 @@ import Crop54Icon from '@material-ui/icons/Crop54'
 import IconButton from '@material-ui/core/IconButton'
 import Styles from '../../../styles/sass/callScreenHeader.module.scss'
 
-type props = {
+type Props = {
   setIsMinimize: Dispatch<SetStateAction<boolean>>
   setIsOneScreen: Dispatch<SetStateAction<boolean>>
 }
 
-const CallScreenHeader: VFC<props> = (props) => {
+const CallScreenHeader: VFC<Props> = (props) => {
   const { setIsMinimize, setIsOneScreen } = props
 
   const updateMinimize = () => {

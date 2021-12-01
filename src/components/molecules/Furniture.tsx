@@ -1,56 +1,17 @@
 import React, { VFC } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { OBJECTSIZE } from '../organisms/utils/iconSize'
-import { setUpdateFurniture } from '../../stores/slices/newFurnitureSlice'
-import { getEditPermission } from '../../stores/slices/employeesStatusSlice'
 import Styles from '../../../styles/sass/furniture.module.scss'
-import { turnUpdateFurniture } from '../../stores/slices/dialogsStatusSlice'
 import classNames from 'classnames'
 import { FurnitureData } from '../../types/furniture'
+import { useFurniture } from './hooks'
 
-type props = {
+type Props = {
   virtual?: true
   furnitureData: FurnitureData
 }
 
-const Furniture: VFC<props> = (props) => {
-  const { virtual } = props
-  const dispatch = useDispatch()
-  const selector = useSelector((state) => state)
-  const furnitureData = props.furnitureData
-  const furnitureSizeStyle = furnitureData.furnitureSize * OBJECTSIZE
-  const magnification = props.virtual ? 4 : 1
-  const furnitureStyle = {
-    width: `${furnitureSizeStyle / magnification}px`,
-    height: `${furnitureSizeStyle / magnification}px`,
-    left: `${furnitureData.xCoordinate / magnification}px`,
-    top: `${furnitureData.yCoordinate / magnification}px`
-  }
-
-  const onDoubleClick = () => {
-    console.log('doubleClick')
-    const editPermission = getEditPermission(selector)
-
-    if (virtual || !editPermission) return
-    const updateFurniture = {
-      furnitureName: furnitureData.furnitureName,
-      furnitureDetail: furnitureData.furnitureDetail,
-      furnitureSize: furnitureData.furnitureSize,
-      furnitureColor: furnitureData.furnitureColor,
-      isClose: furnitureData.isClose,
-      authorities: furnitureData.authorities,
-      updateInfo: {
-        furnitureId: furnitureData.furnitureId,
-        position: {
-          x: furnitureData.xCoordinate / 4,
-          y: furnitureData.yCoordinate / 4
-        }
-      }
-    }
-    dispatch(setUpdateFurniture(updateFurniture))
-    dispatch(turnUpdateFurniture({ isOpen: true }))
-  }
-  const isCloseMsg = furnitureData.isClose ? '不可' : false
+const Furniture: VFC<Props> = (props) => {
+  const { virtual, furnitureData } = props
+  const [furnitureStyle, onDoubleClick] = useFurniture(virtual, furnitureData)
 
   return (
     <div
@@ -65,7 +26,7 @@ const Furniture: VFC<props> = (props) => {
         className={virtual ? Styles.virtualHover : Styles.hover}
         onDoubleClick={() => onDoubleClick()}
       >
-        {isCloseMsg && (
+        {furnitureData.isClose && (
           <p className={Styles.isCloseMsg}>ここは通話出来ません。</p>
         )}
         <p>{furnitureData.furnitureDetail}</p>
