@@ -56,7 +56,6 @@ export const asyncFetchEmployees = createAsyncThunk<
       yCoordinate: employeeData.employee_y_coordinate
     })
   })
-
   return employeesData
 })
 

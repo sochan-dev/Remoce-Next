@@ -148,6 +148,15 @@ const useOfficePageInitialize = (
           .then((employeesData) => {
             employeesData.forEach((employee) => {
               const employeeData = employee.data() as Employee_data
+              console.log(
+                '座標更新したのは、',
+                employee.id,
+                '、',
+                employeeData.employee_name,
+                'で、',
+                employeeData.employee_x_coordinate,
+                employeeData.employee_y_coordinate
+              )
               empList.push({
                 employeeId: employee.id,
                 employeeName: employeeData.employee_name,

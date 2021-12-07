@@ -24,12 +24,19 @@ const dragAreaStyle = {
 const MyIcon: VFC<Props> = (props) => {
   const { officeId, ownData, isDrag, setIsDrag } = props
   const draggableRef = useRef(null)
-  const [handleStop, styleInfo] = useMyIcon(officeId, setIsDrag, ownData)
+
+  const [handleStop, handleDrag, styleInfo] = useMyIcon(
+    officeId,
+    setIsDrag,
+    ownData
+  )
 
   return (
     <Draggable
       nodeRef={draggableRef}
       onStop={handleStop}
+      onDrag={handleDrag}
+      position={styleInfo.position}
       onStart={() => setIsDrag(true)}
       bounds="parent"
       handle=".dragArea"
@@ -37,7 +44,6 @@ const MyIcon: VFC<Props> = (props) => {
       <div
         ref={draggableRef}
         className={classNames(Styles.mine, isDrag && Styles.mineSensor)}
-        style={styleInfo.initialCoordinate}
       >
         <div
           className={classNames('dragArea', Styles.icon, Styles.cursor)}

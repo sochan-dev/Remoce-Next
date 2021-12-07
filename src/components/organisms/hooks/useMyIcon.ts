@@ -48,12 +48,13 @@ const useMyIcon = (
   const employees = getEmployees(selector)
   const rooms = getRooms(selector)
   const furnitureList = getFurniture(selector)
+  const [position, setPosition] = useState({
+    x: ownData.xCoordinate,
+    y: ownData.yCoordinate
+  })
   const [message, setMessage] = useState<false | string>(false)
   const [iconURL, setIconURL] = useState(userIcon)
-  const initialCoordinate = {
-    left: ownData.xCoordinate,
-    top: ownData.yCoordinate
-  }
+
   const pictureRef = ownData.employeePicture
   const imgStyle = {
     backgroundImage: `url(${iconURL})`,
@@ -68,11 +69,39 @@ const useMyIcon = (
       })
     }
   }, [pictureRef])
+  /*
+【関数概要】
+  要素のドラッグが終了すると呼ばれる。
+  １．最終位置の座標を取得しdbに登録。
+
+  ２．employee,furniture,roomとアイコンまたはセンサーが重なっていた場合、通話処理を開始。
+
+  2-1.furnitureと重なった場合、そのfurnitureのjoin_employeeに自身のidを追加
+
+  2-2.roomと重なった場合、そのroomのjoin_employeeに自身のidを追加
+
+  2-3.employeeと重なった場合、重なった対象のemployeeがfurnitureまたはroomと重なっていた場合は通話を開始しない。
+  employeeと重なっていた場合、dbに新しくroomを追加
+
+  複数と重なった場合。furniture -> room -> employeeの順で優先。
+
+
+【引数】
+
+【戻り値】
+*/
+
+  const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+    setPosition({
+      x: position.x + data.deltaX,
+      y: position.y + data.deltaY
+    })
+  }
 
   const handleStop = (_: DraggableEvent, data: DraggableData) => {
     setIsDrag(false)
-    const xCoordinate = initialCoordinate.left + data.lastX //自身のX座標
-    const yCoordinate = initialCoordinate.top + data.lastY //自身のY座標
+    const xCoordinate = position.x //自身のX座標
+    const yCoordinate = position.y //自身のY座標
 
     fsUpdateCoordinate(officeId, ownData.employeeId, xCoordinate, yCoordinate) //座標の更新
     const overlapFurnitureInfo = judgeOverlapFurniture(
@@ -197,11 +226,11 @@ const useMyIcon = (
 
   const styleInfo = {
     message: message,
-    initialCoordinate: initialCoordinate,
+    position: position,
     imgStyle: imgStyle
   }
 
-  return [handleStop, styleInfo] as const
+  return [handleStop, handleDrag, styleInfo] as const
 }
 
 export default useMyIcon

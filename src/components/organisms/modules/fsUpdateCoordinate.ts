@@ -6,6 +6,9 @@ export const fsUpdateCoordinate = async (
   xCoordinate: number,
   yCoordinate: number
 ): Promise<boolean> => {
+  console.log('座標更新発火！！')
+  console.log('生', xCoordinate, yCoordinate)
+  console.log('更新情報', Math.round(xCoordinate), Math.round(yCoordinate))
   let isSuccess: boolean
   await db
     .collection('offices')
