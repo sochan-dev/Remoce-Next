@@ -44,10 +44,10 @@ export const asyncFetchEmployees = createAsyncThunk<
     .where('is_office', '==', true)
     .get()
 
-  const employeesData: EmployeesStatus['employees'] = []
+  const employeesList: EmployeesStatus['employees'] = []
   snapshots.forEach((snapshot) => {
     const employeeData = snapshot.data() as Employee_data
-    employeesData.push({
+    employeesList.push({
       employeeId: snapshot.id,
       employeeName: employeeData.employee_name,
       employeePicture: employeeData.employee_picture,
@@ -56,7 +56,8 @@ export const asyncFetchEmployees = createAsyncThunk<
       yCoordinate: employeeData.employee_y_coordinate
     })
   })
-  return employeesData
+
+  return employeesList
 })
 
 /*////////////////////////////////////////////////
@@ -78,11 +79,14 @@ export const employeesStatusSlice = createSlice({
       state,
       action: PayloadAction<EmployeesStatus['employees']>
     ) => {
-      console.log('permissionTest', action.payload)
       state.employees = action.payload
     },
     updateEmployee: (state, action: PayloadAction<UpdateEmployee>) => {
-      state.employees[action.payload.id] = action.payload.employeeData
+      state.employees.forEach((employee, i) => {
+        if (employee.employeeId === action.payload.employeeData.employeeId) {
+          state.employees[i] = action.payload.employeeData
+        }
+      })
     },
     updateOwnEmployee: (
       state,

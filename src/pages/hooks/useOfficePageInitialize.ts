@@ -48,8 +48,8 @@ const useOfficePageInitialize = (
   const officeId = router.query.office_id as string
   const employeeId = router.query.employee_id as string
 
+  //ISRで取得したデータをstoreに格納して退社処理を予約する。
   useEffect(() => {
-    //ISRで取得したデータをstoreに格納
     dispatch(
       fetchEmployeesStatus({
         yourId: yourEmployeeId,
@@ -61,6 +61,7 @@ const useOfficePageInitialize = (
     dispatch(fetchFurniture(furnitureList))
 
     const leave = async () => {
+      console.log('退社処理')
       const employeeReq: PutRequest = {
         isExit: true,
         officeId: officeId,
@@ -80,7 +81,10 @@ const useOfficePageInitialize = (
     }
   }, [])
 
+  //出社状態にする
   useEffect(() => {
+    let unsubscribe: any
+
     const employeeReq: PutRequest = {
       isExit: false,
       officeId: router.query.office_id as string,
@@ -90,11 +94,48 @@ const useOfficePageInitialize = (
     let employeeParams = new URLSearchParams()
     employeeParams.append('data', employeeReqJSON)
     customAxios.defaults.withCredentials = true
-    customAxios.put(EMPLOYEEURI, employeeParams, {
-      withCredentials: true
-    })
+    customAxios
+      .put(EMPLOYEEURI, employeeParams, {
+        withCredentials: true
+      })
+      .then(() => {
+        unsubscribe = db
+          .collection('offices')
+          .doc(officeId)
+          .collection('employees')
+          .where('is_office', '==', false)
+          .onSnapshot(async (snapshot) => {
+            console.log('出社or退社or入社')
+            const empList = []
+            await db
+              .collection('offices')
+              .doc(officeId)
+              .collection('employees')
+              .where('is_office', '==', true)
+              .get()
+              .then((employeesData) => {
+                employeesData.forEach((employee) => {
+                  const employeeData = employee.data() as Employee_data
+
+                  empList.push({
+                    employeeId: employee.id,
+                    employeeName: employeeData.employee_name,
+                    employeePicture: employeeData.employee_picture,
+                    editPermission: employeeData.edit_permission,
+                    xCoordinate: employeeData.employee_x_coordinate,
+                    yCoordinate: employeeData.employee_y_coordinate
+                  })
+                })
+
+                dispatch(fetchEmployees(empList))
+              })
+          })
+      })
+
+    return unsubscribe
   }, [])
 
+  //必要な情報が取得出来ていない場合、退社状態にする（操作不能にする）
   useEffect(() => {
     if (officeId !== '' || employeeId !== '') {
       realTimeDB
@@ -110,6 +151,7 @@ const useOfficePageInitialize = (
     }
   }, [officeId, employeeId])
 
+  //スクロールのイベント関数を登録
   useEffect(() => {
     //スクロールした座標を更新
     const scrollAction = () => {}
@@ -122,6 +164,7 @@ const useOfficePageInitialize = (
     return window.removeEventListener('scroll', scrollAction)
   }, [])
 
+  //CSRで情報を取得。
   useEffect(() => {
     dispatch(asyncFetchOffice(officeId))
     dispatch(fetchEmployeeId(employeeId))
@@ -130,49 +173,9 @@ const useOfficePageInitialize = (
     dispatch(asyncFetchFurniture(officeId))
   }, [])
 
-  useEffect(() => {
-    const unsubscribe = db
-      .collection('offices')
-      .doc(officeId)
-      .collection('employees')
-      .where('is_office', '==', false)
-      .onSnapshot(async (snapshot) => {
-        console.log('出社or退社or入社')
-        const empList = []
-        await db
-          .collection('offices')
-          .doc(officeId)
-          .collection('employees')
-          .where('is_office', '==', true)
-          .get()
-          .then((employeesData) => {
-            employeesData.forEach((employee) => {
-              const employeeData = employee.data() as Employee_data
-              console.log(
-                '座標更新したのは、',
-                employee.id,
-                '、',
-                employeeData.employee_name,
-                'で、',
-                employeeData.employee_x_coordinate,
-                employeeData.employee_y_coordinate
-              )
-              empList.push({
-                employeeId: employee.id,
-                employeeName: employeeData.employee_name,
-                employeePicture: employeeData.employee_picture,
-                editPermission: employeeData.edit_permission,
-                xCoordinate: employeeData.employee_x_coordinate,
-                yCoordinate: employeeData.employee_y_coordinate
-              })
-            })
-            dispatch(fetchEmployees(empList))
-          })
-      })
+  //出社、退社、入社、座標更新のwebSocketイベント。
 
-    return unsubscribe
-  }, [])
-
+  //ルームの更新のwebSocket
   useEffect(() => {
     const unsubscribe = db
       .collection('offices')
@@ -194,6 +197,7 @@ const useOfficePageInitialize = (
     return unsubscribe
   }, [])
 
+  //エリアの更新のwebSocket
   useEffect(() => {
     const unsubscribe = db
       .collection('offices')
