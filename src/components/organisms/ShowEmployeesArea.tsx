@@ -10,13 +10,12 @@ const ShowEmployeesArea: VFC = () => {
   const { employees, yourId } = getEmployeesStatus(selector)
   const [isDrag, setIsDrag] = useState(false)
   const officeId = getOfficeId(selector)
-
   return (
     <>
       {employees.map((employee, i) =>
         employee.employeeId === yourId ? (
           <MyIcon
-            key={i}
+            key={employee.employeeId}
             id={i}
             officeId={officeId}
             ownData={employee}
@@ -25,7 +24,7 @@ const ShowEmployeesArea: VFC = () => {
           />
         ) : (
           <CoworkerIcon
-            key={i}
+            key={employee.employeeId}
             id={i}
             officeId={officeId}
             ownData={employee}

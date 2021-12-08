@@ -20,7 +20,7 @@ const useCoworkerIcon = (
         setIconURL(url)
       })
     }
-  }, [pictureRef])
+  }, [])
   useEffect(() => {
     const unsubscribe = db
       .collection('offices')
@@ -29,6 +29,7 @@ const useCoworkerIcon = (
       .doc(ownData.employeeId)
       .onSnapshot((doc) => {
         const employee = doc.data() as Employee_data
+
         const employeeData: EmployeeData = {
           employeeId: doc.id,
           employeeName: employee.employee_name,
